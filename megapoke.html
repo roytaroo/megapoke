@@ -251,7 +251,7 @@
     padding:8px; text-align:center; color:var(--text-dim); font-size:0.74rem;
   }
 
-  .hand-row{ display:flex; gap:0; overflow-x:auto; overflow-y:visible; padding:46px 12px 14px; align-items:flex-end; }
+  .hand-row{ display:flex; gap:0; overflow-x:auto; overflow-y:visible; padding:70px 12px 14px; align-items:flex-end; }
   .hand-card{
     flex:0 0 auto; width:92px; background:var(--panel2); border:1px solid var(--line);
     border-radius:8px; padding:6px; cursor:pointer;
@@ -263,7 +263,7 @@
   }
   .hand-card:first-child{ margin-left:0; }
   .hand-card:hover, .hand-card:active{
-    transform: rotate(var(--rot,0deg)) translateY(calc(var(--lift,0px) - 40px)) scale(1.9) !important;
+    transform: rotate(var(--rot,0deg)) translateY(calc(var(--lift,0px) - 30px)) scale(1.5) !important;
     z-index:99 !important;
   }
   .hand-card.playable{ border-color:var(--gold); }
@@ -1997,15 +1997,18 @@ function render(){
       `;
     }else{
       const artImg = card.image ? `<img class="card-art-thumb" src="${card.image}" alt="${card.name}" onclick="event.stopPropagation(); openCardViewer('${card.id}');">` : '';
-      div.innerHTML = `
-        ${artImg}
-        <span class="type-badge type-${card.type}">${card.type}</span>
-        ${rarityBadge(card)}
-        <div class="hname">${card.name}</div>
-        <div class="hstats">HP${card.hp} ${card.basic ? '(基本)' : '(怪化)'}</div>
-        ${renderAbilityLine(card)}
-        <div class="atk-list">${renderAttackList(card, null, true)}</div>
-      `;
+      if(card.image){
+        div.innerHTML = artImg;
+      }else{
+        div.innerHTML = `
+          <span class="type-badge type-${card.type}">${card.type}</span>
+          ${rarityBadge(card)}
+          <div class="hname">${card.name}</div>
+          <div class="hstats">HP${card.hp} ${card.basic ? '(基本)' : '(怪化)'}</div>
+          ${renderAbilityLine(card)}
+          <div class="atk-list">${renderAttackList(card, null, true)}</div>
+        `;
+      }
     }
     if(setupPlayable){
       div.addEventListener('click', () => {
