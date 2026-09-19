@@ -251,23 +251,24 @@
     padding:8px; text-align:center; color:var(--text-dim); font-size:0.74rem;
   }
 
-  .hand-row{ display:flex; gap:0; overflow-x:auto; overflow-y:visible; padding:26px 12px 14px; align-items:flex-end; }
+  .hand-row{ display:flex; gap:0; overflow-x:auto; overflow-y:visible; padding:46px 12px 14px; align-items:flex-end; }
   .hand-card{
-    flex:0 0 auto; width:180px; background:var(--panel2); border:1px solid var(--line);
-    border-radius:12px; padding:10px; cursor:pointer;
+    flex:0 0 auto; width:92px; background:var(--panel2); border:1px solid var(--line);
+    border-radius:8px; padding:6px; cursor:pointer;
     transform-origin:bottom center;
     transform: rotate(var(--rot,0deg)) translateY(var(--lift,0px));
-    transition:transform 0.15s ease, border-color 0.12s ease;
-    margin-left:-52px; position:relative;
+    transition:transform 0.15s ease, border-color 0.12s ease, z-index 0.15s;
+    margin-left:-66px; position:relative;
+    font-size:0.7rem;
   }
   .hand-card:first-child{ margin-left:0; }
   .hand-card:hover, .hand-card:active{
-    transform: rotate(var(--rot,0deg)) translateY(calc(var(--lift,0px) - 18px)) !important;
+    transform: rotate(var(--rot,0deg)) translateY(calc(var(--lift,0px) - 40px)) scale(1.9) !important;
     z-index:99 !important;
   }
   .hand-card.playable{ border-color:var(--gold); }
-  .hand-card .hname{ font-weight:700; font-size:0.88rem; margin-top:4px; }
-  .hand-card .hstats{ font-size:0.74rem; color:var(--text-dim); margin-top:4px; }
+  .hand-card .hname{ font-weight:700; font-size:0.72rem; margin-top:3px; }
+  .hand-card .hstats{ font-size:0.6rem; color:var(--text-dim); margin-top:3px; }
 
   .opp-hand-row{ display:flex; justify-content:center; padding:10px 0 4px; overflow:visible; }
   .opp-hand-card{
@@ -768,6 +769,7 @@ function triggerOnPlayAbility(state, slot, fieldCard){
   const card = CARDS[fieldCard.cardId];
   if(!card.ability || card.ability.timing !== 'onPlay') return;
   const p = state.players[slot];
+  if(p.active !== fieldCard) return;
   if(card.ability.effect === 'draw1'){
     if(p.deck.length > 0){
       const drawn = p.deck.shift();
