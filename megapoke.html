@@ -262,9 +262,20 @@
     font-size:0.7rem;
   }
   .hand-card:first-child{ margin-left:0; }
-  .hand-card:hover, .hand-card:active{
+  .hand-card:hover{
     transform: rotate(var(--rot,0deg)) translateY(calc(var(--lift,0px) - 30px)) scale(1.5) !important;
     z-index:99 !important;
+  }
+  .hand-card.lifted{
+    transform: rotate(0deg) translateY(calc(var(--lift,0px) - 30px)) scale(1.5) !important;
+    z-index:99 !important;
+    transition:transform 0.12s ease;
+  }
+  .hand-card.swiping{
+    transform: rotate(0deg) translateY(calc(var(--lift,0px) - 90px)) scale(1.6) !important;
+    z-index:100 !important;
+    border-color:var(--gold) !important;
+    box-shadow:0 0 0 2px var(--gold), 0 8px 20px rgba(0,0,0,0.5) !important;
   }
   .hand-card.playable{ border-color:var(--gold); }
   .hand-card .hname{ font-weight:700; font-size:0.72rem; margin-top:3px; }
@@ -2010,18 +2021,14 @@ function render(){
         `;
       }
     }
-    if(setupPlayable){
-      div.addEventListener('click', () => {
-        const s = currentState;
+    const doPlayAction = () => {
+      const s = currentState;
+      if(setupPlayable){
         if(canPlaceSetupBasic(s, MY_SLOT, cardId)){
           placeSetupBasic(s, MY_SLOT, cardId);
-          pushState();
-          render();
+          pushState(); render();
         }
-      });
-    }else if(playable){
-      div.addEventListener('click', () => {
-        const s = currentState;
+      }else if(playable){
         if(isTrainer){
           if(canPlayTrainer(s, MY_SLOT, cardId)) playTrainer(s, MY_SLOT, cardId);
         }else if(canPlayBasic(s, MY_SLOT, cardId)){
@@ -2029,10 +2036,46 @@ function render(){
         }else if(canKaika(s, MY_SLOT, cardId)){
           doKaika(s, MY_SLOT, cardId);
         }
-        pushState();
-        render();
-      });
-    }
+        pushState(); render();
+      }
+    };
+    // マウス操作用フォールバック(タッチ端末ではtouchendでpreventDefaultして二重発火を防ぐ)
+    if(setupPlayable || playable) div.addEventListener('click', doPlayAction);
+    // タッチ操作: 長押しで拡大プレビュー、上スワイプで繰り出す(発動できるカードのみ)、離すだけなら元に戻る
+    let touchStartY = null;
+    let swiped = false;
+    div.addEventListener('touchstart', (e) => {
+      touchStartY = e.touches[0].clientY;
+      swiped = false;
+      div.classList.add('lifted');
+    }, { passive: true });
+    div.addEventListener('touchmove', (e) => {
+      if(touchStartY === null) return;
+      const dy = e.touches[0].clientY - touchStartY;
+      const canSwipe = setupPlayable || playable;
+      if(canSwipe && dy < -40){
+        if(!swiped){ swiped = true; div.classList.add('swiping'); }
+      }else if(swiped){
+        swiped = false; div.classList.remove('swiping');
+      }
+    }, { passive: true });
+    div.addEventListener('touchend', (e) => {
+      div.classList.remove('lifted');
+      div.classList.remove('swiping');
+      touchStartY = null;
+      const canSwipe = setupPlayable || playable;
+      if(canSwipe) e.preventDefault(); // タッチ操作ではクリックの疑似発火を常に抑止し、スワイプでのみ発動させる
+      if(swiped){
+        swiped = false;
+        doPlayAction();
+      }
+    });
+    div.addEventListener('touchcancel', () => {
+      div.classList.remove('lifted');
+      div.classList.remove('swiping');
+      touchStartY = null;
+      swiped = false;
+    });
     handRow.appendChild(div);
   });
 
