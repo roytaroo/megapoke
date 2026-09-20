@@ -48,6 +48,12 @@
   button:active:not(:disabled){ transform:scale(0.95); }
   button:disabled{ opacity:0.4; cursor:not-allowed; }
   button.ghost{ background:transparent; border:1px solid var(--line); color:var(--text); }
+  .menu-grid{ display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; }
+  .menu-btn{
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
+    padding:16px 10px; min-height:96px; white-space:normal; line-height:1.3;
+  }
+  .menu-btn-icon{ width:40px; height:40px; object-fit:contain; border-radius:8px; }
 
   @keyframes fadeIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:translateY(0); } }
   #landing, #waiting, #game, #packPage, #deckPage, #statsPage{ animation:fadeIn 0.28s ease; }
@@ -171,12 +177,13 @@
     text-align:center; color:var(--text-dim); font-size:0.85rem;
   }
   .card-back-slot{
-    background-image:var(--card-back); background-size:cover; background-position:center;
+    background-color:#1a1330;
+    background-image:var(--card-back); background-size:contain; background-repeat:no-repeat; background-position:center;
     border:1px solid var(--gold); border-radius:14px;
     display:flex; align-items:center; justify-content:center;
-    padding:18px; min-height:120px;
+    padding:18px; min-height:120px; aspect-ratio:5/3;
   }
-  .bench-card.card-back-slot{ min-height:70px; border-radius:10px; padding:8px; }
+  .bench-card.card-back-slot{ min-height:70px; border-radius:10px; padding:8px; aspect-ratio:4/3; }
   .card-back-face{
     text-align:center; font-size:0.85rem; color:var(--gold); font-weight:700;
     background:rgba(22,16,34,0.75); border-radius:8px; padding:4px 10px;
@@ -260,6 +267,7 @@
     transition:transform 0.15s ease, border-color 0.12s ease, z-index 0.15s;
     margin-left:-66px; position:relative;
     font-size:0.7rem;
+    -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; touch-action:none;
   }
   .hand-card:first-child{ margin-left:0; }
   .hand-card:hover{
@@ -387,11 +395,23 @@
 
     <div class="card stack hidden" id="roomActions">
       <p class="sub" id="whoAmI" style="margin:0;"></p>
-      <div class="row" style="gap:8px;">
-        <button type="button" class="ghost" id="openPackNavBtn" style="flex:1;">🎴 パック開封</button>
-        <button type="button" class="ghost" id="openDeckNavBtn" style="flex:1;">🃏 デッキ構築</button>
-        <button type="button" class="ghost" id="openStatsNavBtn" style="flex:1;">📊 戦績</button>
-        <button type="button" class="ghost" id="changeNameBtn">名前を変える</button>
+      <div class="menu-grid">
+        <button type="button" class="ghost menu-btn" id="openPackNavBtn">
+          <img class="menu-btn-icon" src="https://kbsdvtjkczhnggamnggd.supabase.co/storage/v1/object/public/card-images/pack.PNG" alt="">
+          <span>パック開封</span>
+        </button>
+        <button type="button" class="ghost menu-btn" id="openDeckNavBtn">
+          <img class="menu-btn-icon" src="https://kbsdvtjkczhnggamnggd.supabase.co/storage/v1/object/public/card-images/deck.PNG" alt="">
+          <span>デッキ構築</span>
+        </button>
+        <button type="button" class="ghost menu-btn" id="openStatsNavBtn">
+          <img class="menu-btn-icon" src="https://kbsdvtjkczhnggamnggd.supabase.co/storage/v1/object/public/card-images/Untitled%20design%20(1).png" alt="">
+          <span>戦績</span>
+        </button>
+        <button type="button" class="ghost menu-btn" id="changeNameBtn">
+          <img class="menu-btn-icon" src="https://kbsdvtjkczhnggamnggd.supabase.co/storage/v1/object/public/card-images/name.PNG" alt="">
+          <span>名前を変える</span>
+        </button>
       </div>
       <div>
         <div class="zone-label">部屋を作る</div>
@@ -2041,28 +2061,38 @@ function render(){
     };
     // マウス操作用フォールバック(タッチ端末ではtouchendでpreventDefaultして二重発火を防ぐ)
     if(setupPlayable || playable) div.addEventListener('click', doPlayAction);
-    // タッチ操作: 長押しで拡大プレビュー、上スワイプで繰り出す(発動できるカードのみ)、離すだけなら元に戻る
+    // タッチ操作: 長押しで画面いっぱいにプレビュー、上スワイプで繰り出す(発動できるカードのみ)、離すだけなら元に戻る
     let touchStartY = null;
     let swiped = false;
+    let previewShown = false;
     div.addEventListener('touchstart', (e) => {
       touchStartY = e.touches[0].clientY;
       swiped = false;
       div.classList.add('lifted');
+      previewShown = showTouchPreview(cardId);
     }, { passive: true });
     div.addEventListener('touchmove', (e) => {
       if(touchStartY === null) return;
+      e.preventDefault(); // カード操作中はページ側のスクロールを止める
       const dy = e.touches[0].clientY - touchStartY;
       const canSwipe = setupPlayable || playable;
       if(canSwipe && dy < -40){
-        if(!swiped){ swiped = true; div.classList.add('swiping'); }
+        if(!swiped){
+          swiped = true;
+          div.classList.add('swiping');
+          if(previewShown) setSwipeHint('↑ はなすと繰り出す');
+        }
       }else if(swiped){
-        swiped = false; div.classList.remove('swiping');
+        swiped = false;
+        div.classList.remove('swiping');
+        if(previewShown) setSwipeHint('');
       }
-    }, { passive: true });
+    }, { passive: false });
     div.addEventListener('touchend', (e) => {
       div.classList.remove('lifted');
       div.classList.remove('swiping');
       touchStartY = null;
+      if(previewShown){ hideTouchPreview(); previewShown = false; }
       const canSwipe = setupPlayable || playable;
       if(canSwipe) e.preventDefault(); // タッチ操作ではクリックの疑似発火を常に抑止し、スワイプでのみ発動させる
       if(swiped){
@@ -2075,6 +2105,7 @@ function render(){
       div.classList.remove('swiping');
       touchStartY = null;
       swiped = false;
+      if(previewShown){ hideTouchPreview(); previewShown = false; }
     });
     handRow.appendChild(div);
   });
@@ -2617,6 +2648,23 @@ document.getElementById('changeNameBtn').addEventListener('click', () => {
 });
 
 /* ================= card viewer (tap to enlarge) ================= */
+function showTouchPreview(cardId){
+  const card = CARDS[cardId];
+  if(!card || !card.image) return false;
+  document.getElementById('cardViewerInner').innerHTML = `
+    <img src="${card.image}" alt="${card.name}">
+    <div class="sub" id="swipeHint" style="color:var(--gold); font-weight:700; min-height:1.2em;"></div>
+  `;
+  document.getElementById('cardViewer').classList.remove('hidden');
+  return true;
+}
+function hideTouchPreview(){
+  document.getElementById('cardViewer').classList.add('hidden');
+}
+function setSwipeHint(text){
+  const el = document.getElementById('swipeHint');
+  if(el) el.textContent = text;
+}
 function openCardViewer(cardId, artOverride, nameOverride){
   const card = CARDS[cardId];
   const art = artOverride || (card && card.image);
