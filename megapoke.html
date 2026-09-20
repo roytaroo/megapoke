@@ -259,6 +259,23 @@
   }
 
   .hand-row{ display:flex; gap:0; overflow-x:auto; overflow-y:visible; padding:70px 12px 14px; align-items:flex-end; }
+  .pack-reveal-row{ display:flex; flex-wrap:wrap; gap:12px; justify-content:center; padding:16px 0; perspective:900px; }
+  .pack-reveal-card{
+    width:110px; height:150px; position:relative; cursor:default;
+    transform-style:preserve-3d; transform:rotateY(0deg);
+    transition:transform 0.6s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .pack-reveal-card.revealed{ transform:rotateY(180deg); }
+  .pack-reveal-face{
+    position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    border-radius:10px; border:1px solid var(--gold); overflow:hidden;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:var(--panel2); padding:6px; text-align:center;
+  }
+  .pack-reveal-face.front{ background-image:var(--card-back); background-size:cover; background-position:center; }
+  .pack-reveal-face.back{ transform:rotateY(180deg); }
+  .pack-reveal-face.back img{ width:100%; border-radius:6px; margin-bottom:4px; object-fit:cover; }
+  .pack-reveal-face.back .hname{ font-size:0.72rem; font-weight:700; }
   .hand-card{
     flex:0 0 auto; width:92px; background:var(--panel2); border:1px solid var(--line);
     border-radius:8px; padding:6px; cursor:pointer;
@@ -299,6 +316,25 @@
     transform: rotate(var(--rot,0deg));
   }
   .opp-hand-card:first-child{ margin-left:0; }
+
+  .hand-area-row{ display:flex; align-items:flex-end; gap:8px; }
+  .deck-pile-display{
+    flex:0 0 auto; width:46px; height:64px; border-radius:6px;
+    background-image:var(--card-back); background-size:cover; background-position:center;
+    border:1px solid var(--gold); position:relative;
+    box-shadow:2px 2px 0 rgba(244,201,93,0.2), 4px 4px 0 rgba(244,201,93,0.12);
+  }
+  .deck-pile-display .deck-count{
+    position:absolute; bottom:-6px; right:-6px; background:var(--gold); color:#241a38;
+    font-size:0.66rem; font-weight:700; border-radius:50%; width:20px; height:20px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .flying-draw-card{
+    position:fixed; width:46px; height:64px; border-radius:6px;
+    background-image:var(--card-back); background-size:cover; background-position:center;
+    border:1px solid var(--gold); z-index:80; pointer-events:none;
+    transition:transform 0.55s cubic-bezier(0.22,0.85,0.32,1.1), opacity 0.55s ease;
+  }
 
   .turn-banner{
     text-align:center; font-family:'DotGothic16'; font-size:1rem;
@@ -441,7 +477,7 @@
         <button type="button" class="ghost" id="redeemCodeBtn">使う</button>
       </div>
       <p class="sub" id="redeemCodeStatus"></p>
-      <div id="packReveal" class="hand-row"></div>
+      <div id="packReveal" class="pack-reveal-row"></div>
     </div>
   </div>
 
@@ -512,7 +548,10 @@
 
     <div class="action-row" id="actionRow"></div>
     <div id="drawnBanner"></div>
-    <div class="hand-row" id="handRow"></div>
+    <div class="hand-area-row">
+      <div id="myDeckPile" class="deck-pile-display"></div>
+      <div class="hand-row" id="handRow"></div>
+    </div>
   </div>
 
 </div>
@@ -1708,7 +1747,7 @@ function renderAbilityLine(card){
 function renderActiveCard(activeObj, ownerLabel, showAttacks){
   if(!activeObj) return `<div class="empty-slot">${ownerLabel}: 場にカードがいない</div>`;
   if(activeObj.hidden && ownerLabel === '相手'){
-    return `<div class="board-card card-back-slot"><div class="card-back-face">配置済み(裏向き)</div></div>`;
+    return `<div class="board-card card-back-slot"></div>`;
   }
   const card = CARDS[activeObj.cardId];
   const pct = Math.max(0, Math.round((activeObj.hp / activeObj.maxHp) * 100));
@@ -1779,6 +1818,26 @@ function checkKoFlash(who, activeObj){
   const flashed = (prevId !== undefined && prevId !== null && curId === null);
   prevActiveId[who] = curId;
   return flashed;
+}
+function playDrawFlyAnimation(){
+  const deckEl = document.getElementById('myDeckPile');
+  const handEl = document.getElementById('handRow');
+  if(!deckEl || !handEl) return;
+  const from = deckEl.getBoundingClientRect();
+  const to = handEl.getBoundingClientRect();
+  if(from.width === 0 || to.width === 0) return; // 非表示時は何もしない
+  const flyer = document.createElement('div');
+  flyer.className = 'flying-draw-card';
+  flyer.style.left = from.left + 'px';
+  flyer.style.top = from.top + 'px';
+  document.body.appendChild(flyer);
+  const targetX = to.left + Math.min(30, to.width * 0.15) - from.left;
+  const targetY = to.top - from.top;
+  requestAnimationFrame(() => {
+    flyer.style.transform = `translate(${targetX}px, ${targetY}px) rotate(10deg) scale(0.9)`;
+    flyer.style.opacity = '0';
+  });
+  setTimeout(() => { flyer.remove(); }, 600);
 }
 function render(){
   if(!currentState || !currentState.players) return;
@@ -1985,14 +2044,16 @@ function render(){
     oppHandEl.appendChild(back);
   }
 
-  // hand
   const handRow = document.getElementById('handRow');
   handRow.innerHTML = '';
+  const deckPileEl = document.getElementById('myDeckPile');
+  deckPileEl.innerHTML = `<div class="deck-count">${me.deck.length}</div>`;
   const drawnBanner = document.getElementById('drawnBanner');
   if(me.lastDrawn){
     const drawnSig = state.turn + ':' + MY_SLOT + ':' + me.lastDrawn;
     const isFreshDraw = drawnSig !== lastShownDrawnSig;
     lastShownDrawnSig = drawnSig;
+    if(isFreshDraw) playDrawFlyAnimation();
     const dCard = CARDS[me.lastDrawn];
     const badge = dCard.kind === 'creature'
       ? `<span class="type-badge type-${dCard.type}">${dCard.type}</span>`
@@ -2080,12 +2141,11 @@ function render(){
         if(!swiped){
           swiped = true;
           div.classList.add('swiping');
-          if(previewShown) setSwipeHint('↑ はなすと繰り出す');
+          if(previewShown){ hideTouchPreview(); previewShown = false; }
         }
       }else if(swiped){
         swiped = false;
         div.classList.remove('swiping');
-        if(previewShown) setSwipeHint('');
       }
     }, { passive: false });
     div.addEventListener('touchend', (e) => {
@@ -2125,13 +2185,13 @@ function render(){
       });
       actionRow.appendChild(readyBtn);
     }
-    const hint = document.createElement('div');
-    hint.className = 'sub';
-    hint.style.marginTop = '6px';
-    hint.textContent = me.active
-      ? '自分のバトル場/ベンチをタップすると配置を取り消せるよ'
-      : 'まずはたねメガモンをバトル場に1体配置してね(タップで配置)';
-    actionRow.appendChild(hint);
+    if(me.active){
+      const hint = document.createElement('div');
+      hint.className = 'sub';
+      hint.style.marginTop = '6px';
+      hint.textContent = '自分のバトル場/ベンチをタップすると配置を取り消せるよ';
+      actionRow.appendChild(hint);
+    }
   }
   if(myTurn && state.phase === 'playing'){
     if(canAttachEnergy(state, MY_SLOT)){
@@ -2460,14 +2520,28 @@ async function openPack(packId){
     ? { bonus_packs: row.bonus_packs - 1 }
     : { packs_opened_total: opened + 1, last_pack_date: todayStr() };
   await saveCollection(cards, extraFields);
-  document.getElementById('packReveal').innerHTML = drawn.map(id => {
+  const revealEl = document.getElementById('packReveal');
+  revealEl.innerHTML = drawn.map(id => {
     const c = printCard(id);
     const print = PRINTS[id];
     const badge = c.kind === 'creature'
       ? `<span class="type-badge type-${c.type}">${c.type}</span>`
       : `<span class="type-badge trainer-badge-${c.kind}">${c.trainerType}</span>`;
-    return `<div class="hand-card"><div>${badge} ${rarityBadge(print)}</div><div class="hname">${c.name}</div></div>`;
+    const artImg = printArt(id) ? `<img src="${printArt(id)}" alt="${c.name}">` : '';
+    return `
+      <div class="pack-reveal-card">
+        <div class="pack-reveal-face front"></div>
+        <div class="pack-reveal-face back">
+          ${artImg}
+          <div>${badge} ${rarityBadge(print)}</div>
+          <div class="hname">${c.name}</div>
+        </div>
+      </div>`;
   }).join('');
+  const cardEls = revealEl.querySelectorAll('.pack-reveal-card');
+  cardEls.forEach((el, i) => {
+    setTimeout(() => { el.classList.add('revealed'); }, 350 * (i + 1));
+  });
   await refreshCollectionView();
 }
 
