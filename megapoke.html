@@ -276,6 +276,23 @@
   .pack-reveal-face.back{ transform:rotateY(180deg); }
   .pack-reveal-face.back img{ width:100%; border-radius:6px; margin-bottom:4px; object-fit:cover; }
   .pack-reveal-face.back .hname{ font-size:0.72rem; font-weight:700; }
+
+  .pack-big-overlay{
+    position:fixed; inset:0; z-index:70; background:rgba(10,6,20,0.92);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px;
+    perspective:1200px;
+  }
+  .pack-big-progress{ color:var(--text-dim); font-size:0.85rem; }
+  .pack-big-card{
+    width:min(78vw, 300px); height:min(78vw, 300px); aspect-ratio:5/7; position:relative;
+    transform-style:preserve-3d; transform:rotateY(0deg);
+    transition:transform 0.55s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .pack-big-card.revealed{ transform:rotateY(180deg); }
+  .pack-big-card .pack-reveal-face{ border-radius:16px; padding:14px; }
+  .pack-big-card .pack-reveal-face.back img{ border-radius:10px; margin-bottom:8px; }
+  .pack-big-card .pack-reveal-face.back .hname{ font-size:1.1rem; }
+  .pack-big-hint{ color:var(--gold); font-weight:700; font-size:0.95rem; }
   .hand-card{
     flex:0 0 auto; width:92px; background:var(--panel2); border:1px solid var(--line);
     border-radius:8px; padding:6px; cursor:pointer;
@@ -571,6 +588,15 @@
     <div class="coin-overlay-label" id="coinOverlayLabel"></div>
     <div class="coin-overlay-faces" id="coinOverlayFaces"></div>
   </div>
+</div>
+
+<div id="packBigOverlay" class="pack-big-overlay hidden">
+  <div class="pack-big-progress" id="packBigProgress"></div>
+  <div class="pack-big-card" id="packBigCard">
+    <div class="pack-reveal-face front"></div>
+    <div class="pack-reveal-face back" id="packBigCardBack"></div>
+  </div>
+  <div class="pack-big-hint" id="packBigHint">タップでめくる</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
@@ -2520,6 +2546,8 @@ async function openPack(packId){
     ? { bonus_packs: row.bonus_packs - 1 }
     : { packs_opened_total: opened + 1, last_pack_date: todayStr() };
   await saveCollection(cards, extraFields);
+  await refreshCollectionView();
+  await runPackBigReveal(drawn);
   const revealEl = document.getElementById('packReveal');
   revealEl.innerHTML = drawn.map(id => {
     const c = printCard(id);
@@ -2529,7 +2557,7 @@ async function openPack(packId){
       : `<span class="type-badge trainer-badge-${c.kind}">${c.trainerType}</span>`;
     const artImg = printArt(id) ? `<img src="${printArt(id)}" alt="${c.name}">` : '';
     return `
-      <div class="pack-reveal-card">
+      <div class="pack-reveal-card revealed">
         <div class="pack-reveal-face front"></div>
         <div class="pack-reveal-face back">
           ${artImg}
@@ -2538,11 +2566,54 @@ async function openPack(packId){
         </div>
       </div>`;
   }).join('');
-  const cardEls = revealEl.querySelectorAll('.pack-reveal-card');
-  cardEls.forEach((el, i) => {
-    setTimeout(() => { el.classList.add('revealed'); }, 350 * (i + 1));
+}
+
+function runPackBigReveal(drawn){
+  return new Promise(resolve => {
+    const overlay = document.getElementById('packBigOverlay');
+    const cardEl = document.getElementById('packBigCard');
+    const backEl = document.getElementById('packBigCardBack');
+    const progressEl = document.getElementById('packBigProgress');
+    const hintEl = document.getElementById('packBigHint');
+    let idx = 0;
+    let flipped = false;
+
+    function renderCurrent(){
+      const id = drawn[idx];
+      const c = printCard(id);
+      const print = PRINTS[id];
+      const badge = c.kind === 'creature'
+        ? `<span class="type-badge type-${c.type}">${c.type}</span>`
+        : `<span class="type-badge trainer-badge-${c.kind}">${c.trainerType}</span>`;
+      const artImg = printArt(id) ? `<img src="${printArt(id)}" alt="${c.name}">` : '';
+      backEl.innerHTML = `${artImg}<div>${badge} ${rarityBadge(print)}</div><div class="hname">${c.name}</div>`;
+      progressEl.textContent = `${idx + 1} / ${drawn.length}`;
+      cardEl.classList.remove('revealed');
+      flipped = false;
+      hintEl.textContent = 'タップでめくる';
+    }
+
+    function onTap(){
+      if(!flipped){
+        cardEl.classList.add('revealed');
+        flipped = true;
+        hintEl.textContent = (idx < drawn.length - 1) ? 'タップで次へ' : 'タップで結果を見る';
+        return;
+      }
+      idx++;
+      if(idx >= drawn.length){
+        overlay.classList.add('hidden');
+        overlay.removeEventListener('click', onTap);
+        resolve();
+        return;
+      }
+      renderCurrent();
+    }
+
+    overlay.classList.remove('hidden');
+    renderCurrent();
+    overlay.addEventListener('click', onTap);
   });
-  await refreshCollectionView();
 }
 
 async function refreshDeckBuilder(){
