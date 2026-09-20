@@ -282,17 +282,20 @@
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px;
     perspective:1200px;
   }
-  .pack-big-progress{ color:var(--text-dim); font-size:0.85rem; }
   .pack-big-card{
-    width:min(78vw, 300px); aspect-ratio:5/7; max-height:70vh; position:relative;
+    width:92vw; max-width:420px; aspect-ratio:5/7; max-height:88vh; position:relative;
     transform-style:preserve-3d; transform:rotateY(0deg);
     transition:transform 0.55s cubic-bezier(0.34,1.56,0.64,1);
   }
   .pack-big-card.revealed{ transform:rotateY(180deg); }
-  .pack-big-card .pack-reveal-face{ border-radius:16px; padding:14px; overflow:auto; }
-  .pack-big-card .pack-reveal-face.back img{ width:100%; max-height:55%; object-fit:contain; border-radius:10px; margin-bottom:8px; }
+  .pack-big-card .pack-reveal-face{ border-radius:16px; padding:0; background:transparent; overflow:hidden; }
+  .pack-big-card .pack-reveal-face.front{ background-size:contain; background-repeat:no-repeat; background-color:#1a1330; }
+  .pack-big-card .pack-reveal-face.back{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:#1a1330; padding:10px;
+  }
+  .pack-big-card .pack-reveal-face.back img{ width:100%; height:auto; max-height:82%; object-fit:contain; border-radius:0; margin-bottom:8px; }
   .pack-big-card .pack-reveal-face.back .hname{ font-size:1.1rem; }
-  .pack-big-hint{ color:var(--gold); font-weight:700; font-size:0.95rem; }
   .hand-card{
     flex:0 0 auto; width:92px; background:var(--panel2); border:1px solid var(--line);
     border-radius:8px; padding:6px; cursor:pointer;
@@ -591,12 +594,10 @@
 </div>
 
 <div id="packBigOverlay" class="pack-big-overlay hidden">
-  <div class="pack-big-progress" id="packBigProgress"></div>
   <div class="pack-big-card" id="packBigCard">
     <div class="pack-reveal-face front"></div>
     <div class="pack-reveal-face back" id="packBigCardBack"></div>
   </div>
-  <div class="pack-big-hint" id="packBigHint">タップでめくる</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
@@ -2573,8 +2574,6 @@ function runPackBigReveal(drawn){
     const overlay = document.getElementById('packBigOverlay');
     const cardEl = document.getElementById('packBigCard');
     const backEl = document.getElementById('packBigCardBack');
-    const progressEl = document.getElementById('packBigProgress');
-    const hintEl = document.getElementById('packBigHint');
     let idx = 0;
     let flipped = false;
 
@@ -2587,17 +2586,14 @@ function runPackBigReveal(drawn){
         : `<span class="type-badge trainer-badge-${c.kind}">${c.trainerType}</span>`;
       const artImg = printArt(id) ? `<img src="${printArt(id)}" alt="${c.name}">` : '';
       backEl.innerHTML = `${artImg}<div>${badge} ${rarityBadge(print)}</div><div class="hname">${c.name}</div>`;
-      progressEl.textContent = `${idx + 1} / ${drawn.length}`;
       cardEl.classList.remove('revealed');
       flipped = false;
-      hintEl.textContent = 'タップでめくる';
     }
 
     function onTap(){
       if(!flipped){
         cardEl.classList.add('revealed');
         flipped = true;
-        hintEl.textContent = (idx < drawn.length - 1) ? 'タップで次へ' : 'タップで結果を見る';
         return;
       }
       idx++;
