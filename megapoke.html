@@ -2,436 +2,667 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#e6f0ff">
 <title>メガポケ (β)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
   :root{
-    color-scheme: dark;
-    --bg: #161022;
-    --panel: #241a38;
-    --panel2: #2e2148;
-    --line: rgba(255,255,255,0.12);
-    --text: #f2eefb;
-    --text-dim: #b6acd0;
-    --gold: #f4c95d;
-    --fight: #e2652f;
-    --dark: #8a5bd6;
-    --psy: #e0599f;
-    --colorless: #a7adc2;
-    --hp-green: #4fd68a;
-    --hp-red: #ef5b6a;
+    color-scheme: light;
+    --sky: #e6f0ff;
+    --lav: #efe8ff;
+    --panel: #ffffff;
+    --ink: #27304a;
+    --ink-dim: #6b7493;
+    --line: rgba(39,48,74,0.12);
+    --halo: #f5b82e;
+    --halo-deep: #d8920c;
+    --violet: #6a4cff;
+    --violet-deep: #4b30d6;
+    --fight: #ea7a3c;
+    --dark: #5b4a9e;
+    --psy: #d65bb6;
+    --colorless: #9aa3b8;
+    --hp-green: #2fbf71;
+    --hp-amber: #f0a326;
+    --hp-red: #ef4f5f;
+    /* 旧テーマ互換(他の処理が参照している変数) */
+    --gold: var(--halo);
+    --text: var(--ink);
+    --text-dim: var(--ink-dim);
+    --panel2: #f3f6fd;
     --card-back: url('https://kbsdvtjkczhnggamnggd.supabase.co/storage/v1/object/public/card-images/C5101BFD-AA9F-4278-940D-8F89EB59752D.png');
   }
-  *{ box-sizing:border-box; }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ margin:0; }
   body{
-    margin:0; min-height:100vh;
-    background-color:var(--bg);
-    background-image:
-      radial-gradient(900px 500px at 10% -10%, rgba(138,91,214,0.25), transparent 60%),
-      radial-gradient(800px 400px at 100% 0%, rgba(244,201,93,0.10), transparent 55%);
-    background-repeat:no-repeat;
-    color:var(--text);
-    font-family:'Zen Maru Gothic', sans-serif;
-    line-height:1.7;
+    min-height:100vh; min-height:100dvh;
+    background:
+      radial-gradient(120% 60% at 50% -10%, #ffffff 0%, rgba(255,255,255,0) 60%),
+      linear-gradient(180deg, var(--sky) 0%, var(--lav) 100%);
+    background-attachment:fixed;
+    color:var(--ink);
+    font-family:'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', sans-serif;
+    font-weight:500; line-height:1.6;
   }
-  h1,h2,h3,.pixel{ font-family:'DotGothic16', sans-serif; letter-spacing:0.02em; }
-  .wrap{ max-width:720px; margin:0 auto; padding:24px 16px 60px; }
+  h1,h2,h3,.pixel{ font-family:'Zen Maru Gothic', sans-serif; font-weight:900; letter-spacing:0.02em; }
+  .wrap{ max-width:560px; margin:0 auto; padding:20px 16px 56px; }
+
+  /* ---------- ボタン(押し込める立体ボタン) ---------- */
   button{
-    font-family:'Zen Maru Gothic'; font-weight:700; cursor:pointer;
-    border:none; border-radius:10px; padding:11px 18px; font-size:0.95rem;
-    background:var(--gold); color:#241a38;
-    transition:transform 0.12s ease, opacity 0.12s ease;
+    font-family:inherit; font-weight:900; cursor:pointer; color:#fff;
+    border:none; border-radius:999px; padding:12px 20px; font-size:0.95rem; line-height:1.2;
+    background:linear-gradient(180deg, #8166ff, var(--violet));
+    box-shadow:0 4px 0 var(--violet-deep), 0 8px 18px rgba(106,76,255,0.25);
+    transition:transform 0.08s ease, box-shadow 0.08s ease, opacity 0.12s ease;
   }
-  button:active:not(:disabled){ transform:scale(0.95); }
-  button:disabled{ opacity:0.4; cursor:not-allowed; }
-  button.ghost{ background:transparent; border:1px solid var(--line); color:var(--text); }
-  .menu-grid{ display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; }
-  .menu-btn{
-    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
-    padding:16px 10px; min-height:96px; white-space:normal; line-height:1.3;
+  button:active:not(:disabled){ transform:translateY(3px); box-shadow:0 1px 0 var(--violet-deep), 0 3px 8px rgba(106,76,255,0.2); }
+  button:disabled{ opacity:0.38; cursor:not-allowed; }
+  button.ghost{
+    background:#fff; color:var(--ink);
+    box-shadow:0 3px 0 #d5dbea, 0 6px 14px rgba(39,48,74,0.08);
   }
-  .menu-btn-icon{ width:40px; height:40px; object-fit:contain; border-radius:8px; }
-
-  @keyframes fadeIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:translateY(0); } }
-  #landing, #waiting, #game, #packPage, #deckPage, #statsPage{ animation:fadeIn 0.28s ease; }
-
+  button.ghost:active:not(:disabled){ box-shadow:0 1px 0 #d5dbea; }
+  button.gold{
+    background:linear-gradient(180deg, #ffd256, var(--halo)); color:#4a3200;
+    box-shadow:0 4px 0 var(--halo-deep), 0 8px 18px rgba(245,184,46,0.35);
+  }
+  button.gold:active:not(:disabled){ box-shadow:0 1px 0 var(--halo-deep); }
+  button:focus-visible, .hand-card:focus-visible{ outline:3px solid var(--violet); outline-offset:2px; }
 
   .spinner{
-    width:22px; height:22px; border-radius:50%;
-    border:3px solid rgba(244,201,93,0.25); border-top-color:var(--gold);
+    width:20px; height:20px; border-radius:50%;
+    border:3px solid rgba(106,76,255,0.2); border-top-color:var(--violet);
     animation:spin 0.7s linear infinite; display:inline-block; vertical-align:middle;
   }
   @keyframes spin{ to{ transform:rotate(360deg); } }
-  .loading-row{ display:flex; align-items:center; gap:10px; color:var(--text-dim); font-size:0.88rem; padding:6px 0; }
+  .loading-row{ display:flex; align-items:center; gap:10px; color:var(--ink-dim); font-size:0.88rem; padding:6px 0; }
   input[type=text]{
-    background:var(--panel2); border:1px solid var(--line); color:var(--text);
-    padding:11px 14px; border-radius:10px; font-family:inherit; font-size:1rem;
-    width:100%;
+    background:#fff; border:2px solid #dfe5f3; color:var(--ink);
+    padding:12px 16px; border-radius:999px; font-family:inherit; font-size:1rem; font-weight:700;
+    width:100%; outline:none;
   }
-  .card{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:20px; }
+  input[type=text]:focus{ border-color:var(--violet); }
+  .card{ background:var(--panel); border-radius:24px; padding:20px; box-shadow:0 10px 30px rgba(74,62,160,0.10); }
   .center{ text-align:center; }
   .row{ display:flex; gap:10px; }
   .stack{ display:flex; flex-direction:column; gap:14px; }
+  .sub{ color:var(--ink-dim); font-size:0.85rem; }
+  .divider{ text-align:center; color:var(--ink-dim); font-size:0.8rem; margin:4px 0; }
+  .zone-label{ font-weight:900; font-size:0.95rem; color:var(--ink); margin-bottom:8px; }
 
-  /* landing */
-  #landing h1{ font-size:1.8rem; margin:0 0 6px; }
-  #landing p.sub{ color:var(--text-dim); margin:0 0 28px; }
-  .divider{ text-align:center; color:var(--text-dim); font-size:0.8rem; margin:18px 0; }
+  @keyframes fadeIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:translateY(0); } }
+  #landing, #waiting, #packPage, #deckPage, #statsPage{ animation:fadeIn 0.28s ease; }
 
-  /* type badges */
-  .type-badge{ display:inline-block; padding:2px 9px; border-radius:20px; font-size:0.72rem; font-weight:700; }
-  .type-格闘{ background:var(--fight); color:#2a1006; }
-  .type-悪{ background:var(--dark); color:#160e28; }
-  .type-超{ background:var(--psy); color:#2a0e1c; }
-  .type-無色{ background:var(--colorless); color:#1c1e26; }
-  .trainer-badge-item{ background:#5fb0e8; color:#0a1c2a; display:inline-block; padding:2px 9px; border-radius:20px; font-size:0.72rem; font-weight:700; }
-  .trainer-badge-support{ background:#e88a5f; color:#2a1206; display:inline-block; padding:2px 9px; border-radius:20px; font-size:0.72rem; font-weight:700; }
-  .status-badge{ display:inline-block; padding:2px 8px; border-radius:20px; font-size:0.68rem; font-weight:700; margin-left:4px; }
-  .status-poison{ background:#8e5fd6; color:#1c0f2e; }
-  .status-burn{ background:#e2652f; color:#2a1006; }
-  .status-paralysis{ background:#e8d15f; color:#2a2606; }
-  .status-sleep{ background:#5f8fe8; color:#0a1a2a; }
-  .status-confusion{ background:#d65fb0; color:#2a0a1c; }
-  .coin-tag{ background:#4a4258; color:var(--gold); }
-  .ability-tag{ background:#3f8f6e; color:#eafff5; }
-  .rarity-diamond1{ background:#5a6072; color:#eef0f5; }
-  .rarity-diamond2{ background:#546a8f; color:#eef2f8; }
-  .rarity-diamond3{ background:#3f6fa8; color:#eef4ff; }
-  .rarity-diamond4{ background:#2f8f8f; color:#eafbfb; }
-  .rarity-star1{ background:#8a5bd6; color:#f3ecff; }
-  .rarity-star2{ background:#b04fd6; color:#fbeeff; }
-  .rarity-star3{ background:linear-gradient(90deg,#f4c95d,#e0599f); color:#241a38; font-weight:900; }
-  .rarity-crown{ background:linear-gradient(90deg,#f4c95d,#fff3c4); color:#3a2a06; font-weight:900; }
-  .rarity-spade{ background:#3a3450; color:#d9d2f5; }
-  .rarity-club{ background:#2e8f6e; color:#e6fff4; }
-  .rarity-dopa{ background:repeating-linear-gradient(45deg,#e0435a,#e0435a 6px,#f4c95d 6px,#f4c95d 12px); color:#241a38; font-weight:900; }
-  .rarity-promo{ background:#e88a5f; color:#2a1206; }
+  /* ---------- ホーム ---------- */
+  .logo-img{ max-width:300px; width:78%; margin:6px auto 0; display:block; filter:drop-shadow(0 8px 18px rgba(106,76,255,0.22)); }
+  #landing > p.sub{ text-align:center; margin:4px 0 18px; }
+  #landing .card + .card{ margin-top:14px; }
+  .name-grid{ display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; }
+  .name-card{
+    display:flex; align-items:center; gap:10px; justify-content:flex-start;
+    background:#fff; color:var(--ink); padding:10px 14px; border-radius:18px;
+    box-shadow:0 3px 0 #dbe1ef, 0 6px 14px rgba(39,48,74,0.06); font-size:1rem;
+  }
+  .name-card:active{ transform:translateY(3px); box-shadow:0 1px 0 #dbe1ef; }
+  .name-avatar{
+    width:40px; height:40px; border-radius:50%; background:var(--lav); color:var(--violet);
+    display:flex; align-items:center; justify-content:center; font-size:1.1rem; font-weight:900; flex-shrink:0;
+  }
+  .name-avatar-img{ width:40px; height:40px; border-radius:50%; object-fit:cover; flex-shrink:0; box-shadow:0 0 0 2px #fff, 0 0 0 4px var(--lav); }
+  #whoAmI{ font-weight:900; color:var(--ink) !important; font-size:1.05rem; }
+  .menu-grid{ display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; }
+  .menu-btn{
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
+    padding:16px 10px; min-height:108px; border-radius:22px; font-size:0.95rem;
+  }
+  .menu-btn-icon{ width:52px; height:52px; object-fit:contain; }
+  #createRoomBtn{ width:100%; padding:16px; font-size:1.05rem; }
+  #joinCodeInput{ text-align:center; letter-spacing:0.2em; }
+  #landingStatus{ margin-top:14px; }
+
+  /* ---------- 待機 ---------- */
+  #roomCodeDisplay{
+    font-size:3rem; letter-spacing:0.2em; margin:0; color:var(--violet) !important;
+    font-variant-numeric:tabular-nums;
+  }
+
+  /* ---------- バッジ類 ---------- */
+  .type-badge{ display:inline-block; padding:2px 10px; border-radius:999px; font-size:0.72rem; font-weight:900; color:#fff; }
+  .type-格闘{ background:var(--fight); }
+  .type-悪{ background:var(--dark); }
+  .type-超{ background:var(--psy); }
+  .type-無色{ background:var(--colorless); }
+  .trainer-badge-item, .trainer-badge-support, .trainer-badge-tool{ display:inline-block; padding:2px 10px; border-radius:999px; font-size:0.72rem; font-weight:900; color:#fff; }
+  .trainer-badge-item{ background:#3e9be0; }
+  .trainer-badge-support{ background:#e5824f; }
+  .trainer-badge-tool{ background:#3fae6a; }
+  .status-badge{ display:inline-block; padding:2px 8px; border-radius:999px; font-size:0.68rem; font-weight:900; margin-left:4px; color:#fff; }
+  .status-poison{ background:#8a52d6; }
+  .status-burn{ background:#e5612b; }
+  .status-paralysis{ background:#e3b51e; color:#3b2c00; }
+  .status-sleep{ background:#4e86e0; }
+  .status-confusion{ background:#d453a6; }
+  .coin-tag{ background:#fff4d6; color:#8a5a00; }
+  .ability-tag{ background:#2fa77a; }
+  .rarity-diamond1,.rarity-diamond2,.rarity-diamond3,.rarity-diamond4{ background:#eef2fb; color:#5872a8; }
+  .rarity-diamond4{ background:#e3f6f4; color:#1f8a82; }
+  .rarity-star1{ background:#efe8ff; color:var(--violet); }
+  .rarity-star2{ background:#f6e6ff; color:#a03ad0; }
+  .rarity-star3{ background:linear-gradient(90deg,#ffd256,#ff8ccf); color:#4a2300; }
+  .rarity-crown{ background:linear-gradient(90deg,#ffd256,#fff3c4); color:#5a3c00; }
+  .rarity-spade{ background:#e7e9f2; color:#3a3450; }
+  .rarity-club{ background:#e1f5ec; color:#1e7a55; }
+  .rarity-dopa{ background:repeating-linear-gradient(45deg,#ff5d74,#ff5d74 6px,#ffd256 6px,#ffd256 12px); color:#3b1600; }
+  .rarity-promo{ background:#ffe9dd; color:#b8501c; }
   .ability-line{ margin-top:8px; font-size:0.82rem; }
-  .coin-banner{
-    text-align:center; font-size:0.95rem; font-weight:700; color:var(--gold);
-    background:rgba(244,201,93,0.1); border:1px solid var(--gold); border-radius:10px;
-    padding:8px; margin-top:8px;
-  }
-  .coin-banner .coin-face-row{ display:flex; justify-content:center; gap:6px; margin-top:6px; }
-  .coin-face-img{ width:40px; height:40px; border-radius:50%; }
-  .drawn-banner{
-    display:flex; align-items:center; gap:10px; background:rgba(244,201,93,0.14);
-    border:1px solid var(--gold); border-radius:10px; padding:8px 12px; margin-top:8px;
-    font-size:0.85rem; color:var(--gold); font-weight:700;
-    transform-origin:left center;
-  }
-  .drawn-banner.just-drawn{
-    animation: cardDrawIn 0.55s cubic-bezier(0.22,0.85,0.32,1.2);
-  }
-  .deck-pile-mini{
-    width:26px; height:36px; border-radius:4px; flex:0 0 auto;
-    background-image:var(--card-back); background-size:cover; background-position:center;
-    border:1px solid var(--gold);
-    box-shadow:2px 2px 0 rgba(244,201,93,0.25);
-  }
-  @keyframes cardDrawIn{
-    0%{ opacity:0; transform:translateX(-26px) scale(0.7) rotate(-8deg); }
-    55%{ opacity:1; transform:translateX(3px) scale(1.08) rotate(2deg); }
-    100%{ opacity:1; transform:translateX(0) scale(1) rotate(0deg); }
-  }
+  .atk-list{ margin-top:8px; display:flex; flex-direction:column; gap:4px; }
+  .atk-line{ font-size:0.85rem; color:var(--ink-dim); display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+  .atk-line b{ color:var(--ink); }
+  .energy-dot{ display:inline-block; width:20px; height:20px; border-radius:50%; margin-right:3px; vertical-align:middle; object-fit:cover; }
+  .energy-dot.small{ width:16px; height:16px; margin-right:1px; }
+
   .disconnect-banner{
-    text-align:center; font-size:0.85rem; color:var(--hp-red);
-    background:rgba(239,91,106,0.12); border:1px solid var(--hp-red);
-    border-radius:10px; padding:8px; margin-bottom:14px;
+    font-size:0.8rem; font-weight:900; color:#fff; background:var(--hp-red);
+    border-radius:999px; padding:6px 14px; box-shadow:0 6px 16px rgba(239,79,95,0.35);
   }
   .error-banner{
     display:flex; align-items:center; gap:10px; text-align:left;
-    background:rgba(239,91,106,0.12); border:1px solid var(--hp-red);
-    border-radius:10px; padding:12px 14px; margin-top:10px; font-size:0.85rem; color:var(--text);
+    background:#fff0f2; border-radius:16px; padding:12px 14px; margin-top:10px; font-size:0.85rem; color:#9c2232;
   }
-  .error-banner .err-icon{ font-size:1.3rem; flex-shrink:0; }
+  .error-banner .err-icon{ font-size:1.2rem; flex-shrink:0; }
   .error-banner .err-body{ flex:1; }
   .error-banner button{ flex-shrink:0; padding:8px 14px; font-size:0.82rem; }
   .status-banner{
-    text-align:left; font-size:0.85rem; color:var(--text-dim);
-    background:var(--panel2); border:1px solid var(--line);
-    border-radius:10px; padding:10px 14px; margin-top:10px;
+    display:flex; align-items:center; gap:8px; font-size:0.85rem; color:var(--ink-dim);
+    background:#f3f6fd; border-radius:16px; padding:10px 14px; margin-top:10px;
   }
 
-  /* game layout */
-  .zone-label{ font-family:'DotGothic16'; font-size:0.78rem; color:var(--text-dim); margin-bottom:8px; }
-  .board-card{
-    display:flex; gap:12px; align-items:center;
-    background:var(--panel2); border:1px solid var(--line); border-radius:14px; padding:14px;
+  /* ---------- カード(共通) ---------- */
+  .mcard{
+    position:relative; aspect-ratio:5/7; height:100%; border-radius:7%/5%;
+    overflow:hidden; background:#fff; container-type:inline-size;
+    box-shadow:0 1px 0 rgba(255,255,255,0.8) inset, 0 6px 14px rgba(39,48,74,0.18);
   }
-  .board-card.big{ flex-direction:column; align-items:stretch; }
-  .card-art-full{
-    width:100%; max-width:220px; margin:0 auto 10px; display:block;
-    border-radius:12px; cursor:zoom-in; box-shadow:0 4px 16px rgba(0,0,0,0.35);
+  .mcard-img{ width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; -webkit-user-drag:none; }
+  .mcard.back{
+    background:#6b52c9 var(--card-back) center/cover no-repeat;
   }
-  .board-card .name{ font-weight:700; }
-  .board-card .sub{ font-size:0.8rem; color:var(--text-dim); margin-top:2px; }
-  .hp-bar-outer{ background:#000; border-radius:6px; height:8px; overflow:hidden; margin-top:8px; width:100%; }
-  .hp-bar-inner{ height:100%; background:var(--hp-green); transition:width 0.3s ease; }
-  .hp-bar-inner.low{ background:var(--hp-red); }
-  .empty-slot{
-    border:1px dashed var(--line); border-radius:14px; padding:18px;
-    text-align:center; color:var(--text-dim); font-size:0.85rem;
+  /* 絵がまだ無いカード用の自動生成カード面 */
+  .cface{ --tc:var(--colorless); color:var(--ink); text-align:left; background:#fff; }
+  .cf-in{
+    position:absolute; inset:0; display:flex; flex-direction:column; gap:2.6cqw;
+    padding:5.5cqw 6cqw; border:3cqw solid color-mix(in srgb, var(--tc) 30%, #eef1f8); border-radius:inherit;
+    background:linear-gradient(180deg, color-mix(in srgb, var(--tc) 26%, #fff) 0%, #fff 58%);
   }
-  .card-back-slot{
-    background-color:#1a1330;
-    background-image:var(--card-back); background-size:contain; background-repeat:no-repeat; background-position:center;
-    border:1px solid var(--gold); border-radius:14px;
-    display:flex; align-items:center; justify-content:center;
-    padding:18px; min-height:120px; aspect-ratio:5/3;
+  .cface.ty-格闘{ --tc:var(--fight); } .cface.ty-悪{ --tc:var(--dark); } .cface.ty-超{ --tc:var(--psy); } .cface.ty-無色{ --tc:var(--colorless); }
+  .cface.tr-item{ --tc:#3e9be0; } .cface.tr-support{ --tc:#e5824f; } .cface.tr-tool{ --tc:#3fae6a; }
+  .cf-head{ display:flex; align-items:baseline; gap:2cqw; line-height:1.1; }
+  .cf-stage{ font-size:6.5cqw; font-weight:900; color:#fff; background:var(--tc); border-radius:999px; padding:0.6cqw 2.4cqw; flex-shrink:0; }
+  .cf-name{ font-size:10.5cqw; font-weight:900; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .cf-hp{ font-size:10cqw; font-weight:900; color:var(--hp-red); white-space:nowrap; }
+  .cf-hp small{ font-size:5cqw; margin-right:0.5cqw; }
+  .cf-kind{ align-self:flex-start; font-size:7cqw; font-weight:900; color:#fff; background:var(--tc); border-radius:999px; padding:0.6cqw 3cqw; }
+  .cf-art{
+    flex:0 0 auto; aspect-ratio:16/10; border-radius:3cqw; display:flex; align-items:center; justify-content:center;
+    font-size:30cqw; background:radial-gradient(circle at 50% 40%, #fff 0%, color-mix(in srgb, var(--tc) 45%, #fff) 100%);
+    box-shadow:0 0 0 1cqw #fff inset;
   }
-  .bench-card.card-back-slot{ min-height:70px; border-radius:10px; padding:8px; aspect-ratio:4/3; }
-  .card-back-face{
-    text-align:center; font-size:0.85rem; color:var(--gold); font-weight:700;
-    background:rgba(22,16,34,0.75); border-radius:8px; padding:4px 10px;
-  }
-  .energy-dot{
-    display:inline-block; width:20px; height:20px; border-radius:50%;
-    margin-right:3px; vertical-align:middle; object-fit:cover;
-  }
-  .logo-img{ max-width:280px; width:70%; margin:0 auto 10px; display:block; }
-  .name-grid{ display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; }
-  .pack-select-grid{ display:flex; gap:14px; overflow-x:auto; padding:4px 2px 12px; margin-bottom:6px; }
-  .pack-card{
-    flex:0 0 auto; width:220px;
-    background:transparent; border:none; border-radius:12px;
-    padding:0; display:flex; flex-direction:column; align-items:center; gap:8px;
-  }
-  .pack-card img{ width:100%; border-radius:0; background:transparent; }
-  .pack-card .pname{ font-weight:700; font-size:0.9rem; text-align:center; }
-  .pack-card button{ width:100%; margin-top:2px; }
+  .cf-ab{ font-size:6.8cqw; line-height:1.25; color:#1e7a55; }
+  .cf-ab b{ background:#2fa77a; color:#fff; border-radius:999px; padding:0 1.6cqw; margin-right:1cqw; }
+  .cf-atk{ display:flex; align-items:center; gap:1.6cqw; font-size:8cqw; font-weight:900; line-height:1.2; border-top:0.6cqw solid #eef1f8; padding-top:1.6cqw; }
+  .cf-cost{ display:flex; gap:0.6cqw; flex-shrink:0; }
+  .cf-cost img{ width:8.5cqw; height:8.5cqw; border-radius:50%; }
+  .cf-an{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .cf-dmg{ font-size:10cqw; }
+  .cf-text{ font-size:7.4cqw; line-height:1.35; color:var(--ink); }
 
-  .energy-type-btn{
-    display:flex; align-items:center; gap:6px; padding:8px 14px;
-    background:var(--panel2); border:1px solid var(--line); border-radius:20px;
-    font-family:'Zen Maru Gothic'; font-weight:700; font-size:0.85rem; color:var(--text);
+  /* ---------- 対戦画面 ---------- */
+  #game{
+    position:fixed; inset:0; z-index:5;
+    height:100vh; height:100dvh;
+    display:flex; flex-direction:column;
+    padding:max(6px, env(safe-area-inset-top)) 10px max(6px, env(safe-area-inset-bottom));
+    overflow:hidden; user-select:none; -webkit-user-select:none;
+    background:
+      radial-gradient(60% 34% at 50% 50%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 70%),
+      linear-gradient(180deg, #dfe8ff 0%, #f4f1ff 46%, #f4f1ff 54%, #e5eeff 100%);
+    --hand-h: clamp(66px, 12.5dvh, 128px);
   }
-  .energy-type-btn img{ width:20px; height:20px; }
-  .energy-type-btn.selected{ background:var(--gold); color:#241a38; border-color:var(--gold); }
-
-  .deck-card-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin:10px 0; }
-  .deck-card-tile{
-    background:var(--panel2); border:1px solid var(--line); border-radius:10px;
-    padding:8px 6px; display:flex; flex-direction:column; align-items:center; gap:4px;
-    position:relative;
+  #game.hidden{ display:none; }
+  .g-top{ display:flex; align-items:center; gap:8px; height:40px; flex-shrink:0; position:relative; z-index:3; }
+  .g-top .opp-hand-row{ flex:1; }
+  .ptag{
+    display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.85);
+    border-radius:999px; padding:3px 10px 3px 3px; box-shadow:0 3px 10px rgba(39,48,74,0.08);
+    flex-shrink:0; max-width:46%;
   }
-  .deck-card-tile img{ width:100%; aspect-ratio:3/4; object-fit:cover; border-radius:6px; cursor:zoom-in; }
-  .deck-card-tile .no-art{
-    width:100%; aspect-ratio:3/4; border-radius:6px; display:flex; align-items:center; justify-content:center;
-    text-align:center; font-size:0.7rem; padding:4px; color:var(--text-dim);
+  .ptag .pav{ width:30px; height:30px; border-radius:50%; object-fit:cover; background:var(--lav); display:flex; align-items:center; justify-content:center; font-weight:900; color:var(--violet); flex-shrink:0; }
+  .ptag .pname{ font-weight:900; font-size:0.82rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .halos{ display:flex; gap:3px; flex-shrink:0; }
+  .halo{
+    width:15px; height:15px; border-radius:50%; border:3px solid #d7dbea; background:transparent;
   }
-  .deck-card-tile .dname{ font-size:0.72rem; font-weight:700; text-align:center; line-height:1.2; }
-  .deck-card-tile .downed{ font-size:0.65rem; color:var(--text-dim); }
-  .deck-card-tile .deck-qty-row{ display:flex; align-items:center; gap:6px; margin-top:2px; }
-  .deck-card-tile .deck-qty-row button{ padding:2px 9px; font-size:0.85rem; min-width:26px; }
-  .deck-card-tile .deck-qty-num{ font-weight:900; width:18px; text-align:center; }
-
-  .name-card{
-    display:flex; flex-direction:column; align-items:center; gap:6px;
-    background:var(--panel2); border:1px solid var(--line); border-radius:12px;
-    padding:14px 8px; font-family:'Zen Maru Gothic'; font-weight:700; color:var(--text);
+  .halo.on{ border-color:var(--halo); box-shadow:0 0 6px rgba(245,184,46,0.8), 0 0 0 1px #fff3cf inset; }
+  .halos.pop .halo.on{ animation:haloPop 0.9s ease; }
+  @keyframes haloPop{ 0%{ transform:scale(0.4); } 50%{ transform:scale(1.6); box-shadow:0 0 16px var(--halo); } 100%{ transform:scale(1); } }
+  .deck-chip{
+    display:flex; align-items:center; gap:4px; font-weight:900; font-size:0.78rem; color:var(--ink-dim);
+    background:rgba(255,255,255,0.85); border-radius:999px; padding:4px 10px; flex-shrink:0;
   }
-  .name-card:active{ border-color:var(--gold); transform:scale(0.97); }
-  .name-avatar{
-    width:40px; height:40px; border-radius:50%; background:var(--gold); color:#241a38;
-    display:flex; align-items:center; justify-content:center; font-size:1.1rem; font-weight:900;
-  }
-  .name-avatar-img{ width:48px; height:48px; border-radius:50%; object-fit:cover; }
-  .card-art-thumb{ width:100%; border-radius:8px; margin-bottom:6px; display:block; }
-  .card-art-thumb.board{ width:64px; height:64px; border-radius:8px; object-fit:cover; margin-right:10px; margin-bottom:0; flex-shrink:0; }
-  .energy-dot.small{ width:15px; height:15px; margin-right:1px; }
-  .atk-list{ margin-top:8px; display:flex; flex-direction:column; gap:4px; }
-  .atk-line{ font-size:0.8rem; color:var(--text-dim); display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
-  .atk-line b{ color:var(--text); }
-  .bench-row{ display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
-  .bench-card{
-    flex:1 1 30%; min-width:96px; background:var(--panel2); border:1px solid var(--line);
-    border-radius:10px; padding:8px; font-size:0.76rem;
-  }
-  .bench-card .bname{ font-weight:700; font-size:0.78rem; }
-  .bench-card.clickable{ cursor:pointer; border-color:var(--gold); }
-  .bench-empty{
-    flex:1 1 30%; min-width:96px; border:1px dashed var(--line); border-radius:10px;
-    padding:8px; text-align:center; color:var(--text-dim); font-size:0.74rem;
+  .deck-chip i{ width:12px; height:16px; border-radius:2px; background:#6b52c9 var(--card-back) center/cover; display:inline-block; }
+  .icon-btn{
+    width:34px; height:34px; padding:0; border-radius:50%; flex-shrink:0; font-size:1rem;
+    background:#fff; color:var(--ink); box-shadow:0 3px 0 #d5dbea;
   }
 
-  .hand-row{ display:flex; gap:0; overflow-x:auto; overflow-y:visible; padding:70px 12px 14px; align-items:flex-end; }
-  .pack-reveal-row{ display:flex; flex-wrap:wrap; gap:12px; justify-content:center; padding:16px 0; perspective:900px; }
-  .pack-reveal-card{
-    width:110px; height:150px; position:relative; cursor:default;
-    transform-style:preserve-3d; transform:rotateY(0deg);
-    transition:transform 0.6s cubic-bezier(0.34,1.56,0.64,1);
+  .g-field{
+    flex:1; min-height:0; position:relative; container-type:size;
+    display:flex; flex-direction:column; align-items:center; justify-content:space-evenly;
+    --act-h: min(26.5cqh, 220px);
+    --bench-h: min(13.2cqh, 112px);
   }
-  .pack-reveal-card.revealed{ transform:rotateY(180deg); }
-  .pack-reveal-face{
-    position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden;
-    border-radius:10px; border:1px solid var(--gold); overflow:hidden;
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    background:var(--panel2); padding:6px; text-align:center;
+  /* アリーナの床 */
+  .g-field::before{
+    content:''; position:absolute; left:2%; right:2%; top:15%; bottom:15%;
+    border-radius:44px; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(circle at 50% 50%, transparent 0 13%, rgba(106,76,255,0.10) 13% 13.8%, transparent 13.8%),
+      linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.25));
+    box-shadow:0 0 0 2px rgba(255,255,255,0.7) inset;
   }
-  .pack-reveal-face.front{ background-image:var(--card-back); background-size:cover; background-position:center; }
-  .pack-reveal-face.back{ transform:rotateY(180deg); }
-  .pack-reveal-face.back img{ width:100%; border-radius:6px; margin-bottom:4px; object-fit:cover; }
-  .pack-reveal-face.back .hname{ font-size:0.72rem; font-weight:700; }
+  .g-field::after{
+    content:''; position:absolute; left:8%; right:8%; top:50%; height:2px; z-index:0; pointer-events:none;
+    background:linear-gradient(90deg, transparent, rgba(106,76,255,0.18), transparent);
+  }
+  .g-field > *{ position:relative; z-index:1; }
+  .active-zone{ height:calc(var(--act-h) + 10px); display:flex; justify-content:center; align-items:flex-start; width:100%; }
+  .bench-row{ display:flex; justify-content:center; gap:10px; height:calc(var(--bench-h) + 8px); align-items:flex-start; width:100%; }
 
-  .pack-big-overlay{
-    position:fixed; inset:0; z-index:70; background:rgba(10,6,20,0.92);
-    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px;
-    perspective:1200px;
+  .slot{ position:relative; height:100%; display:flex; justify-content:center; }
+  .slot-act{ height:var(--act-h); }
+  .slot-bench{ height:var(--bench-h); }
+  .slot.empty{
+    aspect-ratio:5/7; border-radius:9px; border:2px dashed rgba(106,76,255,0.25);
+    background:rgba(255,255,255,0.35); align-items:center; color:rgba(106,76,255,0.45);
+    font-size:0.7rem; font-weight:900;
   }
-  .pack-big-card{
-    width:92vw; max-width:420px; aspect-ratio:5/7; max-height:88vh; position:relative;
-    transform-style:preserve-3d; transform:rotateY(0deg);
-    transition:transform 0.55s cubic-bezier(0.34,1.56,0.64,1);
+  .slot-act.empty{ border-radius:12px; font-size:0.78rem; }
+  .slot.mine-hidden .mcard::after{
+    content:'ウラ'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    background:rgba(107,82,201,0.45); color:#fff; font-weight:900; font-size:22cqw; letter-spacing:0.1em;
   }
-  .pack-big-card.revealed{ transform:rotateY(180deg); }
-  .pack-big-card .pack-reveal-face{ border-radius:16px; padding:0; background:transparent; overflow:hidden; }
-  .pack-big-card .pack-reveal-face.front{ background-size:contain; background-repeat:no-repeat; background-color:#1a1330; }
-  .pack-big-card .pack-reveal-face.back{
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    background:#1a1330; padding:10px;
+  .slot.targetable{ cursor:pointer; }
+  .slot.targetable .mcard, .slot.targetable.empty{
+    box-shadow:0 0 0 3px var(--halo), 0 0 18px rgba(245,184,46,0.85);
+    animation:targetPulse 1.1s ease-in-out infinite;
   }
-  .pack-big-card .pack-reveal-face.back img{ width:100%; height:auto; max-height:82%; object-fit:contain; border-radius:0; margin-bottom:8px; }
-  .pack-big-card .pack-reveal-face.back .hname{ font-size:1.1rem; }
+  @keyframes targetPulse{ 50%{ box-shadow:0 0 0 3px #fff, 0 0 24px rgba(245,184,46,1); transform:translateY(-3px); } }
+  .slot.retreatable{ cursor:pointer; }
+  .slot.retreatable .mcard{ box-shadow:0 0 0 2px rgba(106,76,255,0.55), 0 6px 14px rgba(39,48,74,0.18); }
+
+  .hp-pill{
+    position:absolute; left:50%; bottom:-9px; transform:translateX(-50%);
+    display:flex; align-items:center; gap:5px; z-index:2;
+    background:#fff; border-radius:999px; padding:2px 8px 2px 7px;
+    box-shadow:0 3px 8px rgba(39,48,74,0.2); white-space:nowrap;
+  }
+  .hp-num{ font-weight:900; font-size:0.86rem; font-variant-numeric:tabular-nums; line-height:1.1; }
+  .hp-num small{ font-size:0.6rem; color:var(--ink-dim); margin-left:1px; }
+  .hp-bar{ width:34px; height:6px; border-radius:999px; background:#e7ebf4; overflow:hidden; }
+  .hp-bar i{ display:block; height:100%; background:var(--hp-green); border-radius:999px; transition:width 0.5s ease; }
+  .hp-pill.mid .hp-bar i{ background:var(--hp-amber); }
+  .hp-pill.low .hp-bar i{ background:var(--hp-red); }
+  .hp-pill.low .hp-num{ color:var(--hp-red); }
+  .slot-bench .hp-pill{ bottom:-7px; padding:1px 6px; gap:0; }
+  .slot-bench .hp-num{ font-size:0.7rem; }
+  .slot-bench .hp-bar, .slot-bench .hp-num small{ display:none; }
+
+  .e-orbs{
+    position:absolute; right:-12px; top:6%; display:flex; flex-direction:column; gap:2px; z-index:2;
+  }
+  .e-orb{ width:22px; height:22px; border-radius:50%; box-shadow:0 0 0 2px #fff, 0 2px 5px rgba(39,48,74,0.3); display:block; }
+  .slot-bench .e-orbs{ right:-7px; top:4%; gap:1px; }
+  .slot-bench .e-orb{ width:14px; height:14px; box-shadow:0 0 0 1.5px #fff; }
+  .e-orb.fresh{ animation:orbPop 0.7s cubic-bezier(.3,1.6,.5,1); }
+  @keyframes orbPop{ 0%{ transform:scale(0); } 100%{ transform:scale(1); } }
+
+  .slot-tags{ position:absolute; left:-8px; top:-6px; display:flex; flex-direction:column; align-items:flex-start; gap:3px; z-index:2; }
+  .slot-tags .status-badge{ margin:0; box-shadow:0 2px 6px rgba(39,48,74,0.25); }
+  .tool-tag{ background:#3fae6a; }
+  .shield-tag{ background:#4e86e0; }
+  .slot-bench .slot-tags{ left:-5px; top:-5px; }
+  .slot-bench .slot-tags .status-badge{ font-size:0.56rem; padding:1px 5px; }
+
+  .g-mid{
+    width:100%; display:flex; align-items:center; justify-content:space-between; gap:8px;
+    height:min(10cqh, 52px); padding:0 4px;
+  }
+  .turn-banner{
+    flex:1; min-width:0; text-align:center; font-weight:900; font-size:0.86rem; line-height:1.25;
+    padding:7px 12px; border-radius:999px; background:rgba(255,255,255,0.9); color:var(--ink-dim);
+    box-shadow:0 4px 12px rgba(39,48,74,0.08);
+  }
+  .turn-banner.mine{ color:var(--violet); }
+  .turn-banner.alert{ background:var(--halo); color:#4a3200; box-shadow:0 4px 14px rgba(245,184,46,0.45); }
+  .turn-banner.theirs{ color:var(--ink-dim); }
+  .turn-banner small{ display:block; font-size:0.66rem; opacity:0.85; }
+
+  .energy-zone{ display:flex; align-items:center; gap:6px; flex-shrink:0; }
+  .ez-now{
+    width:44px; height:44px; padding:0; border-radius:50%; background:#fff;
+    display:flex; align-items:center; justify-content:center; box-shadow:0 3px 0 #d5dbea;
+  }
+  .ez-now img{ width:34px; height:34px; border-radius:50%; }
+  .ez-now.ready{ box-shadow:0 3px 0 var(--halo-deep), 0 0 0 3px var(--halo), 0 0 18px rgba(245,184,46,0.8); animation:ezGlow 1.4s ease-in-out infinite; }
+  .ez-now.empty{ opacity:0.35; }
+  @keyframes ezGlow{ 50%{ transform:scale(1.07); } }
+  .ez-next{ display:flex; flex-direction:column; align-items:center; font-size:0.56rem; font-weight:900; color:var(--ink-dim); line-height:1; gap:2px; }
+  .ez-next img{ width:20px; height:20px; border-radius:50%; opacity:0.85; }
+
+  .g-actions{ display:flex; align-items:center; gap:8px; height:46px; flex-shrink:0; position:relative; z-index:3; }
+  .g-actions .ptag{ max-width:40%; }
+  .action-row{ flex:1; display:flex; justify-content:flex-end; align-items:center; gap:8px; min-width:0; }
+  .action-row button{ padding:10px 16px; font-size:0.88rem; white-space:nowrap; }
+  .action-row button.has-dot{ position:relative; }
+  .action-row button.has-dot::after{
+    content:''; position:absolute; top:-2px; right:-2px; width:10px; height:10px; border-radius:50%;
+    background:var(--halo); box-shadow:0 0 0 2px #fff;
+  }
+
+  .g-hand{ height:calc(var(--hand-h) + 12px); flex-shrink:0; display:flex; align-items:flex-end; gap:8px; position:relative; z-index:4; padding-bottom:4px; }
+  .deck-pile-display{
+    flex:0 0 auto; height:calc(var(--hand-h) * 0.7); aspect-ratio:5/7; border-radius:6px; margin-bottom:4px;
+    background:#6b52c9 var(--card-back) center/cover no-repeat; position:relative;
+    box-shadow:2px 2px 0 #fff, 4px 4px 0 #d9d1f6, 0 6px 12px rgba(39,48,74,0.18);
+  }
+  .deck-pile-display .deck-count{
+    position:absolute; bottom:-6px; right:-8px; background:#fff; color:var(--ink);
+    font-size:0.7rem; font-weight:900; border-radius:999px; min-width:22px; height:20px; padding:0 5px;
+    display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(39,48,74,0.25);
+  }
+  .hand-row{ flex:1; min-width:0; height:100%; display:flex; align-items:flex-end; justify-content:center; padding:0 4px 2px; }
   .hand-card{
-    flex:0 0 auto; width:92px; background:var(--panel2); border:1px solid var(--line);
-    border-radius:8px; padding:6px; cursor:pointer;
-    transform-origin:bottom center;
-    transform: rotate(var(--rot,0deg)) translateY(var(--lift,0px));
-    transition:transform 0.15s ease, border-color 0.12s ease, z-index 0.15s;
-    margin-left:-66px; position:relative;
-    font-size:0.7rem;
+    flex:0 0 auto; height:var(--hand-h); position:relative; cursor:pointer;
+    transform-origin:50% 120%;
+    transform:rotate(var(--rot,0deg)) translateY(var(--lift,0px));
+    transition:transform 0.18s ease, filter 0.18s ease;
     -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; touch-action:none;
   }
-  .hand-card:first-child{ margin-left:0; }
-  .hand-card:hover{
-    transform: rotate(var(--rot,0deg)) translateY(calc(var(--lift,0px) - 30px)) scale(1.5) !important;
-    z-index:99 !important;
+  .hand-card .mcard{ height:100%; }
+  .hand-card:not(.playable) .mcard{ filter:saturate(0.55) brightness(0.92); }
+  .hand-card.playable .mcard{ box-shadow:0 0 0 2px var(--halo), 0 6px 14px rgba(39,48,74,0.2); }
+  @media (hover:hover){
+    .hand-card:hover{ transform:rotate(0deg) translateY(-18px) scale(1.12); z-index:50 !important; }
   }
-  .hand-card.lifted{
-    transform: rotate(0deg) translateY(calc(var(--lift,0px) - 30px)) scale(1.5) !important;
-    z-index:99 !important;
-    transition:transform 0.12s ease;
-  }
-  .hand-card.swiping{
-    transform: rotate(0deg) translateY(calc(var(--lift,0px) - 90px)) scale(1.6) !important;
-    z-index:100 !important;
-    border-color:var(--gold) !important;
-    box-shadow:0 0 0 2px var(--gold), 0 8px 20px rgba(0,0,0,0.5) !important;
-  }
-  .hand-card.playable{ border-color:var(--gold); }
-  .hand-card .hname{ font-weight:700; font-size:0.72rem; margin-top:3px; }
-  .hand-card .hstats{ font-size:0.6rem; color:var(--text-dim); margin-top:3px; }
+  .hand-card.lifted{ transform:rotate(0deg) translateY(-16px) scale(1.12) !important; z-index:99 !important; transition:transform 0.12s ease; }
+  .hand-card.swiping{ transform:rotate(0deg) translateY(-70px) scale(1.25) !important; z-index:100 !important; }
+  .hand-card.swiping .mcard{ box-shadow:0 0 0 3px var(--halo), 0 0 26px rgba(245,184,46,0.9), 0 16px 26px rgba(39,48,74,0.3) !important; }
 
-  .opp-hand-row{ display:flex; justify-content:center; padding:10px 0 4px; overflow:visible; }
+  .opp-hand-row{ display:flex; justify-content:center; align-items:flex-start; height:40px; overflow:visible; }
   .opp-hand-card{
-    flex:0 0 auto; width:38px; height:54px; margin-left:-20px;
-    background-image:var(--card-back); background-size:cover; background-position:center;
-    border:1px solid var(--gold); border-radius:6px;
-    box-shadow:0 2px 4px rgba(0,0,0,0.3);
-    transform-origin:bottom center;
-    transform: rotate(var(--rot,0deg));
+    flex:0 0 auto; width:26px; height:36px; margin-left:-12px; border-radius:4px;
+    background:#6b52c9 var(--card-back) center/cover no-repeat;
+    box-shadow:0 2px 5px rgba(39,48,74,0.25);
+    transform-origin:50% -60%; transform:rotate(var(--rot,0deg));
   }
   .opp-hand-card:first-child{ margin-left:0; }
 
-  .hand-area-row{ display:flex; align-items:flex-end; gap:8px; }
-  .deck-pile-display{
-    flex:0 0 auto; width:46px; height:64px; border-radius:6px;
-    background-image:var(--card-back); background-size:cover; background-position:center;
-    border:1px solid var(--gold); position:relative;
-    box-shadow:2px 2px 0 rgba(244,201,93,0.2), 4px 4px 0 rgba(244,201,93,0.12);
+  #disconnectBanner{ position:absolute; left:50%; top:46px; transform:translateX(-50%); z-index:8; }
+  #drawnBanner{ display:none; }
+
+  /* ログ(盤面の上に重ねるパネル) */
+  .log-box{
+    position:absolute; right:10px; top:48px; width:min(80vw, 320px); max-height:48%; overflow-y:auto; z-index:20;
+    font-size:0.8rem; color:var(--ink); background:rgba(255,255,255,0.97); border-radius:18px; padding:10px 14px;
+    box-shadow:0 14px 40px rgba(39,48,74,0.25);
   }
-  .deck-pile-display .deck-count{
-    position:absolute; bottom:-6px; right:-6px; background:var(--gold); color:#241a38;
-    font-size:0.66rem; font-weight:700; border-radius:50%; width:20px; height:20px;
-    display:flex; align-items:center; justify-content:center;
+  .log-box div{ padding:3px 0; border-bottom:1px solid #f0f2f8; }
+  .log-box div:last-child{ border-bottom:none; }
+
+  /* ワザ・特性シート */
+  .attack-sheet{ position:fixed; inset:0; z-index:40; display:flex; flex-direction:column; justify-content:flex-end; }
+  .attack-sheet .sheet-backdrop{ position:absolute; inset:0; background:rgba(39,48,74,0.35); animation:fadeOnly 0.18s ease; }
+  @keyframes fadeOnly{ from{ opacity:0; } }
+  .sheet{
+    position:relative; background:#fff; border-radius:26px 26px 0 0; padding:16px 16px max(18px, env(safe-area-inset-bottom));
+    box-shadow:0 -10px 30px rgba(39,48,74,0.2); animation:sheetUp 0.24s cubic-bezier(.2,.9,.3,1.05);
+    max-height:82dvh; overflow-y:auto; display:flex; flex-direction:column; gap:10px;
   }
+  @keyframes sheetUp{ from{ transform:translateY(100%); } }
+  .sheet-head{ display:flex; gap:12px; align-items:center; }
+  .sheet-head .mcard{ height:96px; flex-shrink:0; }
+  .sheet-head .sh-info{ flex:1; min-width:0; }
+  .sheet-name{ font-weight:900; font-size:1.15rem; line-height:1.3; }
+  .sheet-meta{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; font-size:0.8rem; color:var(--ink-dim); font-weight:700; margin-top:2px; }
+  .sheet-meta img{ width:18px; height:18px; border-radius:50%; }
+  .sheet-close{ width:36px; height:36px; padding:0; border-radius:50%; align-self:flex-start; }
+  .sheet-row{
+    display:flex; align-items:center; gap:10px; width:100%; text-align:left; border-radius:18px; padding:12px 14px;
+    background:#f5f7fd; color:var(--ink); box-shadow:0 3px 0 #dfe4f1;
+  }
+  .sheet-row:active:not(:disabled){ box-shadow:0 1px 0 #dfe4f1; }
+  .sheet-row.usable{ background:#fff; box-shadow:0 0 0 2px var(--violet) inset, 0 3px 0 var(--violet-deep); }
+  .sheet-row .sr-cost{ display:flex; gap:2px; flex-shrink:0; min-width:44px; }
+  .sheet-row .sr-cost img{ width:20px; height:20px; border-radius:50%; }
+  .sheet-row .sr-main{ flex:1; min-width:0; }
+  .sheet-row .sr-name{ font-weight:900; font-size:1rem; display:block; }
+  .sheet-row .sr-desc{ font-weight:500; font-size:0.78rem; color:var(--ink-dim); display:block; line-height:1.4; margin-top:2px; }
+  .sheet-row .sr-dmg{ font-weight:900; font-size:1.5rem; color:var(--ink); flex-shrink:0; font-variant-numeric:tabular-nums; }
+  .sheet-row .sr-state{ font-size:0.7rem; font-weight:900; color:var(--ink-dim); display:block; margin-top:2px; }
+  .sheet-row.usable .sr-state{ color:var(--violet); }
+  .sheet-row.locked{ opacity:0.62; cursor:default; }
+  .sheet-ability{ background:#effaf5; box-shadow:0 3px 0 #cdeedd; }
+  .sheet-ability.usable{ box-shadow:0 0 0 2px #2fa77a inset, 0 3px 0 #1e7a55; background:#fff; }
+  .sheet-section{ font-size:0.75rem; font-weight:900; color:var(--ink-dim); margin:2px 4px -4px; }
+
+  /* ---------- 演出 ---------- */
+  #fxLayer{ position:fixed; inset:0; pointer-events:none; z-index:45; overflow:hidden; }
+  .fx-float{
+    position:fixed; transform:translate(-50%,-50%); font-weight:900; font-size:2rem; line-height:1;
+    -webkit-text-stroke:2px #fff; paint-order:stroke fill; text-shadow:0 4px 10px rgba(39,48,74,0.35);
+    animation:floatUp 1.25s cubic-bezier(.2,.9,.3,1) forwards; white-space:nowrap;
+  }
+  .fx-float.dmg{ color:var(--hp-red); font-size:2.4rem; }
+  .fx-float.heal{ color:var(--hp-green); }
+  .fx-float.sm{ font-size:1.25rem; -webkit-text-stroke:1.5px #fff; }
+  .fx-float.info{ color:var(--violet); font-size:1.3rem; }
+  .fx-float.ko{ color:#fff; -webkit-text-stroke:0; background:var(--hp-red); border-radius:999px; padding:6px 16px; font-size:1.3rem; }
+  @keyframes floatUp{
+    0%{ opacity:0; transform:translate(-50%,-30%) scale(0.5); }
+    18%{ opacity:1; transform:translate(-50%,-60%) scale(1.15); }
+    35%{ transform:translate(-50%,-70%) scale(1); }
+    100%{ opacity:0; transform:translate(-50%,-150%) scale(1); }
+  }
+  .fx-hit{ animation:hit 0.45s ease; }
+  @keyframes hit{
+    0%,100%{ transform:translateX(0); filter:none; }
+    15%{ transform:translateX(-7px); filter:brightness(1.8); }
+    35%{ transform:translateX(7px); }
+    55%{ transform:translateX(-4px); }
+    75%{ transform:translateX(3px); }
+  }
+  .fx-lunge-up{ animation:lungeUp 0.5s cubic-bezier(.3,0,.3,1); }
+  @keyframes lungeUp{ 40%{ transform:translateY(-34px) scale(1.06); } }
+  .fx-lunge-down{ animation:lungeDown 0.5s cubic-bezier(.3,0,.3,1); }
+  @keyframes lungeDown{ 40%{ transform:translateY(34px) scale(1.06); } }
+  .fx-drop .mcard{ animation:dropIn 0.45s cubic-bezier(.2,1.4,.4,1); }
+  @keyframes dropIn{ 0%{ transform:translateY(-30px) scale(1.25); opacity:0; } 100%{ transform:none; opacity:1; } }
+  .fx-evolve .mcard{ animation:evolve 1s ease; }
+  @keyframes evolve{
+    0%{ filter:brightness(3) saturate(0); transform:scale(0.9); }
+    40%{ filter:brightness(2); transform:scale(1.12); box-shadow:0 0 40px #fff, 0 0 60px var(--halo); }
+    100%{ filter:none; transform:scale(1); }
+  }
+  .fx-reveal .mcard{ animation:reveal 0.6s ease; }
+  @keyframes reveal{ 0%{ transform:rotateY(90deg); } 100%{ transform:rotateY(0); } }
+  .fx-ko{ animation:koOut 0.6s ease; }
+  @keyframes koOut{ 0%{ transform:none; } 30%{ transform:translateX(-8px) rotate(-3deg); } 60%{ transform:translateX(8px) rotate(3deg); } 100%{ transform:none; } }
+  .fx-ribbon{
+    position:fixed; left:0; right:0; top:44%; transform:translateY(-50%); display:flex; justify-content:center;
+    animation:ribbonIn 1.5s cubic-bezier(.2,.9,.3,1) forwards;
+  }
+  .fx-ribbon span{
+    display:block; width:100%; text-align:center; font-weight:900; font-size:1.7rem; letter-spacing:0.08em; color:#fff;
+    padding:14px 0; background:linear-gradient(90deg, rgba(106,76,255,0), var(--violet) 18%, var(--violet) 82%, rgba(106,76,255,0));
+    text-shadow:0 2px 0 var(--violet-deep);
+  }
+  .fx-ribbon.theirs span{ background:linear-gradient(90deg, rgba(91,99,130,0), #5b6382 18%, #5b6382 82%, rgba(91,99,130,0)); text-shadow:none; }
+  .fx-ribbon.start span{ background:linear-gradient(90deg, rgba(245,184,46,0), var(--halo) 18%, var(--halo) 82%, rgba(245,184,46,0)); color:#4a3200; text-shadow:0 2px 0 #fff3cf; font-size:2rem; }
+  @keyframes ribbonIn{
+    0%{ opacity:0; transform:translateY(-50%) scaleY(0.2); }
+    14%{ opacity:1; transform:translateY(-50%) scaleY(1); }
+    80%{ opacity:1; transform:translateY(-50%) scaleY(1); }
+    100%{ opacity:0; transform:translateY(-50%) scaleY(0.6); }
+  }
+  .fx-toast{
+    position:fixed; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:8px;
+    background:#fff; border-radius:999px; padding:6px 14px 6px 6px; font-weight:900; font-size:0.85rem; color:var(--ink);
+    box-shadow:0 8px 24px rgba(39,48,74,0.22); white-space:nowrap; animation:toast 2.2s ease forwards;
+  }
+  .fx-toast .mcard{ height:34px; box-shadow:none; }
+  @keyframes toast{ 0%{ opacity:0; transform:translate(-50%,10px); } 12%,80%{ opacity:1; transform:translate(-50%,0); } 100%{ opacity:0; transform:translate(-50%,-6px); } }
   .flying-draw-card{
-    position:fixed; width:46px; height:64px; border-radius:6px;
-    background-image:var(--card-back); background-size:cover; background-position:center;
-    border:1px solid var(--gold); z-index:80; pointer-events:none;
+    position:fixed; aspect-ratio:5/7; border-radius:6px; z-index:80; pointer-events:none;
+    background:#6b52c9 var(--card-back) center/cover no-repeat; box-shadow:0 6px 14px rgba(39,48,74,0.3);
     transition:transform 0.55s cubic-bezier(0.22,0.85,0.32,1.1), opacity 0.55s ease;
   }
-
-  .turn-banner{
-    text-align:center; font-family:'DotGothic16'; font-size:1rem;
-    padding:10px; border-radius:10px; margin-bottom:16px;
+  @media (prefers-reduced-motion: reduce){
+    .fx-ribbon, .fx-float, .fx-toast{ animation-duration:0.01s !important; }
+    .fx-hit, .fx-lunge-up, .fx-lunge-down, .fx-drop .mcard, .fx-evolve .mcard, .fx-reveal .mcard, .slot.targetable .mcard, .ez-now.ready{ animation:none !important; }
   }
-  .turn-banner.mine{ background:rgba(244,201,93,0.18); color:var(--gold); }
-  .turn-banner.theirs{ background:rgba(255,255,255,0.06); color:var(--text-dim); }
 
-  .log-box{
-    max-height:140px; overflow-y:auto; font-size:0.82rem; color:var(--text-dim);
-    background:var(--panel2); border-radius:10px; padding:10px 12px;
-  }
-  .log-box div{ padding:2px 0; }
-
-  .action-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
-  .points-row{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
-  .points-row .pts{ font-family:'DotGothic16'; color:var(--gold); }
-
+  /* 勝敗 */
   #winOverlay{
-    position:fixed; inset:0; background:rgba(10,6,18,0.92); display:none;
-    align-items:center; justify-content:center; z-index:50; flex-direction:column; gap:16px;
+    position:fixed; inset:0; display:none; z-index:50; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+    background:radial-gradient(circle at 50% 42%, rgba(255,255,255,0.96) 0%, rgba(230,240,255,0.94) 60%, rgba(214,206,255,0.95) 100%);
+    overflow:hidden;
   }
   #winOverlay.show{ display:flex; }
-  #winOverlay h2{ font-size:2rem; color:var(--gold); }
+  #winOverlay h2{ font-size:2.6rem; margin:0; color:var(--violet); text-shadow:0 4px 0 #fff, 0 10px 24px rgba(106,76,255,0.3); animation:winPop 0.7s cubic-bezier(.2,1.5,.4,1); }
+  #winOverlay.lose h2{ color:#5b6382; text-shadow:0 4px 0 #fff; }
+  #winOverlay .win-halo{ width:120px; height:120px; border-radius:50%; border:10px solid var(--halo); box-shadow:0 0 30px rgba(245,184,46,0.9), 0 0 0 4px #fff3cf inset; animation:haloSpin 3s linear infinite; }
+  #winOverlay.lose .win-halo{ border-color:#c9cfdf; box-shadow:none; animation:none; }
+  #winOverlay .win-score{ font-weight:900; font-size:1.1rem; color:var(--ink-dim); }
+  #winOverlay button{ min-width:220px; }
+  @keyframes winPop{ 0%{ transform:scale(0.3); opacity:0; } 100%{ transform:scale(1); opacity:1; } }
+  @keyframes haloSpin{ 0%{ transform:rotateX(65deg) rotateZ(0); } 100%{ transform:rotateX(65deg) rotateZ(360deg); } }
+  .confetti{ position:absolute; top:-12px; width:9px; height:14px; border-radius:2px; animation:confetti linear forwards; }
+  @keyframes confetti{ to{ transform:translateY(110vh) rotate(720deg); } }
 
-  .card-art-thumb{ cursor:zoom-in; }
-  .card-art-thumb.board{ cursor:zoom-in; }
+  /* カード拡大 */
   .card-viewer{
-    position:fixed; inset:0; background:rgba(10,6,18,0.92); z-index:60;
-    display:flex; align-items:center; justify-content:center; padding:24px;
+    position:fixed; inset:0; background:rgba(39,48,74,0.55); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); z-index:60;
+    display:flex; align-items:center; justify-content:center; padding:20px;
   }
-  .card-viewer-inner{ max-width:92vw; max-height:88vh; display:flex; flex-direction:column; align-items:center; gap:14px; }
-  .card-viewer-inner img{ max-width:100%; max-height:78vh; border-radius:14px; box-shadow:0 10px 40px rgba(0,0,0,0.5); }
-  .card-viewer-close{ background:var(--gold); color:#241a38; padding:10px 24px; }
+  .card-viewer-inner{ max-width:92vw; max-height:90vh; display:flex; flex-direction:column; align-items:center; gap:14px; }
+  .card-viewer-inner img{ max-width:100%; max-height:78vh; border-radius:16px; box-shadow:0 18px 50px rgba(39,48,74,0.45); }
+  .card-viewer-inner .mcard{ height:min(74vh, 124vw); box-shadow:0 18px 50px rgba(39,48,74,0.45); }
+  .card-viewer-close{ min-width:160px; }
 
+  /* コイン */
   .coin-overlay{
     position:fixed; inset:0; z-index:70; display:flex; align-items:center; justify-content:center;
-    background:rgba(10,6,18,0.55); pointer-events:none;
-    animation:coinFadeIn 0.15s ease;
+    background:rgba(39,48,74,0.35); pointer-events:none; animation:coinFadeIn 0.15s ease;
   }
   .coin-overlay.hide{ animation:coinFadeOut 0.4s ease forwards; }
-  .coin-overlay-inner{ display:flex; flex-direction:column; align-items:center; gap:16px; }
-  .coin-overlay-label{ font-family:'DotGothic16'; font-size:1.1rem; color:var(--gold); text-shadow:0 2px 8px rgba(0,0,0,0.6); }
+  .coin-overlay-inner{ display:flex; flex-direction:column; align-items:center; gap:16px; background:#fff; border-radius:28px; padding:22px 26px; box-shadow:0 18px 50px rgba(39,48,74,0.35); }
+  .coin-overlay-label{ font-weight:900; font-size:1.1rem; color:var(--ink); text-align:center; }
   .coin-overlay-faces{ display:flex; gap:14px; }
-  .coin-overlay-faces img{
-    width:96px; height:96px; border-radius:50%; box-shadow:0 8px 30px rgba(0,0,0,0.6);
-    animation:coinFlipPop 0.5s ease;
-  }
+  .coin-overlay-faces img{ width:84px; height:84px; border-radius:50%; box-shadow:0 8px 20px rgba(39,48,74,0.35); animation:coinFlipPop 0.5s ease; }
   @keyframes coinFadeIn{ from{ opacity:0; } to{ opacity:1; } }
   @keyframes coinFadeOut{ from{ opacity:1; } to{ opacity:0; } }
-  .ko-flash{ position:relative; animation:koShake 0.45s ease; }
-  .ko-flash::after{
-    content:'KO!'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-    font-family:'DotGothic16'; font-size:1.7rem; color:#ff4d4d; letter-spacing:2px;
-    background:rgba(0,0,0,0.4); border-radius:14px; z-index:5;
-    animation:koPop 1s ease forwards; pointer-events:none;
-  }
-  @keyframes koPop{
-    0%{ opacity:0; transform:scale(0.4) rotate(-8deg); }
-    25%{ opacity:1; transform:scale(1.3) rotate(4deg); }
-    45%{ transform:scale(1) rotate(-2deg); }
-    75%{ opacity:1; transform:scale(1) rotate(0deg); }
-    100%{ opacity:0; transform:scale(1) rotate(0deg); }
-  }
-  @keyframes koShake{
-    0%,100%{ transform:translateX(0); }
-    20%{ transform:translateX(-6px); }
-    40%{ transform:translateX(6px); }
-    60%{ transform:translateX(-4px); }
-    80%{ transform:translateX(4px); }
-  }
   @keyframes coinFlipPop{
     0%{ transform:scale(0.2) rotateY(0deg); opacity:0; }
     60%{ transform:scale(1.15) rotateY(720deg); opacity:1; }
     100%{ transform:scale(1) rotateY(1080deg); opacity:1; }
   }
 
+  /* ---------- パック ---------- */
+  .pack-select-grid{ display:flex; gap:16px; overflow-x:auto; padding:6px 4px 16px; margin:0 -4px; scroll-snap-type:x mandatory; }
+  .pack-card{ flex:0 0 auto; width:min(62vw, 230px); display:flex; flex-direction:column; align-items:center; gap:10px; scroll-snap-align:center; }
+  .pack-card img{ width:100%; filter:drop-shadow(0 12px 18px rgba(74,62,160,0.28)); transition:transform 0.2s ease; }
+  .pack-card:active img{ transform:scale(0.97) rotate(-1deg); }
+  .pack-card .pname{ font-weight:900; font-size:1rem; text-align:center; line-height:1.4; }
+  .pack-card button{ width:100%; }
+  #packLimitStatus{ font-weight:900; color:var(--violet); background:#f2eeff; border-radius:999px; padding:6px 14px; align-self:flex-start; margin:0; }
+  .pack-reveal-row{ display:grid; grid-template-columns:repeat(5, 1fr); gap:6px; padding:8px 0; perspective:900px; }
+  .pack-reveal-card{ aspect-ratio:5/7; position:relative; transform-style:preserve-3d; transition:transform 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+  .pack-reveal-card.revealed{ transform:rotateY(180deg); }
+  .pack-reveal-face{
+    position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    border-radius:8px; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:#fff; text-align:center; box-shadow:0 6px 14px rgba(39,48,74,0.2);
+  }
+  .pack-reveal-face.front{ background:#6b52c9 var(--card-back) center/cover no-repeat; }
+  .pack-reveal-face.back{ transform:rotateY(180deg); }
+  .pack-reveal-face.back > img{ width:100%; height:100%; object-fit:cover; }
+  .pack-reveal-face.back .mcard{ height:100%; box-shadow:none; }
+  .pack-reveal-face.back .hname, .pack-reveal-face.back .type-badge, .pack-reveal-face.back .status-badge{ display:none; }
+
+  .pack-big-overlay{
+    position:fixed; inset:0; z-index:70; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px;
+    background:radial-gradient(circle at 50% 45%, #ffffff 0%, #e8efff 45%, #cfc4ff 100%); perspective:1200px;
+  }
+  .pack-big-overlay::after{ content:'タップして進む'; position:absolute; bottom:max(28px, env(safe-area-inset-bottom)); font-weight:900; color:var(--violet); opacity:0.7; font-size:0.9rem; }
+  .pack-big-card{
+    height:min(78dvh, 128vw); aspect-ratio:5/7; position:relative;
+    transform-style:preserve-3d; transform:rotateY(0deg);
+    transition:transform 0.55s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .pack-big-card.revealed{ transform:rotateY(180deg); }
+  .pack-big-card .pack-reveal-face{ border-radius:4.5%/3.2%; background:transparent; box-shadow:0 22px 50px rgba(74,62,160,0.45); }
+  .pack-big-card .pack-reveal-face.front{ background:#6b52c9 var(--card-back) center/cover no-repeat; }
+  .pack-big-card .pack-reveal-face.back{ background:#fff; padding:0; }
+  .pack-big-card .pack-reveal-face.back > img{ width:100%; height:100%; object-fit:contain; }
+  .pack-big-card.rare.revealed .pack-reveal-face.back{ box-shadow:0 0 0 4px var(--halo), 0 0 60px rgba(245,184,46,0.9), 0 22px 50px rgba(74,62,160,0.45); }
+  .pack-big-card.rare.revealed .pack-reveal-face.back::after{
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.75) 45%, transparent 60%);
+    background-size:250% 100%; animation:shine 1.6s ease 0.4s 2 both;
+  }
+  @keyframes shine{ from{ background-position:120% 0; } to{ background-position:-120% 0; } }
+
+  /* ---------- デッキ ---------- */
+  .energy-type-btn{
+    display:flex; align-items:center; gap:6px; padding:8px 14px; font-size:0.88rem;
+    background:#fff; color:var(--ink); box-shadow:0 3px 0 #d5dbea;
+  }
+  .energy-type-btn img{ width:22px; height:22px; border-radius:50%; }
+  .energy-type-btn.selected{ background:var(--violet); color:#fff; box-shadow:0 3px 0 var(--violet-deep); }
+  #deckCount{ font-weight:900; color:var(--violet); font-size:1.1rem; }
+  .deck-card-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:12px 10px; margin:6px 0; }
+  .deck-card-tile{ display:flex; flex-direction:column; align-items:center; gap:4px; position:relative; }
+  .deck-card-tile > img{ width:100%; aspect-ratio:5/7; object-fit:cover; border-radius:8px; cursor:zoom-in; box-shadow:0 6px 14px rgba(39,48,74,0.18); }
+  .deck-card-tile .no-art{ width:100%; aspect-ratio:5/7; border-radius:8px; display:flex; align-items:center; justify-content:center; text-align:center; font-size:0.75rem; padding:6px; color:#fff; font-weight:900; }
+  .deck-card-tile > .status-badge{ position:absolute; top:-6px; left:-4px; margin:0; }
+  .deck-card-tile .dname{ font-size:0.75rem; font-weight:900; text-align:center; line-height:1.25; }
+  .deck-card-tile .downed{ font-size:0.66rem; color:var(--ink-dim); font-weight:700; }
+  .deck-card-tile .deck-qty-row{ display:flex; align-items:center; gap:6px; background:#f3f6fd; border-radius:999px; padding:3px; }
+  .deck-card-tile .deck-qty-row button{ width:28px; height:28px; padding:0; font-size:1rem; }
+  .deck-card-tile .deck-qty-num{ font-weight:900; width:16px; text-align:center; }
+
+  .deck-card-tile > .mcard{ width:100%; height:auto; cursor:zoom-in; }
+  .card-art-thumb{ width:100%; border-radius:8px; display:block; }
+  /* ---------- 戦績 ---------- */
+  #statsRanking{ counter-reset:rk; gap:8px; }
+  #statsRanking .atk-line, #statsHistory .atk-line{ background:#f5f7fd; border-radius:16px; padding:10px 14px; color:var(--ink); font-weight:700; }
+  #statsRanking .atk-line::before{
+    counter-increment:rk; content:counter(rk); width:26px; height:26px; border-radius:50%; flex-shrink:0;
+    display:inline-flex; align-items:center; justify-content:center; font-weight:900; background:#e7ebf4; color:var(--ink-dim);
+  }
+  #statsRanking .atk-line:first-child::before{ background:var(--halo); color:#4a3200; box-shadow:0 0 0 3px #fff3cf; }
+  #statsRanking .atk-line b{ margin-left:auto; color:var(--violet); }
+  #statsHistory{ gap:8px; }
+  #statsHistory .atk-line{ font-size:0.8rem; font-weight:500; }
+
+  .img-broken{ display:none !important; }
+  .logo-text{
+    text-align:center; font-weight:900; font-size:3rem; line-height:1.1; margin:18px 0 4px; color:var(--violet);
+    text-shadow:0 4px 0 #fff, 0 10px 24px rgba(106,76,255,0.3); letter-spacing:0.04em;
+  }
   .hidden{ display:none !important; }
 </style>
 </head>
@@ -541,34 +772,32 @@
 
   <!-- ===== GAME ===== -->
   <div id="game" class="hidden">
-    <div id="turnBanner" class="turn-banner"></div>
-
-    <div id="boardScroll" class="board-scroll">
-      <div id="disconnectBanner"></div>
-
-      <div class="points-row">
-        <div>あなた: <span class="pts" id="myPoints">0</span>点</div>
-        <div>相手: <span class="pts" id="oppPoints">0</span>点</div>
-      </div>
-
-      <div class="zone-label">相手の場</div>
+    <div class="g-top">
+      <div class="ptag" id="oppTag"></div>
       <div id="oppHandRow" class="opp-hand-row"></div>
-      <div id="oppBoard"></div>
+      <div class="deck-chip" id="oppDeckChip"></div>
+      <button type="button" class="icon-btn" id="logToggleBtn" aria-label="ログを見る">📜</button>
+    </div>
+    <div id="disconnectBanner"></div>
+    <div class="log-box hidden" id="logBox"></div>
+
+    <div class="g-field" id="boardScroll">
       <div id="oppBench" class="bench-row"></div>
-
-      <div class="zone-label" style="margin-top:12px;">自分の場</div>
-      <div id="myBoard"></div>
+      <div id="oppBoard" class="active-zone"></div>
+      <div class="g-mid">
+        <div id="turnBanner" class="turn-banner"></div>
+        <div id="pendingEnergyBox" class="energy-zone"></div>
+      </div>
+      <div id="myBoard" class="active-zone"></div>
       <div id="myBench" class="bench-row"></div>
-
-      <div id="pendingEnergyBox" class="stack" style="margin-top:10px;"></div>
-
-      <button type="button" class="ghost" id="logToggleBtn" style="margin-top:12px; width:100%;">ログを表示</button>
-      <div class="log-box hidden" id="logBox"></div>
     </div>
 
-    <div class="action-row" id="actionRow"></div>
+    <div class="g-actions">
+      <div class="ptag" id="myTag"></div>
+      <div class="action-row" id="actionRow"></div>
+    </div>
     <div id="drawnBanner"></div>
-    <div class="hand-area-row">
+    <div class="g-hand hand-area-row">
       <div id="myDeckPile" class="deck-pile-display"></div>
       <div class="hand-row" id="handRow"></div>
     </div>
@@ -577,8 +806,10 @@
 </div>
 
 <div id="winOverlay">
+  <div class="win-halo"></div>
   <h2 id="winText"></h2>
-  <button id="rematchBtn">もう一度対戦する</button>
+  <div class="win-score" id="winScore"></div>
+  <button id="rematchBtn" class="gold">もう一度対戦する</button>
   <button id="backToLandingBtn" class="ghost">タイトルに戻る</button>
 </div>
 
@@ -600,6 +831,9 @@
   </div>
 </div>
 
+<div id="attackSheet" class="attack-sheet hidden"></div>
+<div id="fxLayer" aria-hidden="true"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
 <script>
 /* ================= Supabase ================= */
@@ -613,6 +847,8 @@ const CARDS = {
   fight_kaika: { id:'fight_kaika', name:'怪化・拳鬼',     type:'格闘', hp:90,  basic:false, kind:'creature', retreatCost:1, kaikaOf:'fight_base',                     attacks:[{name:'鬼衝拳',     cost:['格闘','格闘'], dmg:50},{name:'痺れ突き', cost:['格闘'], dmg:20, inflicts:'paralysis'}] },
   dark_base:   { id:'dark_base',   name:'悪の使い魔',     type:'悪',   hp:50,  basic:true,  kind:'creature', retreatCost:1, kaikaTo:'dark_kaika',                     ability:{name:'闇の加護', timing:'passive', effect:'dmgReduce10', desc:'アクティブでいる間、受けるダメージ-10'}, attacks:[{name:'影撃ち',     cost:['悪'],         dmg:20}] },
   mitsu_base:  { id:'mitsu_base',  name:'みーつ',         type:'悪',   hp:70,  basic:true,  kind:'creature', retreatCost:1, kaikaTo:'mitsu_ex', attacks:[{name:'裏作業', cost:['悪'], dmg:20, coinBenchDamage:{amount:10}, desc:'コインを1回投げオモテなら、相手のベンチメガモン1匹にも10ダメージ'}], image:'https://kbsdvtjkczhnggamnggd.supabase.co/storage/v1/object/public/card-images/IMG_8772.png' },
+  pom_ex:      { id:'pom_ex',      name:'ぽむEX',         type:'悪',   hp:140, basic:true,  kind:'creature', retreatCost:2, isEx:true, ability:{name:'スイカの御加護', timing:'passive', effect:'healAllOnItemUse', itemName:'ぽむのスイカ', amount:20, desc:'このメガモンがいるかぎり、グッズの「ぽむのスイカ」を使った時に自分のメガモン全員のHPを追加で20回復'}, attacks:[{name:'どんまいチャチャチャウーロン茶', cost:['悪','悪','無色'], dmg:80, bonusEnergyInflict:{type:'悪', extra:1, status:'poison'}, desc:'追加で悪エネルギーが1つ付いているなら、その技で相手のバトルメガモンをどくにする'}], image:'https://kbsdvtjkczhnggamnggd.supabase.co/storage/v1/object/public/card-images/IMG_8941.png' },
+  kagame_base: { id:'kagame_base', name:'かがめ',         type:'悪',   hp:90,  basic:true,  kind:'creature', retreatCost:2, ability:{name:'デバフとか笑', timing:'passive', effect:'statusImmune', desc:'このメガモンは状態異常にならない'}, attacks:[{name:'ランクスタックソウル', cost:['悪','悪'], dmg:40, repeatBonus:{extra:30}, desc:'前のターンもこの技を使っていたなら、追加で30ダメージ'}], image:'https://kbsdvtjkczhnggamnggd.supabase.co/storage/v1/object/public/card-images/IMG_8943.png' },
   dark_kaika:  { id:'dark_kaika',  name:'怪化・闇喰らい', type:'悪',   hp:90,  basic:false, kind:'creature', retreatCost:1, kaikaOf:'dark_base',                      attacks:[{name:'深淵の顎',   cost:['悪','悪'],     dmg:50},{name:'毒牙', cost:['悪'], dmg:10, inflicts:'poison'}] },
   mitsu_ex:    { id:'mitsu_ex',    name:'みーつEX',       type:'悪',   hp:130, basic:false, kind:'creature', retreatCost:1, kaikaOf:'mitsu_base', isEx:true, ability:{name:'ピック・ミー・アップ', timing:'passive', effect:'healSelfOnKO', amount:30, desc:'このメガモンは相手のバトルメガモンをきぜつさせたとき、自分のHPを30回復する'}, attacks:[{name:'ドロップ・オブ・ザ・ブルースカイ', cost:['悪','悪','悪'], dmg:100, bonusIfSelfHpBelow:{threshold:80, bonus:30}, desc:'このメガモンの残りHPが80以下なら、30ダメージ追加'}], image:'https://kbsdvtjkczhnggamnggd.supabase.co/storage/v1/object/public/card-images/IMG_8768.png' },
   psy_base:    { id:'psy_base',    name:'超能力の少女',   type:'超',   hp:50,  basic:true,  kind:'creature', retreatCost:1, kaikaTo:'psy_kaika',                      ability:{name:'占い', timing:'onPlay', effect:'draw1', desc:'場に出た時、山札を1枚引く'}, attacks:[{name:'念動弾',     cost:['超'],         dmg:20}] },
@@ -628,6 +864,9 @@ const CARDS = {
   bird_base: { id:'bird_base', name:'ばーど', type:'悪', hp:90, basic:true, kind:'creature', retreatCost:1, image:'data:image/jpeg;base64,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', ability:{name:'マイク・イーター', timing:'onPlay', effect:'coinInflictOpponent', status:'confusion', desc:'バトル場に出した時に1回使える。コインを1回投げオモテなら、相手のバトルメガモンをこんらんにする。'}, attacks:[{name:'つつきまくる', cost:['悪'], dmg:0, coin:{count:2,type:'perHeads',amount:20}}] },
   promo_launch: { id:'promo_launch', name:'食堂のおばちゃん', type:'無色', hp:80, basic:true, kind:'creature', retreatCost:2, image:'https://kbsdvtjkczhnggamnggd.supabase.co/storage/v1/object/public/card-images/IMG_8695.png', ability:{name:'起死回生', timing:'passive', effect:'costReduceIfBehind', amount:1, desc:'相手に2ポイント取られているなら、技のコストが無色1個分少なくなる'}, attacks:[{name:'エンドレス・ランチタイム', cost:['無色','無色','無色'], dmg:10, coinKO:{count:4, threshold:3}, desc:'コインを4回投げ、3回以上表なら相手のバトルメガモンは即きぜつ'}] },
   item_potion:  { id:'item_potion',  name:'ポーション',       kind:'item',    trainerType:'グッズ',   effect:'heal20',      desc:'アクティブのHPを20回復' },
+  item_ball:    { id:'item_ball',    name:'メガモンボール',   kind:'item',    trainerType:'グッズ',   effect:'randomBasicToHand', desc:'自分の山札からたねメガモンをランダムに1枚手札に加える', image:'https://kbsdvtjkczhnggamnggd.supabase.co/storage/v1/object/public/card-images/IMG_8942.png' },
+  item_akamaru: { id:'item_akamaru', name:'みーつの赤マル',   kind:'item',    trainerType:'グッズ',   effect:'heal20Return', desc:'自分のバトルメガモンのHPを20回復。その後コインを1回投げオモテならトラッシュせず手札に戻す', image:'https://kbsdvtjkczhnggamnggd.supabase.co/storage/v1/object/public/card-images/IMG_8944.png' },
+  item_watermelon: { id:'item_watermelon', name:'ぽむのスイカ', kind:'item',  trainerType:'グッズ',   effect:'heal20DarkFullHeal', desc:'自分のバトルメガモンのHPを20回復。もし悪タイプなら、状態異常もすべて回復', image:'https://kbsdvtjkczhnggamnggd.supabase.co/storage/v1/object/public/card-images/IMG_8946.png' },
   item_energy:  { id:'item_energy',  name:'エナジーカプセル', kind:'item',    trainerType:'グッズ',   effect:'energyBoost', desc:'ランダムなエネルギーをアクティブに即付与' },
   sup_scout:    { id:'sup_scout',    name:'スカウト',         kind:'support', trainerType:'サポート', effect:'draw2',       desc:'山札から2枚引く' },
   sup_powerup:  { id:'sup_powerup',  name:'気合注入',         kind:'support', trainerType:'サポート', effect:'attackBoost20', desc:'次の攻撃のダメージ+20' },
@@ -636,6 +875,7 @@ const CARDS = {
   item_freeretreat:{ id:'item_freeretreat',name:'とっかえロープ', kind:'item',  trainerType:'グッズ',   effect:'freeRetreat',   desc:'回数制限もコストも無視してベンチと交代する' },
   item_knife:      { id:'item_knife',      name:'投げナイフ',   kind:'item',    trainerType:'グッズ',   effect:'directDamage10',desc:'相手アクティブに直接10ダメージ(エネルギー不要)' },
   sup_refresh:     { id:'sup_refresh',     name:'総入れ替え',   kind:'support', trainerType:'サポート', effect:'fullRefresh',   desc:'手札を全部捨てて5枚引き直す' },
+  tool_gtx:        { id:'tool_gtx',        name:'GTX1660super', kind:'tool',    trainerType:'どうぐ',   effect:'useBaseAttacks', desc:'このカードをつけているメガモンは、進化前に持っていたワザをすべて使える(ワザを使うためのエネルギーは必要)', image:'https://kbsdvtjkczhnggamnggd.supabase.co/storage/v1/object/public/card-images/IMG_8945.png' },
 };
 const WEAKNESS = { '格闘':'悪', '悪':'超', '超':'格闘' }; // attackerType -> type it deals bonus damage to
 const TYPES = ['格闘','悪','超','無色']; // カードのタイプ(バッジ表示・弱点判定などに使用)
@@ -661,10 +901,15 @@ const PRINTS = {
   mitsu_ex_d4:         { id:'mitsu_ex_d4',         cardId:'mitsu_ex',         rarity:'diamond4' },
   mitsu_ex_s3:         { id:'mitsu_ex_s3',         cardId:'mitsu_ex',         rarity:'star3', image:'https://kbsdvtjkczhnggamnggd.supabase.co/storage/v1/object/public/card-images/IMG_8769.png' },
   mitsu_base_d1:       { id:'mitsu_base_d1',       cardId:'mitsu_base',       rarity:'diamond1' },
+  pom_ex_d4:           { id:'pom_ex_d4',           cardId:'pom_ex',           rarity:'diamond4' },
+  kagame_base_d4:      { id:'kagame_base_d4',      cardId:'kagame_base',      rarity:'diamond4' },
   psy_kaika_d3:        { id:'psy_kaika_d3',        cardId:'psy_kaika',        rarity:'diamond3' },
   col_kaika_d3:        { id:'col_kaika_d3',        cardId:'col_kaika',        rarity:'diamond3' },
   family_rabbit_d2:   { id:'family_rabbit_d2',   cardId:'family_rabbit',   rarity:'diamond2' },
   item_potion_d1:      { id:'item_potion_d1',      cardId:'item_potion',      rarity:'diamond1' },
+  item_ball_d1:        { id:'item_ball_d1',        cardId:'item_ball',        rarity:'diamond1' },
+  item_akamaru_d1:     { id:'item_akamaru_d1',     cardId:'item_akamaru',     rarity:'diamond1', packId:'pack_dark' },
+  item_watermelon_d1:  { id:'item_watermelon_d1',  cardId:'item_watermelon',  rarity:'diamond1', packId:'pack_dark' },
   item_energy_d1:      { id:'item_energy_d1',      cardId:'item_energy',      rarity:'diamond1' },
   sup_scout_d1:        { id:'sup_scout_d1',        cardId:'sup_scout',        rarity:'diamond1' },
   sup_powerup_d1:      { id:'sup_powerup_d1',      cardId:'sup_powerup',      rarity:'diamond2' },
@@ -672,6 +917,7 @@ const PRINTS = {
   item_freeretreat_d1: { id:'item_freeretreat_d1', cardId:'item_freeretreat', rarity:'diamond2' },
   item_knife_d1:       { id:'item_knife_d1',       cardId:'item_knife',       rarity:'diamond2' },
   sup_refresh_d1:      { id:'sup_refresh_d1',      cardId:'sup_refresh',      rarity:'diamond2' },
+  tool_gtx_d1:         { id:'tool_gtx_d1',         cardId:'tool_gtx',         rarity:'diamond1', packId:'pack_psychic' },
 };
 const ALL_PRINT_IDS = Object.keys(PRINTS);
 function printCard(printId){ const p = PRINTS[printId]; return p ? CARDS[p.cardId] : null; }
@@ -788,6 +1034,25 @@ function log(state, msg){
 
 /* ================= game state helpers ================= */
 function otherSlot(slot){ return slot === 'p1' ? 'p2' : 'p1'; }
+function hasStatusImmunity(fieldCard){
+  if(!fieldCard) return false;
+  const ab = CARDS[fieldCard.cardId].ability;
+  return !!(ab && ab.timing === 'passive' && ab.effect === 'statusImmune');
+}
+function getEffectiveAttacks(fieldCard){
+  const card = CARDS[fieldCard.cardId];
+  let attacks = card.attacks || [];
+  if(fieldCard.tool){
+    const tool = CARDS[fieldCard.tool];
+    if(tool && tool.effect === 'useBaseAttacks' && card.kaikaOf){
+      const baseCard = CARDS[card.kaikaOf];
+      if(baseCard && baseCard.attacks && baseCard.attacks.length){
+        attacks = attacks.concat(baseCard.attacks);
+      }
+    }
+  }
+  return attacks;
+}
 function countOnField(player, cardId){
   let n = 0;
   if(player.active && player.active.cardId === cardId) n++;
@@ -860,7 +1125,7 @@ async function buildDeckForPlayer(name){
 }
 function makeFieldCard(cardId){
   const card = CARDS[cardId];
-  return { cardId, hp: card.hp, maxHp: card.hp, damage:0, energy:[], turnsInPlay:0, kaika:false, status:null, statusBlocked:false, abilityUsedThisTurn:false, shield:0, hidden:false };
+  return { cardId, hp: card.hp, maxHp: card.hp, damage:0, energy:[], turnsInPlay:0, kaika:false, status:null, statusBlocked:false, abilityUsedThisTurn:false, shield:0, hidden:false, lastAttackName:null, lastAttackTurn:null };
 }
 function triggerOnPlayAbility(state, slot, fieldCard){
   const card = CARDS[fieldCard.cardId];
@@ -878,7 +1143,7 @@ function triggerOnPlayAbility(state, slot, fieldCard){
     if(!opp.active) return;
     const results = flipCoins(1);
     log(state, `${nameOf(slot)}の${card.name}の特性「${card.ability.name}」: ${coinResultText(results)}`);
-    if(results[0] && !opp.active.status){
+    if(results[0] && !opp.active.status && !hasStatusImmunity(opp.active)){
       opp.active.status = card.ability.status;
       opp.active.statusBlocked = false;
       log(state, `${nameOf(otherSlot(slot))}の${CARDS[opp.active.cardId].name}は${STATUS_LABEL[card.ability.status]}状態になった`);
@@ -1066,7 +1331,7 @@ function canPlayTrainer(state, slot, cardId){
   if(!card || (card.kind !== 'item' && card.kind !== 'support')) return false;
   if(!p.hand.includes(cardId)) return false;
   if(card.kind === 'support' && p.supporterUsedThisTurn) return false;
-  if(['heal20','energyBoost','attackBoost20','fullHeal','freeRetreat'].includes(card.effect) && !p.active) return false;
+  if(['heal20','energyBoost','attackBoost20','fullHeal','freeRetreat','heal20Return','heal20DarkFullHeal'].includes(card.effect) && !p.active) return false;
   if(card.effect === 'freeRetreat' && p.bench.length === 0) return false;
   if(card.effect === 'directDamage10' && !opp.active) return false;
   return true;
@@ -1083,6 +1348,28 @@ function playTrainer(state, slot, cardId){
     p.active.damage = Math.max(0, p.active.damage - 20);
     p.active.hp = Math.min(p.active.maxHp, p.active.hp + 20);
     log(state, `${nameOf(slot)}が${card.name}を使って${CARDS[p.active.cardId].name}を20回復`);
+  }else if(card.effect === 'heal20Return'){
+    p.active.damage = Math.max(0, p.active.damage - 20);
+    p.active.hp = Math.min(p.active.maxHp, p.active.hp + 20);
+    log(state, `${nameOf(slot)}が${card.name}を使って${CARDS[p.active.cardId].name}を20回復`);
+    const results = flipCoins(1);
+    p.lastCoinFlip = { attackName: `${card.name}(手札に戻る判定)`, results };
+    log(state, `${nameOf(slot)}の${card.name}: ${coinResultText(results)}`);
+    if(results[0]){
+      const dIdx = p.discard.lastIndexOf(cardId);
+      if(dIdx !== -1) p.discard.splice(dIdx,1);
+      p.hand.push(cardId);
+      log(state, `${nameOf(slot)}の${card.name}はトラッシュされず手札に戻った`);
+    }
+  }else if(card.effect === 'heal20DarkFullHeal'){
+    p.active.damage = Math.max(0, p.active.damage - 20);
+    p.active.hp = Math.min(p.active.maxHp, p.active.hp + 20);
+    log(state, `${nameOf(slot)}が${card.name}を使って${CARDS[p.active.cardId].name}を20回復`);
+    if(CARDS[p.active.cardId].type === '悪' && p.active.status){
+      log(state, `${nameOf(slot)}の${CARDS[p.active.cardId].name}は悪タイプなので状態異常(${STATUS_LABEL[p.active.status]})も治った`);
+      p.active.status = null;
+      p.active.statusBlocked = false;
+    }
   }else if(card.effect === 'energyBoost'){
     const t = p.energyTypes[Math.floor(Math.random()*p.energyTypes.length)];
     p.active.energy.push(t);
@@ -1113,6 +1400,31 @@ function playTrainer(state, slot, cardId){
     p.deck = shuffle(p.deck);
     for(let i=0;i<5 && p.deck.length>0;i++) p.hand.push(p.deck.shift());
     log(state, `${nameOf(slot)}が${card.name}で手札を入れ替えた`);
+  }else if(card.effect === 'randomBasicToHand'){
+    const basicIdxs = p.deck.map((id,i) => (CARDS[id] && CARDS[id].basic) ? i : null).filter(i => i !== null);
+    if(basicIdxs.length > 0){
+      const idx = basicIdxs[Math.floor(Math.random()*basicIdxs.length)];
+      const drawnId = p.deck.splice(idx,1)[0];
+      p.hand.push(drawnId);
+      log(state, `${nameOf(slot)}が${card.name}で山札から${CARDS[drawnId].name}を手札に加えた`);
+    }else{
+      log(state, `${nameOf(slot)}が${card.name}を使ったが、山札にたねメガモンが無かった`);
+    }
+  }
+
+  if(card.kind === 'item'){
+    const allMine = [p.active, ...p.bench].filter(Boolean);
+    allMine.forEach(fc => {
+      const fcCard = CARDS[fc.cardId];
+      const ab = fcCard.ability;
+      if(ab && ab.timing === 'passive' && ab.effect === 'healAllOnItemUse' && ab.itemName === card.name){
+        allMine.forEach(t => {
+          t.damage = Math.max(0, t.damage - ab.amount);
+          t.hp = Math.min(t.maxHp, t.hp + ab.amount);
+        });
+        log(state, `${nameOf(slot)}の${fcCard.name}の特性「${ab.name}」で自分のメガモン全員のHPを${ab.amount}追加回復`);
+      }
+    });
   }
 }
 
@@ -1211,6 +1523,24 @@ function attachEnergy(state, slot, target){
   dest.energy.push(p.pendingEnergy);
   log(state, `${nameOf(slot)}が${CARDS[dest.cardId].name}に${dest.energy[dest.energy.length-1]}エネルギーを付けた`);
   p.pendingEnergy = null;
+}
+
+function canPlayTool(state, slot, cardId){
+  const p = state.players[slot];
+  const card = CARDS[cardId];
+  if(!card || card.kind !== 'tool') return false;
+  if(!p.hand.includes(cardId)) return false;
+  const targets = [p.active, ...p.bench].filter(Boolean);
+  return targets.some(fc => !fc.tool);
+}
+function attachTool(state, slot, cardId, target){
+  const p = state.players[slot];
+  const card = CARDS[cardId];
+  const dest = (target && target.where === 'bench') ? p.bench[target.idx] : p.active;
+  if(!dest || dest.tool) return;
+  p.hand.splice(p.hand.indexOf(cardId),1);
+  dest.tool = cardId;
+  log(state, `${nameOf(slot)}が${CARDS[dest.cardId].name}に${card.name}をつけた`);
 }
 
 function effectiveRetreatCost(state, slot){
@@ -1328,8 +1658,7 @@ function canAttack(state, slot, attackIdx){
   const p = state.players[slot];
   if(!p.active) return false;
   if(p.active.statusBlocked) return false;
-  const card = CARDS[p.active.cardId];
-  const atk = card.attacks[attackIdx];
+  const atk = getEffectiveAttacks(p.active)[attackIdx];
   if(!atk) return false;
   return canPayCost(p.active.energy, effectiveAttackCost(state, slot, atk));
 }
@@ -1338,7 +1667,7 @@ function doAttack(state, slot, attackIdx, targetBenchIdx){
   const defSlot = otherSlot(slot);
   const defender = state.players[defSlot];
   const attackerCard = CARDS[attacker.active.cardId];
-  const atk = attackerCard.attacks[attackIdx];
+  const atk = getEffectiveAttacks(attacker.active)[attackIdx];
 
   attacker.lastCoinFlip = null;
   if(attacker.active.status === 'confusion'){
@@ -1360,6 +1689,12 @@ function doAttack(state, slot, attackIdx, targetBenchIdx){
     dmg += atk.bonusIfSelfHpBelow.bonus;
     log(state, `${nameOf(slot)}の${attackerCard.name}は残りHPが少なく、追加${atk.bonusIfSelfHpBelow.bonus}ダメージ！`);
   }
+  if(atk.repeatBonus && attacker.active.lastAttackName === atk.name && attacker.active.lastAttackTurn === state.turn - 2){
+    dmg += atk.repeatBonus.extra;
+    log(state, `${nameOf(slot)}の${attackerCard.name}は前のターンと同じ技で、追加${atk.repeatBonus.extra}ダメージ！`);
+  }
+  attacker.active.lastAttackName = atk.name;
+  attacker.active.lastAttackTurn = state.turn;
 
   if(atk.attackEffect === 'attachBenchEnergy' && typeof targetBenchIdx === 'number' && attacker.bench[targetBenchIdx]){
     const target = attacker.bench[targetBenchIdx];
@@ -1414,10 +1749,20 @@ function doAttack(state, slot, attackIdx, targetBenchIdx){
     log(state, `${nameOf(slot)}の${attackerCard.name}は次の相手のターン、受けるダメージが${atk.selfShield.amount}減る`);
   }
 
-  if(atk.inflicts && defender.active.hp > 0 && !defender.active.status){
+  if(atk.inflicts && defender.active.hp > 0 && !defender.active.status && !hasStatusImmunity(defender.active)){
     defender.active.status = atk.inflicts;
     const label = { poison:'どく', burn:'やけど', paralysis:'まひ', sleep:'ねむり' }[atk.inflicts];
     log(state, `${nameOf(defSlot)}の${defenderCard.name}は${label}状態になった`);
+  }
+
+  if(atk.bonusEnergyInflict && defender.active.hp > 0 && !defender.active.status && !hasStatusImmunity(defender.active)){
+    const need = atk.cost.filter(c => c === atk.bonusEnergyInflict.type).length + atk.bonusEnergyInflict.extra;
+    const have = attacker.active.energy.filter(e => e === atk.bonusEnergyInflict.type).length;
+    if(have >= need){
+      defender.active.status = atk.bonusEnergyInflict.status;
+      const label = { poison:'どく', burn:'やけど', paralysis:'まひ', sleep:'ねむり' }[atk.bonusEnergyInflict.status];
+      log(state, `${nameOf(slot)}の${attackerCard.name}は${atk.bonusEnergyInflict.type}エネルギーが余分についていたので、${nameOf(defSlot)}の${defenderCard.name}を${label}状態にした`);
+    }
   }
 
   if(atk.discardDefenderEnergy && defender.active.hp > 0 && defender.active.energy.length > 0){
@@ -1725,14 +2070,14 @@ const ENERGY_IMG = {
 function renderEnergyDots(energyArr){
   return energyArr.map(t => `<img class="energy-dot" src="${ENERGY_IMG[t]}" alt="${t}">`).join('');
 }
-function renderAttackList(cardDef, energyAttached, compact){
+function renderAttackList(attacks, energyAttached, compact){
   if(compact){
-    return cardDef.attacks.map(atk => {
+    return attacks.map(atk => {
       const costIcons = atk.cost.map(t => `<img class="energy-dot small" src="${ENERGY_IMG[t]}" alt="${t}">`).join('');
       return `<div class="atk-line">${costIcons} <b>${atk.name}</b></div>`;
     }).join('');
   }
-  return cardDef.attacks.map(atk => {
+  return attacks.map(atk => {
     const costIcons = atk.cost.map(t => `<img class="energy-dot small" src="${ENERGY_IMG[t]}" alt="${t}">`).join('');
     const payable = energyAttached ? canPayCost(energyAttached, atk.cost) : null;
     const mark = payable === null ? '' : (payable ? ' <span style="color:var(--hp-green);">✓使える</span>' : ' <span style="color:var(--text-dim);">✗コスト不足</span>');
@@ -1771,80 +2116,246 @@ function renderAbilityLine(card){
   const timingLabel = { onPlay:'場に出た時', passive:'常時', activated:'ターン1回' }[card.ability.timing] || '';
   return `<div class="ability-line"><span class="status-badge ability-tag">特性・${timingLabel}</span> <b>${card.ability.name}</b><div class="sub">${card.ability.desc}</div></div>`;
 }
-function renderActiveCard(activeObj, ownerLabel, showAttacks){
-  if(!activeObj) return `<div class="empty-slot">${ownerLabel}: 場にカードがいない</div>`;
-  if(activeObj.hidden && ownerLabel === '相手'){
-    return `<div class="board-card card-back-slot"></div>`;
+/* ---------- カードの見た目 ---------- */
+const TYPE_ICON = { '格闘':'👊', '悪':'🌙', '超':'🔮', '無色':'⭐' };
+const TRAINER_ICON = { item:'🧪', support:'🤝', tool:'⚙️' };
+const RARE_RARITIES = new Set(['diamond4','star1','star2','star3','crown','spade','club','dopa','promo']);
+function cardFaceHTML(cardId, art){
+  const c = CARDS[cardId];
+  if(!c) return '<div class="mcard back"></div>';
+  const img = art || c.image;
+  if(img) return `<div class="mcard"><img class="mcard-img" data-card="${cardId}" src="${img}" alt="${c.name}" draggable="false"></div>`;
+  return cardFaceGenHTML(cardId);
+}
+/* 絵が無い(または読み込めなかった)カードのカード面を自動で作る */
+function cardFaceGenHTML(cardId){
+  const c = CARDS[cardId];
+  if(!c) return '<div class="mcard back"></div>';
+  if(c.kind !== 'creature'){
+    return `<div class="mcard cface tr-${c.kind}"><div class="cf-in"><span class="cf-kind">${c.trainerType || ''}</span><div class="cf-name">${c.name}</div><div class="cf-art">${TRAINER_ICON[c.kind] || '🃏'}</div><div class="cf-text">${c.desc || ''}</div></div></div>`;
   }
-  const card = CARDS[activeObj.cardId];
-  const pct = Math.max(0, Math.round((activeObj.hp / activeObj.maxHp) * 100));
-  const statusBadge = activeObj.status ? `<span class="status-badge status-${activeObj.status}">${STATUS_LABEL[activeObj.status]}</span>` : '';
-  const shieldBadge = activeObj.shield > 0 ? `<span class="status-badge ability-tag">🛡️-${activeObj.shield}</span>` : '';
-  const attackBlock = showAttacks ? `<div class="atk-list">${renderAttackList(card, activeObj.energy)}</div>` : '';
-  const abilityBlock = renderAbilityLine(card);
-
-  if(card.image){
-    return `
-      <div class="board-card big">
-        <img class="card-art-full" src="${card.image}" alt="${card.name}" onclick="event.stopPropagation(); openCardViewer('${card.id}');">
-        <div style="width:100%;">
-          <span class="type-badge type-${card.type}">${card.type}</span>
-          ${rarityBadge(card)}
-          <span class="name">${card.name}</span>
-          ${statusBadge}${shieldBadge}
-          <div class="sub">HP ${activeObj.hp} / ${activeObj.maxHp}</div>
-          <div class="hp-bar-outer"><div class="hp-bar-inner ${pct<=30?'low':''}" style="width:${pct}%"></div></div>
-          <div class="sub" style="margin-top:6px;">エネルギー: ${activeObj.energy.length ? renderEnergyDots(activeObj.energy) : 'なし'}</div>
-          ${abilityBlock}
-          ${attackBlock}
-        </div>
-      </div>`;
-  }
-  return `
-    <div class="board-card">
-      <div style="flex:1;">
-        <span class="type-badge type-${card.type}">${card.type}</span>
-        ${rarityBadge(card)}
-        <span class="name">${card.name}</span>
-        ${statusBadge}${shieldBadge}
-        <div class="sub">HP ${activeObj.hp} / ${activeObj.maxHp}</div>
-        <div class="hp-bar-outer"><div class="hp-bar-inner ${pct<=30?'low':''}" style="width:${pct}%"></div></div>
-        <div class="sub" style="margin-top:6px;">エネルギー: ${activeObj.energy.length ? renderEnergyDots(activeObj.energy) : 'なし'}</div>
-        ${abilityBlock}
-        ${attackBlock}
-      </div>
-    </div>`;
+  const atks = (c.attacks || []).map(a =>
+    `<div class="cf-atk"><span class="cf-cost">${a.cost.map(t => `<img src="${ENERGY_IMG[t]}" alt="${t}">`).join('')}</span><span class="cf-an">${a.name}</span><span class="cf-dmg">${a.dmg || ''}</span></div>`
+  ).join('');
+  const ab = c.ability ? `<div class="cf-ab"><b>特性</b>${c.ability.name}</div>` : '';
+  const nameSize = c.name.length <= 4 ? 10.5 : Math.max(6, 10.5 * 4.2 / c.name.length);
+  return `<div class="mcard cface ty-${c.type}"><div class="cf-in"><div class="cf-head"><span class="cf-stage">${c.basic ? 'たね' : '怪化'}</span><span class="cf-name" style="font-size:${nameSize.toFixed(1)}cqw">${c.name}</span><span class="cf-hp"><small>HP</small>${c.hp}</span></div><div class="cf-art">${TYPE_ICON[c.type] || ''}</div>${ab}${atks}</div></div>`;
 }
 
-function renderBench(benchArr, slotsToShow, isOpponent){
+function slotInner(o, compact){
+  const pct = Math.max(0, Math.round((o.hp / o.maxHp) * 100));
+  const tags = [];
+  if(o.status) tags.push(`<span class="status-badge status-${o.status}">${STATUS_LABEL[o.status]}</span>`);
+  if(o.shield > 0) tags.push(`<span class="status-badge shield-tag">🛡−${o.shield}</span>`);
+  if(o.tool && CARDS[o.tool]) tags.push(`<span class="status-badge tool-tag">⚙${compact ? '' : CARDS[o.tool].name}</span>`);
+  const orbs = o.energy.length ? `<div class="e-orbs">${o.energy.map(t => `<img class="e-orb" src="${ENERGY_IMG[t]}" alt="${t}">`).join('')}</div>` : '';
+  const hpCls = pct <= 30 ? 'low' : (pct <= 60 ? 'mid' : '');
+  return `${cardFaceHTML(o.cardId)}${tags.length ? `<div class="slot-tags">${tags.join('')}</div>` : ''}<div class="hp-pill ${hpCls}"><span class="hp-num">${o.hp}<small>/${o.maxHp}</small></span><span class="hp-bar"><i style="width:${pct}%"></i></span></div>${orbs}`;
+}
+function renderActiveCard(o, isOpp){
+  if(!o) return `<div class="slot slot-act empty">バトル場</div>`;
+  if(o.hidden && isOpp) return `<div class="slot slot-act"><div class="mcard back"></div></div>`;
+  return `<div class="slot slot-act${o.hidden ? ' mine-hidden' : ''}" data-filled="1">${slotInner(o, false)}</div>`;
+}
+function renderBench(benchArr, isOpp){
   let html = '';
-  for(let i=0;i<slotsToShow;i++){
+  for(let i=0;i<3;i++){
     const b = benchArr[i];
-    if(!b){ html += `<div class="bench-empty">空き</div>`; continue; }
-    if(b.hidden && isOpponent){
-      html += `<div class="bench-card card-back-slot" data-bench-idx="${i}"></div>`;
-      continue;
-    }
-    const card = CARDS[b.cardId];
-    html += `
-      <div class="bench-card" data-bench-idx="${i}">
-        <span class="type-badge type-${card.type}">${card.type}</span>
-        <div class="bname">${card.name}</div>
-        <div>HP ${b.hp}/${b.maxHp}</div>
-        <div>${b.energy.length ? renderEnergyDots(b.energy) : ''}</div>
-      </div>`;
+    if(!b){ html += `<div class="slot slot-bench empty" data-bench-idx="${i}"></div>`; continue; }
+    if(b.hidden && isOpp){ html += `<div class="slot slot-bench" data-bench-idx="${i}"><div class="mcard back"></div></div>`; continue; }
+    html += `<div class="slot slot-bench${b.hidden ? ' mine-hidden' : ''}" data-bench-idx="${i}" data-filled="1">${slotInner(b, true)}</div>`;
   }
   return html;
 }
+function playerTagHTML(slot, points){
+  const name = nameOf(slot);
+  const icon = PLAYER_ICONS[name];
+  const av = icon ? `<img class="pav" src="${icon}" alt="">` : `<span class="pav">${name.charAt(0)}</span>`;
+  const halos = [0,1,2].map(i => `<span class="halo${i < points ? ' on' : ''}"></span>`).join('');
+  return `${av}<span class="pname">${name}</span><span class="halos" id="${slot === MY_SLOT ? 'myPoints' : 'oppPoints'}" aria-label="${points}ポイント">${halos}</span>`;
+}
+function atkDamageLabel(atk){
+  if(atk.attackEffect === 'attachBenchEnergy') return '';
+  if(atk.coin && atk.coin.type === 'perHeads') return `${atk.coin.amount}×`;
+  if(atk.coin && atk.coin.type === 'bonus') return `${atk.dmg}+`;
+  return atk.dmg ? String(atk.dmg) : '';
+}
+function atkDetailText(atk){
+  if(atk.desc) return atk.desc;
+  const parts = [];
+  if(atk.attackEffect === 'attachBenchEnergy') parts.push(`自分のベンチのメガモンに${atk.energyType}エネルギーをつける`);
+  if(atk.coin && atk.coin.type === 'perHeads'){
+    const n = atk.coin.countMode === 'boardCount' ? '場の同じカードの数だけ' : `${atk.coin.count}回`;
+    parts.push(`コインを${n}投げ、オモテの数×${atk.coin.amount}ダメージ`);
+  }
+  if(atk.coin && atk.coin.type === 'bonus') parts.push(`コインを${atk.coin.count}回投げ、オモテなら${atk.coin.amount}ダメージ追加`);
+  if(atk.inflicts) parts.push(`相手のバトルメガモンを${STATUS_LABEL[atk.inflicts]}にする`);
+  if(atk.benchSplash) parts.push(`相手のベンチ全員にも${atk.benchSplash.amount}ダメージ`);
+  if(atk.discardDefenderEnergy) parts.push('相手のバトルメガモンのエネルギーを1個トラッシュ');
+  if(atk.selfShield) parts.push(`次の相手の番、受けるダメージ−${atk.selfShield.amount}`);
+  if(atk.coinKO) parts.push(`コインを${atk.coinKO.count}回投げ、${atk.coinKO.threshold}回以上オモテなら相手をきぜつさせる`);
+  return parts.join('。');
+}
 
-const prevActiveId = { me: undefined, opp: undefined };
+/* 画像が読み込めなかったら「？」のままにせず差し替える */
+function handleImgFail(el){
+  if(!el || el.tagName !== 'IMG' || el.dataset.failed) return;
+  el.dataset.failed = '1';
+  const cid = el.dataset.card;
+  if(cid && CARDS[cid]){
+    const box = el.closest('.mcard') || el;
+    box.outerHTML = cardFaceGenHTML(cid);
+    return;
+  }
+  if(el.classList.contains('logo-img')){
+    el.outerHTML = '<div class="logo-text">メガポケ</div>';
+    return;
+  }
+  el.classList.add('img-broken');
+}
+document.addEventListener('error', e => handleImgFail(e.target), true);
+document.querySelectorAll('img').forEach(img => { if(img.complete && img.naturalWidth === 0 && img.getAttribute('src')) handleImgFail(img); });
+
+/* ---------- 演出(前回の状態と比べて、変わったところだけ再生する) ---------- */
+let fxPrev = null, fxPrevLog = null, fxPrevTurnKey = null;
 let lastShownDrawnSig = null;
-function checkKoFlash(who, activeObj){
-  const curId = activeObj ? activeObj.cardId : null;
-  const prevId = prevActiveId[who];
-  const flashed = (prevId !== undefined && prevId !== null && curId === null);
-  prevActiveId[who] = curId;
-  return flashed;
+let attackSheetOpen = false;
+function fxSnap(state){
+  const f = o => o ? { id:o.cardId, hp:o.hp, en:o.energy.length, st:o.status || null, hid:!!o.hidden } : null;
+  const out = {};
+  ['p1','p2'].forEach(s => {
+    const p = state.players[s];
+    out[s] = { a:f(p.active), b:[0,1,2].map(i => f(p.bench[i])), pts:p.points };
+  });
+  return out;
+}
+function fxLayerEl(){ return document.getElementById('fxLayer'); }
+function fxFloat(el, text, cls){
+  if(!el) return;
+  const r = el.getBoundingClientRect();
+  if(!r.width) return;
+  const d = document.createElement('div');
+  d.className = 'fx-float ' + cls;
+  d.textContent = text;
+  d.style.left = (r.left + r.width / 2) + 'px';
+  d.style.top = (r.top + r.height * 0.42) + 'px';
+  fxLayerEl().appendChild(d);
+  setTimeout(() => d.remove(), 1350);
+}
+function fxAnim(el, cls, ms){
+  if(!el) return;
+  el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls);
+  setTimeout(() => el.classList.remove(cls), ms || 700);
+}
+function fxRibbon(text, cls, delay){
+  setTimeout(() => {
+    const d = document.createElement('div');
+    d.className = 'fx-ribbon ' + (cls || '');
+    d.innerHTML = `<span>${text}</span>`;
+    fxLayerEl().appendChild(d);
+    setTimeout(() => d.remove(), 1550);
+  }, delay || 0);
+}
+function fxToast(html){
+  // 盤面中央の状況メッセージの位置に、少しの間だけ重ねて出す
+  const anchor = document.getElementById('turnBanner');
+  const r = anchor ? anchor.getBoundingClientRect() : null;
+  const d = document.createElement('div');
+  d.className = 'fx-toast';
+  d.innerHTML = html;
+  d.style.top = ((r && r.height) ? r.top + r.height / 2 - 23 : innerHeight * 0.45) + 'px';
+  fxLayerEl().appendChild(d);
+  setTimeout(() => d.remove(), 2300);
+}
+function spawnConfetti(host){
+  const colors = ['#f5b82e','#6a4cff','#d65bb6','#3e9be0','#2fbf71','#ffffff'];
+  for(let i=0;i<46;i++){
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = (Math.random() * 100) + '%';
+    c.style.background = colors[i % colors.length];
+    c.style.animationDuration = (2.4 + Math.random() * 2) + 's';
+    c.style.animationDelay = (Math.random() * 0.9) + 's';
+    c.style.transform = `rotate(${Math.random() * 180}deg)`;
+    host.appendChild(c);
+    setTimeout(() => c.remove(), 5600);
+  }
+}
+function runFx(state){
+  const snap = fxSnap(state);
+  const prev = fxPrev; fxPrev = snap;
+  const log = state.log || [];
+  const prevLog = fxPrevLog; fxPrevLog = log.slice();
+  const turnKey = state.phase + ':' + state.activePlayer + ':' + state.turn;
+  const prevTurnKey = fxPrevTurnKey; fxPrevTurnKey = turnKey;
+  if(!prev) return;
+  const opSlot = otherSlot(MY_SLOT);
+  const myBoardEl = document.getElementById('myBoard');
+  const oppBoardEl = document.getElementById('oppBoard');
+
+  // 攻撃したメガモンの踏み込み(新しく増えたログから判定)
+  let newLines = [];
+  if(prevLog){
+    const last = prevLog[prevLog.length - 1];
+    const idx = last === undefined ? -1 : log.lastIndexOf(last);
+    if(idx >= 0 || prevLog.length === 0) newLines = log.slice(idx + 1);
+  }
+  let lunged = false;
+  newLines.forEach(line => {
+    if(lunged) return;
+    const m = line.match(/^(.+?)の(.+?)が(.+?)！/);
+    if(!m) return;
+    const isMe = m[1] === nameOf(MY_SLOT);
+    fxAnim(isMe ? myBoardEl : oppBoardEl, isMe ? 'fx-lunge-up' : 'fx-lunge-down', 520);
+    lunged = true;
+  });
+
+  ['me','opp'].forEach(side => {
+    const isMe = side === 'me';
+    const sl = isMe ? MY_SLOT : opSlot;
+    const P = prev[sl], C = snap[sl];
+    const benchBox = document.getElementById(isMe ? 'myBench' : 'oppBench');
+    const compare = (p, c, where, i) => {
+      const box = where === 'a' ? (isMe ? myBoardEl : oppBoardEl) : null;
+      const el = where === 'a' ? box.querySelector('.slot') : benchBox.querySelector(`.slot[data-bench-idx="${i}"]`);
+      const anchor = where === 'a' ? box : el;
+      if(p && !c){
+        if(where === 'a'){ setTimeout(() => fxFloat(box, 'きぜつ！', 'ko'), 200); fxAnim(box, 'fx-ko', 650); }
+        return;
+      }
+      if(!p && c){ if(!c.hid || isMe) fxAnim(el, 'fx-drop', 520); return; }
+      if(!p || !c) return;
+      if(p.id !== c.id){
+        const cc = CARDS[c.id];
+        if(cc && cc.kaikaOf === p.id){ fxAnim(el, 'fx-evolve', 1000); setTimeout(() => fxFloat(anchor, '怪化！', 'info'), 200); }
+        else fxAnim(el, 'fx-drop', 520);
+        return;
+      }
+      if(p.hid && !c.hid) fxAnim(el, 'fx-reveal', 650);
+      if(c.hp < p.hp){
+        const dmg = p.hp - c.hp;
+        setTimeout(() => { fxFloat(anchor, `−${dmg}`, where === 'a' ? 'dmg' : 'dmg sm'); fxAnim(anchor, 'fx-hit', 460); }, lunged ? 230 : 0);
+      }else if(c.hp > p.hp){
+        fxFloat(anchor, `+${c.hp - p.hp}`, where === 'a' ? 'heal' : 'heal sm');
+      }
+      if(c.en > p.en && el){
+        const orbs = el.querySelectorAll('.e-orb');
+        for(let k = p.en; k < orbs.length; k++) orbs[k].classList.add('fresh');
+      }
+      if(c.st && c.st !== p.st) setTimeout(() => fxFloat(anchor, STATUS_LABEL[c.st] || c.st, 'info'), 420);
+    };
+    compare(P.a, C.a, 'a');
+    for(let i=0;i<3;i++) compare(P.b[i], C.b[i], 'b', i);
+    if(C.pts > P.pts) fxAnim(document.getElementById(isMe ? 'myPoints' : 'oppPoints'), 'pop', 950);
+  });
+
+  // ターン交代・対戦開始の帯
+  if(prevTurnKey && turnKey !== prevTurnKey && state.phase === 'playing'){
+    const wasSetup = prevTurnKey.indexOf('setup') === 0;
+    const mine = state.activePlayer === MY_SLOT;
+    if(wasSetup) fxRibbon('バトルスタート！', 'start', 250);
+    fxRibbon(mine ? 'あなたのターン' : 'あいてのターン', mine ? '' : 'theirs', wasSetup ? 1750 : (lunged ? 900 : 300));
+  }
 }
 function playDrawFlyAnimation(){
   const deckEl = document.getElementById('myDeckPile');
@@ -1857,15 +2368,24 @@ function playDrawFlyAnimation(){
   flyer.className = 'flying-draw-card';
   flyer.style.left = from.left + 'px';
   flyer.style.top = from.top + 'px';
+  flyer.style.height = from.height + 'px';
   document.body.appendChild(flyer);
-  const targetX = to.left + Math.min(30, to.width * 0.15) - from.left;
-  const targetY = to.top - from.top;
+  const targetX = to.left + to.width * 0.5 - from.left;
+  const targetY = to.top + 8 - from.top;
   requestAnimationFrame(() => {
-    flyer.style.transform = `translate(${targetX}px, ${targetY}px) rotate(10deg) scale(0.9)`;
+    flyer.style.transform = `translate(${targetX}px, ${targetY}px) rotate(12deg) scale(1.2)`;
     flyer.style.opacity = '0';
   });
   setTimeout(() => { flyer.remove(); }, 600);
 }
+function openAttackSheet(){ attackSheetOpen = true; render(); }
+function closeAttackSheet(){
+  attackSheetOpen = false;
+  const el = document.getElementById('attackSheet');
+  el.classList.add('hidden');
+  el.innerHTML = '';
+}
+
 function render(){
   if(!currentState || !currentState.players) return;
   const state = currentState;
@@ -1873,62 +2393,56 @@ function render(){
   const opp = state.players[otherSlot(MY_SLOT)];
   const myTurn = state.activePlayer === MY_SLOT && state.phase === 'playing';
   if(!myTurn) pendingTarget = null;
-
-  document.getElementById('myPoints').textContent = me.points;
-  document.getElementById('oppPoints').textContent = opp.points;
-
   const isSetupPhase = state.phase === 'setup';
-  const banner = document.getElementById('turnBanner');
-  if(isSetupPhase){
-    banner.textContent = me.setupReady ? '相手の配置を待ってるよ…' : 'たねメガモンを裏側で配置してね';
-    banner.className = 'turn-banner ' + (me.setupReady ? 'theirs' : 'mine');
-  }else{
-    banner.textContent = state.phase === 'finished' ? '対戦終了' : (myTurn ? 'あなたのターン' : '相手のターン');
-    banner.className = 'turn-banner ' + (myTurn ? 'mine' : 'theirs');
-  }
+  const needsMyPromote = !me.active && me.bench.some(Boolean) && state.phase === 'playing';
+  if(needsMyPromote) pendingTarget = null; // まず次に出すメガモンを選ぶ
+
+  // プレイヤー表示
+  document.getElementById('oppTag').innerHTML = playerTagHTML(otherSlot(MY_SLOT), opp.points);
+  document.getElementById('myTag').innerHTML = playerTagHTML(MY_SLOT, me.points);
+  document.getElementById('oppDeckChip').innerHTML = `<i></i>${opp.deck.length}`;
 
   const dcBanner = document.getElementById('disconnectBanner');
   const isStale = oppLastSeen && (Date.now() - new Date(oppLastSeen).getTime()) > 15000;
   dcBanner.innerHTML = (isStale && state.phase === 'playing')
-    ? `<div class="disconnect-banner">⚠️ 相手からの反応が15秒以上ありません(通信が切れたかも)</div>`
+    ? `<div class="disconnect-banner">相手の反応が15秒以上ないよ(通信が切れたかも)</div>`
     : '';
 
-  const oppFlash = checkKoFlash('opp', opp.active);
-  const myFlash = checkKoFlash('me', me.active);
+  // 盤面
   const oppBoardEl = document.getElementById('oppBoard');
   const myBoardEl = document.getElementById('myBoard');
-  oppBoardEl.innerHTML = renderActiveCard(opp.active, '相手', true);
-  myBoardEl.innerHTML = renderActiveCard(me.active, '自分', false);
-  if(oppFlash){
-    const el = oppBoardEl.firstElementChild;
-    if(el){ el.classList.add('ko-flash'); setTimeout(() => el.classList.remove('ko-flash'), 1000); }
-  }
-  if(myFlash){
-    const el = myBoardEl.firstElementChild;
-    if(el){ el.classList.add('ko-flash'); setTimeout(() => el.classList.remove('ko-flash'), 1000); }
-  }
+  const oppBenchEl = document.getElementById('oppBench');
+  const myBenchEl = document.getElementById('myBench');
+  oppBoardEl.innerHTML = renderActiveCard(opp.active, true);
+  myBoardEl.innerHTML = renderActiveCard(me.active, false);
+  oppBenchEl.innerHTML = renderBench(opp.bench, true);
+  myBenchEl.innerHTML = renderBench(me.bench, false);
 
   maybeShowCoinOverlay('me', me.lastCoinFlip);
   maybeShowCoinOverlay('opp', opp.lastCoinFlip);
   maybeShowCoinOverlay('game', state.firstPlayerCoinFlip);
 
-  const oppBenchEl = document.getElementById('oppBench');
-  oppBenchEl.innerHTML = renderBench(opp.bench, 3, true);
-
   const isAwaitingTarget = myTurn && !!pendingTarget;
   const allowsActiveTarget = isAwaitingTarget && (
     (pendingTarget.type === 'ability' && pendingTarget.allowActive) ||
     (pendingTarget.type === 'energy' && pendingTarget.allowActive) ||
-    (pendingTarget.type === 'attack' && me.active && CARDS[me.active.cardId].attacks[pendingTarget.idx] && CARDS[me.active.cardId].attacks[pendingTarget.idx].allowActiveTarget)
+    (pendingTarget.type === 'tool' && pendingTarget.allowActive) ||
+    (pendingTarget.type === 'attack' && me.active && getEffectiveAttacks(me.active)[pendingTarget.idx] && getEffectiveAttacks(me.active)[pendingTarget.idx].allowActiveTarget)
   );
+  const isTargetingOppBench = isAwaitingTarget && pendingTarget.type === 'attack' && pendingTarget.oppBench;
+  const canDoRetreat = myTurn && !!me.active && !me.retreatedThisTurn && !isAwaitingTarget;
   function resolvePendingTarget(fieldTarget){
     const target = pendingTarget;
     pendingTarget = null;
+    if(!target) return;
     if(target.type === 'ability'){
       useAbility(currentState, MY_SLOT, fieldTarget);
       pushState(); render();
     }else if(target.type === 'energy'){
       attachEnergy(currentState, MY_SLOT, fieldTarget);
+      pushState(); render();
+    }else if(target.type === 'tool'){
+      attachTool(currentState, MY_SLOT, target.cardId, fieldTarget);
       pushState(); render();
     }else if(target.type === 'attack'){
       const s = currentState;
@@ -1937,198 +2451,151 @@ function render(){
       pushState(); render();
     }
   }
-  if(myBoardEl._captureClickHandler){
-    myBoardEl.removeEventListener('click', myBoardEl._captureClickHandler, true);
-    myBoardEl._captureClickHandler = null;
+
+  // 自分のバトル場をタップしたとき
+  const myActiveSlot = myBoardEl.querySelector('.slot');
+  if(myActiveSlot && me.active){
+    let act;
+    if(allowsActiveTarget){
+      myActiveSlot.classList.add('targetable');
+      act = () => resolvePendingTarget({ where:'active' });
+    }else if(isSetupPhase && !me.setupReady){
+      act = () => { undoSetupBasic(currentState, MY_SLOT, 'active', null); pushState(); render(); };
+    }else if(myTurn && !isAwaitingTarget){
+      act = () => openAttackSheet();
+    }else{
+      act = () => openCardViewer(me.active.cardId);
+    }
+    myActiveSlot.addEventListener('click', act);
   }
-  if(allowsActiveTarget && me.active){
-    myBoardEl.style.cursor = 'pointer';
-    myBoardEl.style.outline = '2px solid var(--gold)';
-    myBoardEl.style.borderRadius = '14px';
-    const activeTargetHandler = (e) => {
-      e.stopPropagation();
-      resolvePendingTarget({ where:'active' });
-    };
-    myBoardEl.addEventListener('click', activeTargetHandler, true);
-    myBoardEl._captureClickHandler = activeTargetHandler;
-  }else if(isSetupPhase && !me.setupReady && me.active){
-    myBoardEl.style.cursor = 'pointer';
-    myBoardEl.style.outline = '2px dashed var(--gold)';
-    myBoardEl.style.borderRadius = '14px';
-    const undoHandler = (e) => {
-      e.stopPropagation();
-      undoSetupBasic(currentState, MY_SLOT, 'active', null);
-      pushState(); render();
-    };
-    myBoardEl.addEventListener('click', undoHandler, true);
-    myBoardEl._captureClickHandler = undoHandler;
+  const oppActiveSlot = oppBoardEl.querySelector('.slot[data-filled]');
+  if(oppActiveSlot) oppActiveSlot.addEventListener('click', () => openCardViewer(opp.active.cardId));
+
+  // 自分のベンチ
+  myBenchEl.querySelectorAll('.slot[data-filled]').forEach(el => {
+    const idx = parseInt(el.dataset.benchIdx, 10);
+    if(!me.bench[idx]) return;
+    let act = null, cls = null;
+    if(isSetupPhase && !me.setupReady){
+      act = () => { undoSetupBasic(currentState, MY_SLOT, 'bench', idx); pushState(); render(); };
+    }else if(needsMyPromote){
+      cls = 'targetable';
+      act = () => { doPromote(currentState, MY_SLOT, idx); pushState(); render(); };
+    }else if(isAwaitingTarget && !isTargetingOppBench){
+      cls = 'targetable';
+      act = () => resolvePendingTarget({ where:'bench', idx });
+    }else if(canDoRetreat && canRetreat(state, MY_SLOT, idx)){
+      cls = 'retreatable';
+      act = () => { doRetreat(currentState, MY_SLOT, idx); pushState(); render(); };
+    }else{
+      act = () => openCardViewer(me.bench[idx].cardId);
+    }
+    if(cls) el.classList.add(cls);
+    el.addEventListener('click', act);
+  });
+  // 相手のベンチ
+  oppBenchEl.querySelectorAll('.slot[data-filled]').forEach(el => {
+    const idx = parseInt(el.dataset.benchIdx, 10);
+    if(!opp.bench[idx]) return;
+    if(isTargetingOppBench){
+      el.classList.add('targetable');
+      el.addEventListener('click', () => resolvePendingTarget({ where:'bench', idx }));
+    }else{
+      el.addEventListener('click', () => openCardViewer(opp.bench[idx].cardId));
+    }
+  });
+
+  // 状況メッセージ
+  const banner = document.getElementById('turnBanner');
+  let hint = '', bcls = 'theirs';
+  if(state.phase === 'finished'){
+    hint = '対戦終了';
+  }else if(isSetupPhase){
+    if(me.setupReady){ hint = '相手の配置を待ってるよ'; }
+    else{ bcls = 'mine'; hint = me.active ? 'ベンチにも出せるよ。できたら「準備完了」' : 'たねメガモンを上にスワイプしてバトル場へ'; }
+  }else if(needsMyPromote){
+    bcls = 'alert'; hint = '次にバトル場に出すメガモンをタップ';
+  }else if(!myTurn){
+    hint = (!opp.active && opp.bench.some(Boolean)) ? '相手が次のメガモンを選んでるよ' : 'あいてのターン';
+  }else if(isAwaitingTarget){
+    bcls = 'alert';
+    hint = ({ energy:'エネルギーをつけるメガモンをタップ', tool:'どうぐをつけるメガモンをタップ', ability:'特性を使う相手をタップ' })[pendingTarget.type]
+      || (pendingTarget.oppBench ? '相手のベンチをタップ(コインがウラだと不発)' : '自分のベンチのメガモンをタップ');
   }else{
-    myBoardEl.style.cursor = '';
-    myBoardEl.style.outline = '';
+    bcls = 'mine'; hint = 'あなたのターン';
+  }
+  banner.className = 'turn-banner ' + bcls;
+  banner.textContent = hint;
+
+  // エネルギー
+  const ez = document.getElementById('pendingEnergyBox');
+  if(state.phase === 'playing'){
+    const canAtt = myTurn && !needsMyPromote && canAttachEnergy(state, MY_SLOT);
+    const choosing = pendingTarget && pendingTarget.type === 'energy';
+    const now = (myTurn && me.pendingEnergy)
+      ? `<button type="button" class="ez-now ${canAtt && !choosing ? 'ready' : ''}" id="ezNowBtn" aria-label="エネルギーをつける"><img src="${ENERGY_IMG[me.pendingEnergy]}" alt="${me.pendingEnergy}"></button>`
+      : `<div class="ez-now empty"></div>`;
+    const next = me.nextEnergy ? `<div class="ez-next"><img src="${ENERGY_IMG[me.nextEnergy]}" alt="${me.nextEnergy}">つぎ</div>` : '';
+    ez.innerHTML = now + next;
+    const ezBtn = document.getElementById('ezNowBtn');
+    if(ezBtn) ezBtn.addEventListener('click', () => {
+      if(choosing){ pendingTarget = null; }
+      else if(canAtt){ attackSheetOpen = false; pendingTarget = { type:'energy', allowActive: !!me.active }; }
+      render();
+    });
+  }else{
+    ez.innerHTML = '';
   }
 
-  const canDoRetreat = myTurn && !!me.active && !me.retreatedThisTurn && !isAwaitingTarget;
-  const myBenchEl = document.getElementById('myBench');
-  myBenchEl.innerHTML = renderBench(me.bench, 3);
-  if(isSetupPhase && !me.setupReady){
-    myBenchEl.querySelectorAll('.bench-card').forEach(el => {
-      const idx = parseInt(el.dataset.benchIdx, 10);
-      if(!me.bench[idx]) return;
-      el.classList.add('clickable');
-      el.addEventListener('click', () => {
-        undoSetupBasic(currentState, MY_SLOT, 'bench', idx);
-        pushState(); render();
-      });
-    });
-  }
-  const needsMyPromote = !me.active && me.bench.some(Boolean) && state.phase === 'playing';
-  if(needsMyPromote){
-    myBenchEl.querySelectorAll('.bench-card').forEach(el => {
-      const idx = parseInt(el.dataset.benchIdx, 10);
-      if(!me.bench[idx]) return;
-      el.classList.add('clickable');
-      el.addEventListener('click', () => {
-        doPromote(currentState, MY_SLOT, idx);
-        pushState(); render();
-      });
-    });
-    const hint = document.createElement('div');
-    hint.className = 'sub';
-    hint.style.marginTop = '6px';
-    hint.textContent = 'メガモンがきぜつしたよ。ベンチから次に出すメガモンを選んでね';
-    myBenchEl.appendChild(hint);
-  }
-  const isTargetingOppBench = isAwaitingTarget && pendingTarget.type === 'attack' && pendingTarget.oppBench;
-  if(isAwaitingTarget && !isTargetingOppBench){
-    myBenchEl.querySelectorAll('.bench-card').forEach(el => {
-      const idx = parseInt(el.dataset.benchIdx, 10);
-      if(!me.bench[idx]) return;
-      el.classList.add('clickable');
-      el.addEventListener('click', () => resolvePendingTarget({ where:'bench', idx }));
-    });
-    const hint = document.createElement('div');
-    hint.className = 'sub';
-    hint.style.marginTop = '6px';
-    hint.textContent = allowsActiveTarget ? 'アクティブかベンチをタップして対象を選んでね' : 'ベンチをタップして対象を選んでね';
-    myBenchEl.appendChild(hint);
-  }
-  if(isTargetingOppBench){
-    oppBenchEl.querySelectorAll('.bench-card').forEach(el => {
-      const idx = parseInt(el.dataset.benchIdx, 10);
-      if(!opp.bench[idx]) return;
-      el.classList.add('clickable');
-      el.addEventListener('click', () => resolvePendingTarget({ where:'bench', idx }));
-    });
-    const hint = document.createElement('div');
-    hint.className = 'sub';
-    hint.style.marginTop = '6px';
-    hint.textContent = '相手のベンチをタップして対象を選んでね(コインが裏だと不発)';
-    oppBenchEl.appendChild(hint);
-  }
-  if(canDoRetreat){
-    myBenchEl.querySelectorAll('.bench-card').forEach(el => {
-      const idx = parseInt(el.dataset.benchIdx, 10);
-      if(canRetreat(state, MY_SLOT, idx)){
-        el.classList.add('clickable');
-        el.addEventListener('click', () => {
-          doRetreat(currentState, MY_SLOT, idx);
-          pushState(); render();
-        });
-      }
-    });
-  }
-  if(canDoRetreat && me.bench.some(b=>b)){
-    const hint = document.createElement('div');
-    hint.className = 'sub';
-    hint.style.marginTop = '6px';
-    const cost = me.active ? effectiveRetreatCost(state, MY_SLOT) : 0;
-    hint.textContent = `ベンチをタップすると交代できる(1ターン1回・エネルギー${cost}個消費)`;
-    myBenchEl.appendChild(hint);
-  }
-
-  // pending energy
-  const peBox = document.getElementById('pendingEnergyBox');
-  let peHtml = '';
-  if(myTurn && me.pendingEnergy){
-    peHtml += `<div class="sub">今ターンのエネルギー: <img class="energy-dot" src="${ENERGY_IMG[me.pendingEnergy]}" alt="${me.pendingEnergy}">${me.pendingEnergy}</div>`;
-  }
-  if(state.phase === 'playing' && me.nextEnergy){
-    peHtml += `<div class="sub">次のターンのエネルギー: <img class="energy-dot" src="${ENERGY_IMG[me.nextEnergy]}" alt="${me.nextEnergy}">${me.nextEnergy}</div>`;
-  }
-  peBox.innerHTML = peHtml;
-
-  // opponent's hand (face-down fan)
+  // 相手の手札(裏向き)
   const oppHandEl = document.getElementById('oppHandRow');
   oppHandEl.innerHTML = '';
   const oppHandN = opp.hand.length;
   for(let i=0;i<oppHandN;i++){
     const back = document.createElement('div');
     back.className = 'opp-hand-card';
-    const mid = (oppHandN-1)/2;
-    const off = i - mid;
-    back.style.setProperty('--rot', `${off*5}deg`);
+    back.style.setProperty('--rot', `${(i - (oppHandN - 1) / 2) * -5}deg`);
     back.style.zIndex = i;
     oppHandEl.appendChild(back);
   }
 
+  // 山札・引いたカード
   const handRow = document.getElementById('handRow');
   handRow.innerHTML = '';
-  const deckPileEl = document.getElementById('myDeckPile');
-  deckPileEl.innerHTML = `<div class="deck-count">${me.deck.length}</div>`;
-  const drawnBanner = document.getElementById('drawnBanner');
+  document.getElementById('myDeckPile').innerHTML = `<div class="deck-count">${me.deck.length}</div>`;
   if(me.lastDrawn){
     const drawnSig = state.turn + ':' + MY_SLOT + ':' + me.lastDrawn;
     const isFreshDraw = drawnSig !== lastShownDrawnSig;
     lastShownDrawnSig = drawnSig;
-    if(isFreshDraw) playDrawFlyAnimation();
-    const dCard = CARDS[me.lastDrawn];
-    const badge = dCard.kind === 'creature'
-      ? `<span class="type-badge type-${dCard.type}">${dCard.type}</span>`
-      : `<span class="type-badge trainer-badge-${dCard.kind}">${dCard.trainerType}</span>`;
-    drawnBanner.innerHTML = `<div class="drawn-banner${isFreshDraw ? ' just-drawn' : ''}"><span class="deck-pile-mini"></span>${badge} ${dCard.name} を引いた</div>`;
+    if(isFreshDraw && CARDS[me.lastDrawn]){
+      playDrawFlyAnimation();
+      fxToast(`${cardFaceHTML(me.lastDrawn)}<span>${CARDS[me.lastDrawn].name} を引いた</span>`);
+    }
   }else{
-    drawnBanner.innerHTML = '';
     lastShownDrawnSig = null;
   }
 
+  // 手札
   const handN = me.hand.length;
-  const handMid = (handN-1)/2;
+  const handMid = (handN - 1) / 2;
   me.hand.forEach((cardId, handIdx) => {
     const card = CARDS[cardId];
-    const isTrainer = card.kind === 'item' || card.kind === 'support';
+    if(!card) return;
+    const isTool = card.kind === 'tool';
+    const isTrainer = card.kind === 'item' || card.kind === 'support' || isTool;
     const setupPlayable = isSetupPhase && !isTrainer && canPlaceSetupBasic(state, MY_SLOT, cardId);
-    const playable = setupPlayable || (myTurn && (
-      isTrainer ? canPlayTrainer(state, MY_SLOT, cardId)
-                : (canPlayBasic(state, MY_SLOT, cardId) || canKaika(state, MY_SLOT, cardId))
+    const playable = setupPlayable || (myTurn && !needsMyPromote && (
+      isTool ? canPlayTool(state, MY_SLOT, cardId)
+             : isTrainer ? canPlayTrainer(state, MY_SLOT, cardId)
+             : (canPlayBasic(state, MY_SLOT, cardId) || canKaika(state, MY_SLOT, cardId))
     ));
     const div = document.createElement('div');
     div.className = 'hand-card' + (playable ? ' playable' : '');
     const handOff = handIdx - handMid;
-    div.style.setProperty('--rot', `${handOff*4}deg`);
-    div.style.setProperty('--lift', `${Math.abs(handOff)*5}px`);
-    div.style.zIndex = handIdx;
-    if(isTrainer){
-      div.innerHTML = `
-        <span class="type-badge trainer-badge-${card.kind}">${card.trainerType}</span>
-        ${rarityBadge(card)}
-        <div class="hname">${card.name}</div>
-        <div class="hstats">${card.desc}</div>
-      `;
-    }else{
-      const artImg = card.image ? `<img class="card-art-thumb" src="${card.image}" alt="${card.name}" onclick="event.stopPropagation(); openCardViewer('${card.id}');">` : '';
-      if(card.image){
-        div.innerHTML = artImg;
-      }else{
-        div.innerHTML = `
-          <span class="type-badge type-${card.type}">${card.type}</span>
-          ${rarityBadge(card)}
-          <div class="hname">${card.name}</div>
-          <div class="hstats">HP${card.hp} ${card.basic ? '(基本)' : '(怪化)'}</div>
-          ${renderAbilityLine(card)}
-          <div class="atk-list">${renderAttackList(card, null, true)}</div>
-        `;
-      }
-    }
+    div.style.setProperty('--rot', `${handOff * 3}deg`);
+    div.style.setProperty('--lift', `${Math.min(10, Math.abs(handOff) * 2.5)}px`);
+    div.style.zIndex = handIdx + 1;
+    div.innerHTML = cardFaceHTML(cardId);
     const doPlayAction = () => {
       const s = currentState;
       if(setupPlayable){
@@ -2137,7 +2604,14 @@ function render(){
           pushState(); render();
         }
       }else if(playable){
-        if(isTrainer){
+        if(isTool){
+          if(canPlayTool(s, MY_SLOT, cardId)){
+            attackSheetOpen = false;
+            pendingTarget = { type:'tool', cardId, allowActive: !!s.players[MY_SLOT].active };
+            render();
+          }
+          return;
+        }else if(isTrainer){
           if(canPlayTrainer(s, MY_SLOT, cardId)) playTrainer(s, MY_SLOT, cardId);
         }else if(canPlayBasic(s, MY_SLOT, cardId)){
           playBasic(s, MY_SLOT, cardId);
@@ -2147,9 +2621,9 @@ function render(){
         pushState(); render();
       }
     };
-    // マウス操作用フォールバック(タッチ端末ではtouchendでpreventDefaultして二重発火を防ぐ)
-    if(setupPlayable || playable) div.addEventListener('click', doPlayAction);
-    // タッチ操作: 長押しで画面いっぱいにプレビュー、上スワイプで繰り出す(発動できるカードのみ)、離すだけなら元に戻る
+    // マウス操作: 出せるカードはクリックで出す、出せないカードはクリックで拡大
+    div.addEventListener('click', () => { if(setupPlayable || playable) doPlayAction(); else openCardViewer(cardId); });
+    // タッチ操作: 長押しで拡大プレビュー、上スワイプで繰り出す(出せるカードのみ)、離すだけなら元に戻る
     let touchStartY = null;
     let swiped = false;
     let previewShown = false;
@@ -2180,8 +2654,7 @@ function render(){
       div.classList.remove('swiping');
       touchStartY = null;
       if(previewShown){ hideTouchPreview(); previewShown = false; }
-      const canSwipe = setupPlayable || playable;
-      if(canSwipe) e.preventDefault(); // タッチ操作ではクリックの疑似発火を常に抑止し、スワイプでのみ発動させる
+      e.preventDefault(); // タッチではクリックの疑似発火を止め、スワイプでのみ出す
       if(swiped){
         swiped = false;
         doPlayAction();
@@ -2196,111 +2669,159 @@ function render(){
     });
     handRow.appendChild(div);
   });
+  // 手札の重なり具合を枚数と画面幅に合わせて調整
+  const handCards = handRow.children;
+  if(handCards.length > 1){
+    const w = handCards[0].offsetWidth;
+    const avail = handRow.clientWidth - 8;
+    if(w > 0 && avail > 0){
+      const step = Math.max(w * 0.32, Math.min(w * 0.9, (avail - w) / (handCards.length - 1)));
+      for(let i=1;i<handCards.length;i++) handCards[i].style.marginLeft = (step - w) + 'px';
+    }
+  }
 
-  // actions
+  // 操作ボタン
   const actionRow = document.getElementById('actionRow');
   actionRow.innerHTML = '';
-  if(isSetupPhase && !me.setupReady){
-    if(me.active){
-      const readyBtn = document.createElement('button');
-      readyBtn.className = 'primary';
-      readyBtn.textContent = '準備完了';
-      readyBtn.addEventListener('click', () => {
-        markSetupReady(currentState, MY_SLOT);
+  const addBtn = (label, cls, onClick) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    if(cls) b.className = cls;
+    b.textContent = label;
+    b.addEventListener('click', onClick);
+    actionRow.appendChild(b);
+    return b;
+  };
+  if(isSetupPhase && !me.setupReady && me.active){
+    addBtn('準備完了', 'gold', () => { markSetupReady(currentState, MY_SLOT); pushState(); render(); });
+  }
+  if(myTurn){
+    if(isAwaitingTarget){
+      addBtn('キャンセル', 'ghost', () => { pendingTarget = null; render(); });
+    }else if(!needsMyPromote){
+      if(me.active){
+        const anyAtk = getEffectiveAttacks(me.active).some((a, i) => canAttack(state, MY_SLOT, i));
+        const abil = canUseAbility(state, MY_SLOT);
+        const b = addBtn('ワザ', anyAtk ? '' : 'ghost', () => openAttackSheet());
+        if(abil) b.classList.add('has-dot');
+      }
+      addBtn('ターン終了', 'ghost', () => { attackSheetOpen = false; endTurn(currentState); pushState(); render(); });
+    }
+  }
+
+  // ワザ・特性シート
+  const sheetEl = document.getElementById('attackSheet');
+  if(!(myTurn && me.active) || isAwaitingTarget || needsMyPromote) attackSheetOpen = false;
+  if(attackSheetOpen){
+    const card = CARDS[me.active.cardId];
+    const abilityUsable = canUseAbility(state, MY_SLOT);
+    let rows = '';
+    if(card.ability){
+      const ab = card.ability;
+      const timing = { onPlay:'バトル場に出た時に自動で発動', passive:'場にいる間ずっと有効', activated:'1ターンに1回使える' }[ab.timing] || '';
+      if(ab.timing === 'activated'){
+        rows += `<div class="sheet-section">特性</div><button type="button" class="sheet-row sheet-ability ${abilityUsable ? 'usable' : 'locked'}" data-ability="1"><span class="sr-main"><span class="sr-name">${ab.name}</span><span class="sr-desc">${ab.desc || ''}</span><span class="sr-state">${abilityUsable ? 'タップで使う' : 'このターンはもう使えない'}</span></span></button>`;
+      }else{
+        rows += `<div class="sheet-section">特性</div><div class="sheet-row sheet-ability"><span class="sr-main"><span class="sr-name">${ab.name}</span><span class="sr-desc">${ab.desc || ''}</span><span class="sr-state">${timing}</span></span></div>`;
+      }
+    }
+    rows += `<div class="sheet-section">ワザ</div>`;
+    getEffectiveAttacks(me.active).forEach((atk, idx) => {
+      const usable = canAttack(state, MY_SLOT, idx);
+      const cost = effectiveAttackCost(state, MY_SLOT, atk);
+      const detail = atkDetailText(atk);
+      const why = usable ? 'タップでこのワザを使う' : (me.active.statusBlocked ? '今は動けない' : 'エネルギーが足りない');
+      rows += `<button type="button" class="sheet-row ${usable ? 'usable' : 'locked'}" data-atk="${idx}">
+        <span class="sr-cost">${cost.length ? cost.map(t => `<img src="${ENERGY_IMG[t]}" alt="${t}">`).join('') : '<small>なし</small>'}</span>
+        <span class="sr-main"><span class="sr-name">${atk.name}</span>${detail ? `<span class="sr-desc">${detail}</span>` : ''}<span class="sr-state">${why}</span></span>
+        <span class="sr-dmg">${atkDamageLabel(atk)}</span></button>`;
+    });
+    const energyIcons = me.active.energy.map(t => `<img src="${ENERGY_IMG[t]}" alt="${t}">`).join('');
+    sheetEl.innerHTML = `<div class="sheet-backdrop"></div>
+      <div class="sheet" role="dialog" aria-label="${card.name}のワザ">
+        <div class="sheet-head">${cardFaceHTML(me.active.cardId)}
+          <div class="sh-info"><div class="sheet-name">${card.name}</div>
+          <div class="sheet-meta">HP ${me.active.hp}/${me.active.maxHp}${energyIcons ? ' ' + energyIcons : ''}</div></div>
+          <button type="button" class="ghost sheet-close" aria-label="閉じる">✕</button>
+        </div>${rows}</div>`;
+    sheetEl.classList.remove('hidden');
+    sheetEl.querySelector('.sheet-backdrop').addEventListener('click', closeAttackSheet);
+    sheetEl.querySelector('.sheet-close').addEventListener('click', closeAttackSheet);
+    sheetEl.querySelector('.sheet-head .mcard').addEventListener('click', () => openCardViewer(me.active.cardId));
+    const abBtn = sheetEl.querySelector('[data-ability]');
+    if(abBtn && abilityUsable) abBtn.addEventListener('click', () => {
+      const abDef = CARDS[currentState.players[MY_SLOT].active.cardId].ability;
+      attackSheetOpen = false;
+      const needsBenchTarget = abDef.effect === 'attachBenchEnergy';
+      const needsFieldTarget = abDef.effect === 'healOwnField10';
+      if(needsBenchTarget || needsFieldTarget){
+        pendingTarget = { type:'ability', allowActive: needsFieldTarget };
+        render();
+      }else{
+        useAbility(currentState, MY_SLOT);
+        pushState(); render();
+      }
+    });
+    sheetEl.querySelectorAll('[data-atk]').forEach(btn => {
+      const idx = parseInt(btn.dataset.atk, 10);
+      if(!canAttack(state, MY_SLOT, idx)) return;
+      btn.addEventListener('click', () => {
+        const meNow = currentState.players[MY_SLOT];
+        const oppNow = currentState.players[otherSlot(MY_SLOT)];
+        const atk = getEffectiveAttacks(meNow.active)[idx];
+        attackSheetOpen = false;
+        if(atk.attackEffect === 'attachBenchEnergy' && meNow.bench.some(b => b)){
+          pendingTarget = { type:'attack', idx };
+          render();
+          return;
+        }
+        if(atk.coinBenchDamage && oppNow.bench.some(b => b)){
+          pendingTarget = { type:'attack', idx, oppBench:true };
+          render();
+          return;
+        }
+        const s = currentState;
+        doAttack(s, MY_SLOT, idx);
+        if(s.phase === 'playing') endTurn(s);
         pushState();
         render();
       });
-      actionRow.appendChild(readyBtn);
-    }
-    if(me.active){
-      const hint = document.createElement('div');
-      hint.className = 'sub';
-      hint.style.marginTop = '6px';
-      hint.textContent = '自分のバトル場/ベンチをタップすると配置を取り消せるよ';
-      actionRow.appendChild(hint);
-    }
-  }
-  if(myTurn && state.phase === 'playing'){
-    if(canAttachEnergy(state, MY_SLOT)){
-      const b = document.createElement('button');
-      b.className = 'ghost';
-      const isTargeting = pendingTarget && pendingTarget.type === 'energy';
-      b.textContent = isTargeting ? 'エネルギーを付ける: 対象をタップ' : 'エネルギーを付ける';
-      b.addEventListener('click', () => {
-        pendingTarget = { type:'energy', allowActive: !!me.active };
-        render();
-      });
-      actionRow.appendChild(b);
-    }
-    if(canUseAbility(state, MY_SLOT)){
-      const b = document.createElement('button');
-      b.className = 'ghost';
-      const abDef = CARDS[me.active.cardId].ability;
-      const isTargeting = pendingTarget && pendingTarget.type === 'ability';
-      const needsBenchTarget = abDef.effect === 'attachBenchEnergy';
-      const needsFieldTarget = abDef.effect === 'healOwnField10';
-      b.textContent = isTargeting ? `${abDef.name}: 対象をタップ` : `特性: ${abDef.name}`;
-      b.addEventListener('click', () => {
-        if(needsBenchTarget || needsFieldTarget){
-          pendingTarget = { type:'ability', allowActive: needsFieldTarget };
-          render();
-        }else{
-          useAbility(currentState, MY_SLOT);
-          pushState(); render();
-        }
-      });
-      actionRow.appendChild(b);
-    }
-    if(me.active){
-      const card = CARDS[me.active.cardId];
-      card.attacks.forEach((atk, idx) => {
-        const b = document.createElement('button');
-        const usable = canAttack(state, MY_SLOT, idx);
-        const costIcons = atk.cost.map(t => `<img class="energy-dot small" src="${ENERGY_IMG[t]}" alt="${t}">`).join('');
-        const isTargeting = pendingTarget && pendingTarget.type === 'attack' && pendingTarget.idx === idx;
-        const dmgLabel = atk.attackEffect === 'attachBenchEnergy' ? '' : ((atk.coin && atk.coin.type === 'perHeads') ? `表×${atk.coin.amount}` : `(${atk.dmg})`);
-        b.innerHTML = isTargeting ? `${atk.name}: ベンチをタップ` : `${costIcons} ${atk.name}${dmgLabel}`;
-        b.disabled = !usable;
-        b.addEventListener('click', () => {
-          if(atk.attackEffect === 'attachBenchEnergy' && me.bench.some(b=>b)){
-            pendingTarget = { type:'attack', idx };
-            render();
-            return;
-          }
-          if(atk.coinBenchDamage && opp.bench.some(b=>b)){
-            pendingTarget = { type:'attack', idx, oppBench:true };
-            render();
-            return;
-          }
-          const s = currentState;
-          doAttack(s, MY_SLOT, idx);
-          if(s.phase === 'playing') endTurn(s);
-          pushState();
-          render();
-        });
-        actionRow.appendChild(b);
-      });
-    }
-    const endBtn = document.createElement('button');
-    endBtn.className = 'ghost';
-    endBtn.textContent = 'ターンを終える';
-    endBtn.addEventListener('click', () => { endTurn(currentState); pushState(); render(); });
-    actionRow.appendChild(endBtn);
+    });
+  }else{
+    sheetEl.classList.add('hidden');
+    sheetEl.innerHTML = '';
   }
 
-  // log
+  // ログ
   const logBox = document.getElementById('logBox');
   logBox.innerHTML = (state.log || []).slice().reverse().map(l => `<div>${l}</div>`).join('');
 
-  // win overlay
+  // 勝敗
   const overlay = document.getElementById('winOverlay');
   if(state.phase === 'finished'){
-    overlay.classList.add('show');
-    document.getElementById('winText').textContent =
-      state.winner === MY_SLOT ? 'あなたの勝ち！' : 'あなたの負け…';
+    const win = state.winner === MY_SLOT;
+    overlay.classList.toggle('lose', !win);
+    document.getElementById('winText').textContent = win ? 'あなたの勝ち！' : 'あなたの負け…';
+    document.getElementById('winScore').textContent = `${me.points} − ${opp.points}`;
+    const showNow = () => {
+      overlay._pending = null;
+      if(!currentState || currentState.phase !== 'finished') return;
+      overlay.classList.add('show');
+      const key = String(currentState.turn);
+      if(currentState.winner === MY_SLOT && overlay.dataset.confetti !== key){ overlay.dataset.confetti = key; spawnConfetti(overlay); }
+    };
+    // 決着の瞬間は、最後の攻撃ときぜつの演出を見せてから結果を出す
+    if(!overlay.classList.contains('show') && !overlay._pending){
+      if(fxPrev && fxPrev.p1 && fxPrevTurnKey && fxPrevTurnKey.indexOf('finished') !== 0) overlay._pending = setTimeout(showNow, 1500);
+      else showNow();
+    }
   }else{
-    overlay.classList.remove('show');
+    if(overlay._pending){ clearTimeout(overlay._pending); overlay._pending = null; }
+    overlay.classList.remove('show', 'lose');
+    delete overlay.dataset.confetti;
   }
+
+  runFx(state);
 }
 
 /* ================= pack opening / collection / deck building ================= */
@@ -2314,11 +2835,14 @@ const PACKS = {
 function exclusivePoolFor(packType, packId){
   return ALL_PRINT_IDS.filter(id => {
     const c = printCard(id);
-    if(!c || c.kind !== 'creature') return false;
+    if(!c) return false;
+    if(!printArt(id)) return false; // 絵が無い(仮データの)カードはパック対象外
     const print = PRINTS[id];
     // このPRINTが特定パック専用に指定されてたら、そのパックでだけ出す(タイプ一致は問わない)
     if(print.packId) return print.packId === packId;
-    // 指定が無ければ通常通りタイプ一致。無色タイプは全パック共通で出す。
+    // トレーナーズ(グッズ/サポート)はタイプが無いので、絵ありなら全パック共通で出す
+    if(c.kind !== 'creature') return true;
+    // 生き物カードは指定が無ければ通常通りタイプ一致。無色タイプは全パック共通で出す。
     return c.type === packType || c.type === '無色';
   });
 }
@@ -2556,7 +3080,7 @@ async function openPack(packId){
     const badge = c.kind === 'creature'
       ? `<span class="type-badge type-${c.type}">${c.type}</span>`
       : `<span class="type-badge trainer-badge-${c.kind}">${c.trainerType}</span>`;
-    const artImg = printArt(id) ? `<img src="${printArt(id)}" alt="${c.name}">` : '';
+    const artImg = cardFaceHTML(print.cardId, printArt(id));
     return `
       <div class="pack-reveal-card revealed">
         <div class="pack-reveal-face front"></div>
@@ -2584,8 +3108,8 @@ function runPackBigReveal(drawn){
       const badge = c.kind === 'creature'
         ? `<span class="type-badge type-${c.type}">${c.type}</span>`
         : `<span class="type-badge trainer-badge-${c.kind}">${c.trainerType}</span>`;
-      const artImg = printArt(id) ? `<img src="${printArt(id)}" alt="${c.name}">` : '';
-      backEl.innerHTML = `${artImg}<div>${badge} ${rarityBadge(print)}</div><div class="hname">${c.name}</div>`;
+      backEl.innerHTML = cardFaceHTML(print.cardId, printArt(id));
+      cardEl.classList.toggle('rare', RARE_RARITIES.has(print.rarity));
       cardEl.classList.remove('revealed');
       flipped = false;
     }
@@ -2681,8 +3205,8 @@ async function refreshDeckBuilder(){
       const inDeck = deckCounts[id] || 0;
       const art = printArt(id);
       const artHtml = art
-        ? `<img src="${art}" alt="${c.name}" data-zoom-print="${id}">`
-        : `<div class="no-art type-${c.type}">${c.name}</div>`;
+        ? `<img src="${art}" alt="${c.name}" data-zoom-print="${id}" data-card="${print.cardId}">`
+        : cardFaceHTML(print.cardId).replace('class="mcard', `data-zoom-print="${id}" class="mcard`);
       return `
         <div class="deck-card-tile" data-print="${id}">
           ${artHtml}
@@ -2791,11 +3315,8 @@ document.getElementById('changeNameBtn').addEventListener('click', () => {
 /* ================= card viewer (tap to enlarge) ================= */
 function showTouchPreview(cardId){
   const card = CARDS[cardId];
-  if(!card || !card.image) return false;
-  document.getElementById('cardViewerInner').innerHTML = `
-    <img src="${card.image}" alt="${card.name}">
-    <div class="sub" id="swipeHint" style="color:var(--gold); font-weight:700; min-height:1.2em;"></div>
-  `;
+  if(!card) return false;
+  document.getElementById('cardViewerInner').innerHTML = cardFaceHTML(cardId);
   document.getElementById('cardViewer').classList.remove('hidden');
   return true;
 }
@@ -2808,12 +3329,12 @@ function setSwipeHint(text){
 }
 function openCardViewer(cardId, artOverride, nameOverride){
   const card = CARDS[cardId];
-  const art = artOverride || (card && card.image);
-  if(!art) return;
-  const label = nameOverride || (card && card.name) || '';
+  if(!card) return;
+  const art = artOverride || card.image;
+  const label = nameOverride || card.name || '';
   document.getElementById('cardViewerInner').innerHTML = `
-    <img src="${art}" alt="${label}">
-    <button class="card-viewer-close" id="cardViewerCloseBtn">閉じる</button>
+    ${cardFaceHTML(cardId, art)}
+    <button class="ghost card-viewer-close" id="cardViewerCloseBtn">閉じる</button>
   `;
   document.getElementById('cardViewer').classList.remove('hidden');
   document.getElementById('cardViewerCloseBtn').addEventListener('click', closeCardViewer);
@@ -2829,9 +3350,8 @@ document.getElementById('cardViewer').addEventListener('click', (e) => {
 document.getElementById('logToggleBtn').addEventListener('click', () => {
   const box = document.getElementById('logBox');
   const btn = document.getElementById('logToggleBtn');
-  const showing = !box.classList.contains('hidden');
-  if(showing){ box.classList.add('hidden'); btn.textContent = 'ログを表示'; }
-  else{ box.classList.remove('hidden'); btn.textContent = 'ログを隠す'; }
+  box.classList.toggle('hidden');
+  btn.setAttribute('aria-expanded', String(!box.classList.contains('hidden')));
 });
 document.getElementById('createRoomBtn').addEventListener('click', createRoom);
 document.getElementById('joinRoomBtn').addEventListener('click', joinRoom);
