@@ -15,6 +15,12 @@
 - 新しい効果は、まず下の「実装済みメカニクス」で表現できないか確認してから新規実装する
 - ルールの決定事項(下記)を勝手に変えない
 
+## wiki(wiki.html)
+- 公開URL: https://megapoke.pages.dev/wiki.html(ホーム下部からリンク)。遊び方・ルール・カード図鑑・パック・排出率
+- カードデータは`megapoke.html`をfetchして`CARDS`〜`PRINTS`・`RARITY_LABEL`・`RARITY_NAME`・`PACKS`・`SLOT_RARITY_WEIGHTS`の定義部分を切り出して読む。カード追加時のwiki更新は不要。これらの定数名や`const X = {`〜`\n};`の書き方を変えたらwikiも直す
+- ルールを変えたら、wikiのルール文(手書き)も直す
+- カード画像の自動生成スクリプトは`tools/cardmaker/`(README参照)
+
 ## コードの構成(megapoke.html)
 - `CARDS`(性能データ)と`PRINTS`(刷り・レア度・絵・`packId`)を分離。1CARDに複数PRINTを持てる
 - 対戦: Supabaseの`megapoke_rooms`の1行(`state`列にJSON)を両者で共有。リアルタイム購読+3秒ポーリング+楽観的ロック。状態に項目を足すだけならSQLは不要
