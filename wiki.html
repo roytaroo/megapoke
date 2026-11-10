@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>メガポケ wiki</title>
+<meta name="description" content="メガポケ(MEGAMI Trading Card Game Pocket)の遊び方・ルール・カード図鑑">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    color-scheme: light;
+    --sky:#e6f0ff; --lav:#efe8ff; --panel:#ffffff; --panel2:#f3f6fd;
+    --ink:#27304a; --ink-dim:#6b7493; --line:rgba(39,48,74,0.12);
+    --halo:#f5b82e; --halo-deep:#d8920c; --violet:#6a4cff; --violet-deep:#4b30d6;
+    --fight:#ea7a3c; --dark:#5b4a9e; --psy:#d65bb6; --colorless:#9aa3b8;
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html{ scroll-behavior:smooth; scroll-padding-top:64px; }
+  body{
+    margin:0; min-height:100dvh; color:var(--ink);
+    background:
+      radial-gradient(120% 60% at 50% -10%, #ffffff 0%, rgba(255,255,255,0) 60%),
+      linear-gradient(180deg, var(--sky) 0%, var(--lav) 100%);
+    background-attachment:fixed;
+    font-family:'Zen Maru Gothic','Hiragino Maru Gothic ProN',sans-serif; font-weight:500;
+    line-height:1.75; font-size:15px;
+  }
+  a{ color:var(--violet-deep); }
+  .wrap{ max-width:760px; margin:0 auto; padding:0 16px 80px; }
+
+  /* ヘッダー */
+  header.top{
+    position:sticky; top:0; z-index:20;
+    background:rgba(255,255,255,0.82); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  header.top .in{ max-width:760px; margin:0 auto; padding:8px 16px; display:flex; align-items:center; gap:10px; }
+  .logo{ font-weight:900; font-size:18px; letter-spacing:.02em; white-space:nowrap; }
+  .logo .halo{ display:inline-block; width:18px; height:8px; border:3px solid var(--halo); border-radius:50%; margin-right:6px; vertical-align:middle; position:relative; top:-3px; }
+  .logo small{ color:var(--ink-dim); font-weight:700; font-size:12px; margin-left:4px; }
+  .play-btn{
+    margin-left:auto; text-decoration:none; color:#fff; font-weight:900; font-size:13px;
+    background:linear-gradient(180deg,var(--violet),var(--violet-deep)); padding:7px 14px; border-radius:999px;
+    box-shadow:0 2px 0 #3a22b0; white-space:nowrap;
+  }
+  nav.toc{ max-width:760px; margin:0 auto; padding:0 16px 8px; display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; }
+  nav.toc::-webkit-scrollbar{ display:none; }
+  nav.toc a{
+    flex:none; text-decoration:none; font-size:12.5px; font-weight:700; color:var(--ink);
+    background:#fff; border:1px solid var(--line); padding:4px 11px; border-radius:999px;
+  }
+
+  /* ヒーロー */
+  .hero{ text-align:center; padding:28px 0 8px; }
+  .hero h1{ font-size:30px; font-weight:900; margin:0; letter-spacing:.04em; }
+  .hero .rings{ display:flex; justify-content:center; gap:8px; margin:6px 0 10px; }
+  .hero .rings i{ width:30px; height:12px; border:4px solid var(--halo); border-radius:50%; box-shadow:0 0 10px rgba(245,184,46,.6); }
+  .hero p{ margin:0 auto; max-width:30em; color:var(--ink-dim); }
+
+  /* セクション */
+  section{ margin-top:22px; }
+  h2{
+    font-size:20px; font-weight:900; margin:0 0 10px; display:flex; align-items:center; gap:8px;
+  }
+  h2::before{ content:""; width:6px; height:22px; border-radius:3px; background:linear-gradient(180deg,var(--halo),var(--halo-deep)); }
+  h3{ font-size:16px; font-weight:900; margin:18px 0 6px; }
+  .panel{ background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:16px; box-shadow:0 2px 0 #dbe1ef; }
+  .panel + .panel{ margin-top:12px; }
+  .panel > :first-child{ margin-top:0; }
+  .panel > :last-child{ margin-bottom:0; }
+  ol, ul{ padding-left:1.3em; margin:6px 0; }
+  li{ margin:3px 0; }
+  .note{ background:#fff8e6; border:1px solid #f3dfa6; border-radius:12px; padding:10px 12px; font-size:14px; }
+  .kbd{ display:inline-block; background:var(--panel2); border:1px solid var(--line); border-radius:6px; padding:0 6px; font-size:13px; font-weight:700; }
+  b.gold{ color:var(--halo-deep); }
+
+  table{ width:100%; border-collapse:collapse; font-size:14px; }
+  th, td{ text-align:left; padding:7px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th{ font-size:12.5px; color:var(--ink-dim); font-weight:700; white-space:nowrap; }
+  tr:last-child td{ border-bottom:none; }
+  .num{ text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+
+  /* タイプ */
+  .type{ display:inline-flex; align-items:center; gap:3px; font-weight:700; color:#fff; border-radius:999px; padding:0 9px; font-size:13px; line-height:22px; white-space:nowrap; }
+  .type.格闘{ background:var(--fight); } .type.悪{ background:var(--dark); } .type.超{ background:var(--psy); } .type.無色{ background:var(--colorless); }
+  .weak-cycle{ display:flex; align-items:center; justify-content:center; gap:6px; flex-wrap:wrap; margin:10px 0 4px; font-weight:900; }
+  .weak-cycle .arr{ color:var(--ink-dim); font-size:13px; }
+
+  /* 図鑑 */
+  .filters{ display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
+  .filters input{
+    width:100%; font:inherit; font-size:16px; padding:9px 12px; border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--ink);
+  }
+  .chips{ display:flex; gap:6px; flex-wrap:wrap; }
+  .chip{
+    font:inherit; font-size:13px; font-weight:700; padding:4px 11px; border-radius:999px;
+    border:1px solid var(--line); background:#fff; color:var(--ink); cursor:pointer;
+  }
+  .chip.on{ background:var(--ink); color:#fff; border-color:var(--ink); }
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(104px,1fr)); gap:10px; }
+  .card{
+    border:0; padding:0; background:none; font:inherit; color:inherit; cursor:pointer; text-align:center;
+  }
+  .face{
+    aspect-ratio:745/1040; border-radius:8px; overflow:hidden; position:relative;
+    box-shadow:0 2px 6px rgba(39,48,74,.18); background:#dfe5f2;
+  }
+  .face img.art-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; z-index:1; }
+  .gen{
+    width:100%; height:100%; display:flex; flex-direction:column; padding:7px 6px; text-align:left; color:#fff;
+    font-size:10px; line-height:1.35;
+  }
+  .gen.格闘{ background:linear-gradient(160deg,#f3a06f,var(--fight)); }
+  .gen.悪{ background:linear-gradient(160deg,#8a7bc6,var(--dark)); }
+  .gen.超{ background:linear-gradient(160deg,#ec93d5,var(--psy)); }
+  .gen.無色{ background:linear-gradient(160deg,#c4cad8,#7f889e); }
+  .gen.trainer{ background:linear-gradient(160deg,#c9d4ea,#8e9bbd); }
+  .gen .nm{ font-weight:900; font-size:11.5px; }
+  .gen .hp{ margin-left:auto; font-weight:900; }
+  .gen .row{ display:flex; gap:4px; align-items:baseline; }
+  .gen .art{ flex:1; margin:5px 0; border-radius:4px; background:rgba(255,255,255,.25); display:flex; align-items:center; justify-content:center; font-size:26px; }
+  .gen .tx{ font-size:9.5px; opacity:.95; }
+  .card .cap{ font-size:12px; font-weight:700; margin-top:4px; line-height:1.3; }
+  .card .rar{ font-size:11px; color:var(--halo-deep); font-weight:900; }
+  .empty{ color:var(--ink-dim); text-align:center; padding:20px 0; }
+
+  /* 詳細 */
+  dialog{
+    border:0; padding:0; width:min(92vw,420px); max-height:88dvh; border-radius:20px; background:var(--panel); color:var(--ink);
+    box-shadow:0 20px 50px rgba(39,48,74,.35);
+  }
+  dialog::backdrop{ background:rgba(28,22,60,.45); }
+  .dlg{ padding:16px; overflow:auto; max-height:88dvh; }
+  .dlg .big{ width:62%; margin:0 auto 12px; }
+  .dlg h4{ margin:0; font-size:19px; font-weight:900; }
+  .dlg .meta{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin:6px 0 10px; font-size:13px; }
+  .tag{ background:var(--panel2); border:1px solid var(--line); border-radius:999px; padding:0 9px; font-weight:700; font-size:12.5px; line-height:22px; white-space:nowrap; }
+  .tag.ex{ background:#fff1c9; border-color:#f1d27a; color:#8a5a00; }
+  .move{ border-top:1px solid var(--line); padding:9px 0; }
+  .move .hd{ display:flex; align-items:center; gap:6px; font-weight:900; }
+  .move .hd .dmg{ margin-left:auto; font-size:17px; }
+  .move .ds{ font-size:13.5px; color:var(--ink-dim); margin-top:2px; }
+  .cost{ display:inline-flex; gap:2px; }
+  .orb{ width:18px; height:18px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:10px; color:#fff; font-weight:900; }
+  .orb.格闘{ background:var(--fight); } .orb.悪{ background:var(--dark); } .orb.超{ background:var(--psy); } .orb.無色{ background:var(--colorless); }
+  .close{ display:block; width:100%; margin-top:12px; font:inherit; font-weight:900; padding:10px; border-radius:12px; border:1px solid var(--line); background:var(--panel2); color:var(--ink); }
+
+  /* パック */
+  .packs{ display:grid; gap:12px; }
+  .pack{ display:flex; gap:12px; align-items:flex-start; }
+  .pack img{ width:78px; border-radius:8px; flex:none; box-shadow:0 2px 6px rgba(39,48,74,.2); }
+  .pack .nm{ font-weight:900; font-size:16px; }
+  .pack .list{ font-size:13.5px; color:var(--ink-dim); }
+
+  footer{ text-align:center; color:var(--ink-dim); font-size:12px; margin-top:36px; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <div class="logo"><span class="halo"></span>メガポケ<small>wiki</small></div>
+    <a class="play-btn" href="megapoke.html">あそぶ</a>
+  </div>
+  <nav class="toc">
+    <a href="#about">メガポケとは</a>
+    <a href="#flow">試合の流れ</a>
+    <a href="#controls">操作</a>
+    <a href="#rules">ルール</a>
+    <a href="#status">状態異常</a>
+    <a href="#kinds">カードの種類</a>
+    <a href="#cards">カード図鑑</a>
+    <a href="#packs">パック</a>
+    <a href="#rarity">レアリティ</a>
+    <a href="#deck">デッキ</a>
+    <a href="#faq">Q&amp;A</a>
+  </nav>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <h1>メガポケ</h1>
+    <div class="rings"><i></i><i></i><i></i></div>
+    <p>女神鯖のオリジナル対戦カードゲーム「MEGAMI Trading Card Game Pocket」の遊び方・ルール・カード図鑑。</p>
+  </div>
+
+  <section id="about">
+    <h2>メガポケとは</h2>
+    <div class="panel">
+      <p>女神鯖のメンバーが「メガモン」になって戦う、2人対戦のカードゲーム。スマホのブラウザだけで遊べて、インストールは要らない。</p>
+      <ul>
+        <li>相手のメガモンをきぜつさせて<b class="gold">ポイント</b>を取る。<b class="gold">3ポイント</b>先取で勝ち</li>
+        <li>エネルギーは毎ターン自動でもらえる。山札から引く必要はない</li>
+        <li>パックを開けてカードを集め、自分だけのデッキを作って戦う</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="flow">
+    <h2>試合の流れ</h2>
+    <div class="panel">
+      <h3>1. 部屋を作る・入る</h3>
+      <p>ホームの「対戦する」から<b>部屋を作る</b>と、6文字の部屋コードが出る。相手はそのコードを入れて<b>入る</b>。</p>
+      <h3>2. 準備</h3>
+      <ol>
+        <li>コイントスで先攻・後攻が決まる(先攻のプレイヤー名が表示される)</li>
+        <li>山札から手札を5枚引く。手札に「たね」のメガモンがいなければ自動で引き直し</li>
+        <li>たねのメガモンを<b>裏向き</b>でバトル場に1体、ベンチに好きなだけ(3体まで)置く</li>
+        <li>2人とも「準備完了」を押したら、同時に表になって試合開始</li>
+      </ol>
+      <h3>3. 自分の番にできること</h3>
+      <p>番のはじめに山札から1枚引く(先攻の最初の番だけは引かない)。そのあと、順番は自由に:</p>
+      <ul>
+        <li>たねのメガモンをベンチに出す(ベンチは3体まで)</li>
+        <li>エネルギーを1個、バトル場かベンチのメガモンに付ける</li>
+        <li>メガモンを<b>怪化</b>させる</li>
+        <li>グッズ・どうぐを使う / サポートを1枚使う</li>
+        <li>特性を使う / バトル場のメガモンを<b>にげる</b>でベンチと入れ替える(1回)</li>
+      </ul>
+      <p>最後にバトル場のメガモンで<b>ワザ</b>を使うと、番が終わる。ワザを使わずに番を終えてもいい。</p>
+      <h3>4. きぜつと勝ち負け</h3>
+      <ul>
+        <li>HPが0になったメガモンはきぜつしてトラッシュへ。倒した側がポイントをもらう(exは<b class="gold">2点</b>、それ以外は1点)</li>
+        <li>バトル場のメガモンがきぜつしたら、ベンチから次に出すメガモンを自分で選ぶ</li>
+        <li><b class="gold">3点</b>取ったら勝ち</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="controls">
+    <h2>画面の操作</h2>
+    <div class="panel">
+      <table>
+        <tr><th>やりたいこと</th><th>操作</th></tr>
+        <tr><td>ワザ・特性を使う</td><td>自分のバトル場のメガモンをタップ → シートから選ぶ</td></tr>
+        <tr><td>エネルギーを付ける</td><td>真ん中の光るエネルギーの玉をタップ → 付けたいメガモンをタップ</td></tr>
+        <tr><td>にげる</td><td>ベンチのメガモンをタップ</td></tr>
+        <tr><td>カードを出す</td><td>手札のカードを上にスワイプ</td></tr>
+        <tr><td>カードを大きく見る</td><td>手札のカードを長押し</td></tr>
+        <tr><td>対象を選ぶ</td><td>金色に光っている場所をタップ</td></tr>
+      </table>
+      <p class="note" style="margin-top:10px;">真ん中のエネルギーの玉の横には、<b>次の番にもらえるエネルギー</b>も小さく表示される。先を読んで付け先を決めよう。</p>
+    </div>
+  </section>
+
+  <section id="rules">
+    <h2>ルール</h2>
+    <div class="panel">
+      <h3>タイプと弱点</h3>
+      <p>タイプは <span class="type 格闘">👊 格闘</span> <span class="type 悪">🌙 悪</span> <span class="type 超">🔮 超</span> <span class="type 無色">⭐ 無色</span> の4つ。弱点は一方通行の三すくみ:</p>
+      <div class="weak-cycle">
+        <span class="type 格闘">👊 格闘</span><span class="arr">は強い →</span>
+        <span class="type 悪">🌙 悪</span><span class="arr">は強い →</span>
+        <span class="type 超">🔮 超</span><span class="arr">は強い →</span>
+        <span class="type 格闘">👊 格闘</span>
+      </div>
+      <p>弱点を突くと、ワザのダメージが<b>+20</b>される。無色には弱点がなく、無色のワザも弱点を突かない。</p>
+
+      <h3>エネルギー</h3>
+      <ul>
+        <li>毎ターン1個、自動でもらえる。付けられるのは<b>1ターンに1個</b>まで</li>
+        <li>出てくるのは格闘・悪・超の3種類。どれが出るかは、デッキで選んだタイプ(1〜3種類)の中からランダム</li>
+        <li>ワザのコストの<span class="orb 無色" style="display:inline-flex;vertical-align:middle;">⭐</span>(無色)は、どの種類のエネルギーでも払える</li>
+        <li>バトル場にもベンチにも付けられる</li>
+      </ul>
+
+      <h3>怪化(かいか)</h3>
+      <p>メガモンの進化のこと。手札の怪化カードを、場にいる怪化前のメガモンに重ねる。</p>
+      <ul>
+        <li>場に出したばかりのメガモンはその番には怪化できない(1ターン待つ)</li>
+        <li>ダメージと付いているエネルギーはそのまま引き継ぐ</li>
+      </ul>
+
+      <h3>にげる</h3>
+      <p>バトル場のメガモンをベンチと入れ替える。カードに書いてある数だけエネルギーをトラッシュする。1ターンに1回まで。にげると、こんらんが治る。</p>
+
+      <h3>ex</h3>
+      <p>名前に「ex」が付くメガモンは強いかわりに、きぜつさせられると相手に<b class="gold">2ポイント</b>入る。</p>
+
+      <h3>山札が無くなったら</h3>
+      <p>引けないだけで、負けにはならない。</p>
+    </div>
+  </section>
+
+  <section id="status">
+    <h2>状態異常</h2>
+    <div class="panel">
+      <p>状態異常になるのはバトル場のメガモン。<b>怪化すると、まひ・ねむり・こんらんは治る</b>(どく・やけどは残る)。</p>
+      <table>
+        <tr><th>状態</th><th>効果</th><th>治り方</th></tr>
+        <tr><td><b>どく</b></td><td>自分の番のはじめに10ダメージ</td><td>状態異常を治すカード(万能薬など)</td></tr>
+        <tr><td><b>やけど</b></td><td>自分の番のはじめに20ダメージ</td><td>そのあとコインでオモテなら治る</td></tr>
+        <tr><td><b>まひ</b></td><td>その番はワザもにげるも使えない</td><td>1ターンで治る</td></tr>
+        <tr><td><b>ねむり</b></td><td>ワザもにげるも使えない</td><td>番のはじめにコインでオモテなら起きる</td></tr>
+        <tr><td><b>こんらん</b></td><td>ワザを使う時にコイン。ウラだとワザが失敗</td><td>にげる・怪化する</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section id="kinds">
+    <h2>カードの種類</h2>
+    <div class="panel">
+      <table>
+        <tr><th>種類</th><th>説明</th></tr>
+        <tr><td><b>メガモン(たね)</b></td><td>そのまま場に出せるメガモン</td></tr>
+        <tr><td><b>メガモン(怪化)</b></td><td>場のたねに重ねて出すメガモン</td></tr>
+        <tr><td><b>グッズ</b></td><td>使い切りの道具。1ターンに何枚でも使える</td></tr>
+        <tr><td><b>サポート</b></td><td>強力なお助けカード。<b>1ターンに1枚</b>まで</td></tr>
+        <tr><td><b>どうぐ</b></td><td>メガモンに付けて使う。1体に1枚まで</td></tr>
+      </table>
+      <h3>特性のタイミング</h3>
+      <ul>
+        <li><b>場に出た時</b>:バトル場に出た時だけ発動(ベンチに出した時は発動しない)</li>
+        <li><b>常時</b>:場にいる間ずっと効いている</li>
+        <li><b>ターン1回</b>:自分の番に1回、ワザ・特性シートから使える</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="cards">
+    <h2>カード図鑑</h2>
+    <div class="panel">
+      <div class="filters">
+        <input type="search" id="q" placeholder="名前・ワザ・特性で検索" autocomplete="off">
+        <div class="chips" id="fType"></div>
+        <div class="chips" id="fKind"></div>
+        <div class="chips" id="fPack"></div>
+      </div>
+      <div class="grid" id="grid"><div class="empty">カードを読み込み中…</div></div>
+      <p class="note" style="margin-top:12px;font-size:13px;">カードをタップすると詳しい性能が見られる。「パックに出ない」と書いてあるカードは、絵がまだ無い試作カード。</p>
+    </div>
+  </section>
+
+  <section id="packs">
+    <h2>パック</h2>
+    <div class="panel">
+      <p>1パック5枚入り。初回は無料で<b>3回</b>、そのあとは<b>1日1回</b>開けられる。特典コードでもらったボーナスパックは別枠。</p>
+      <ul>
+        <li>メガモンは、パックのタイプと同じタイプのカードが出る</li>
+        <li>無色のメガモンと、パック指定の無いトレーナーズは全パック共通</li>
+        <li>一部のカードはそのパック限定</li>
+      </ul>
+      <div class="packs" id="packList" style="margin-top:12px;"><div class="empty">読み込み中…</div></div>
+    </div>
+  </section>
+
+  <section id="rarity">
+    <h2>レアリティと出やすさ</h2>
+    <div class="panel">
+      <p>1〜3枚目は必ず ◇。4枚目・5枚目は下の確率で決まる(パックにそのレアリティのカードが無い場合は、あるものの中で抽選)。</p>
+      <table id="rateTable"><tr><td class="empty">読み込み中…</td></tr></table>
+      <p style="font-size:13px;color:var(--ink-dim);margin-top:8px;">ほかに、配布などでもらえる <b>PROMO</b> がある。</p>
+    </div>
+  </section>
+
+  <section id="deck">
+    <h2>デッキの作り方</h2>
+    <div class="panel">
+      <ul>
+        <li>ホームの「デッキ構築」で作る。カードは持っているものから選ぶ</li>
+        <li>同じカードは<b>2枚まで</b>(レアリティ違いも合わせて2枚)</li>
+        <li>デッキごとに、使うエネルギーのタイプを1〜3種類選ぶ。メガモンのワザに合わせて選ぼう</li>
+      </ul>
+      <h3>組み方のコツ</h3>
+      <ul>
+        <li>たねのメガモンを多めに入れると、最初の手札で困りにくい</li>
+        <li>エネルギーのタイプを1種類にしぼると、欲しいエネルギーが確実に来る</li>
+        <li>怪化カードを入れるなら、怪化前のたねも一緒に入れる</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="faq">
+    <h2>Q&amp;A</h2>
+    <div class="panel">
+      <h3>カードの絵が出ない・「？」になる</h3>
+      <p>画像サーバーが一時的に止まっていることがある。少し待ってから開き直してみて。</p>
+      <h3>相手の動きが反映されない</h3>
+      <p>数秒ごとに自動で同期している。止まって見える時はページを読み込み直すと戻る。</p>
+      <h3>特典コードはどこで入れる?</h3>
+      <p>パック開封の画面から入れられる。コードは女神鯖のお知らせをチェック。</p>
+    </div>
+  </section>
+
+  <footer>メガポケ wiki ・ カードデータはゲーム本体から自動で読み込んでいます</footer>
+</main>
+
+<dialog id="dlg"><div class="dlg" id="dlgBody"></div></dialog>
+
+<script>
+const TYPE_ICON = { '格闘':'👊', '悪':'🌙', '超':'🔮', '無色':'⭐' };
+const TRAINER_ICON = { item:'🧪', support:'🤝', tool:'⚙️' };
+const KIND_LABEL = { item:'グッズ', support:'サポート', tool:'どうぐ' };
+const STATUS_LABEL = { poison:'どく', burn:'やけど', paralysis:'まひ', sleep:'ねむり', confusion:'こんらん' };
+const TIMING_LABEL = { onPlay:'場に出た時', passive:'常時', activated:'ターン1回' };
+const RARITY_ORDER = ['diamond1','diamond2','diamond3','diamond4','star1','star2','star3','spade','club','crown','dopa','promo'];
+let D = null; // { CARDS, PRINTS, WEAKNESS, PACKS, SLOT_RARITY_WEIGHTS, RARITY_LABEL, RARITY_NAME }
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// ゲーム本体からデータ定義の部分だけ切り出して読む(カードを追加すると自動で反映される)
+function slice(src, start, end){
+  const a = src.indexOf(start); if(a < 0) throw new Error('not found: ' + start);
+  const b = src.indexOf(end, a); if(b < 0) throw new Error('not found: ' + end);
+  return src.slice(a, b + (end.startsWith('\n') ? end.length : 0));
+}
+async function loadData(){
+  const src = await (await fetch('megapoke.html', { cache:'no-cache' })).text();
+  const code = [
+    slice(src, 'const CARDS = {', 'const ALL_PRINT_IDS'),
+    slice(src, 'const RARITY_LABEL = {', '\n};'),
+    slice(src, 'const RARITY_NAME = {', '\n};'),
+    slice(src, 'const PACKS = {', '\n};'),
+    slice(src, 'const SLOT_RARITY_WEIGHTS = {', '\n};'),
+    'return { CARDS, PRINTS, WEAKNESS, PACKS, SLOT_RARITY_WEIGHTS, RARITY_LABEL, RARITY_NAME };'
+  ].join('\n');
+  return new Function(code)();
+}
+
+const printsOf = cardId => Object.values(D.PRINTS).filter(p => p.cardId === cardId)
+  .sort((a,b) => RARITY_ORDER.indexOf(a.rarity) - RARITY_ORDER.indexOf(b.rarity));
+const artOf = p => p.image || D.CARDS[p.cardId].image || null;
+function packsOfPrint(p){
+  const c = D.CARDS[p.cardId];
+  if(!artOf(p)) return [];
+  return Object.values(D.PACKS).filter(pk => {
+    if(p.packId) return p.packId === pk.id;
+    if(c.kind !== 'creature') return true;
+    return c.type === pk.type || c.type === '無色';
+  }).map(pk => pk.id);
+}
+function weaknessOf(type){
+  return Object.keys(D.WEAKNESS).find(k => D.WEAKNESS[k] === type) || null;
+}
+function attackDesc(atk, card){
+  if(atk.desc) return atk.desc;
+  const parts = [];
+  const c = atk.coin;
+  if(c){
+    if(c.countMode === 'boardCount') parts.push(`自分の場の「${card.name}」の数ぶんコインを投げ、オモテの数×${c.amount}ダメージ。`);
+    else if(c.type === 'perHeads') parts.push(`コインを${c.count}回投げ、オモテの数×${c.amount}ダメージ。`);
+    else if(c.type === 'bonus') parts.push(`コインを${c.count||1}回投げオモテなら、${c.amount}ダメージ追加。`);
+  }
+  if(atk.attackEffect === 'attachBenchEnergy') parts.push(`エネルギーゾーンから${atk.energyType||''}エネルギーを1個出し、ベンチのメガモンにつける。`);
+  if(atk.inflicts) parts.push(`相手のバトルメガモンを${STATUS_LABEL[atk.inflicts]||atk.inflicts}にする。`);
+  return parts.join('');
+}
+const orbs = cost => `<span class="cost">${(cost||[]).map(t => `<span class="orb ${esc(t)}">${TYPE_ICON[t]||''}</span>`).join('')}</span>`;
+function dmgText(atk){
+  if(!atk.dmg) return atk.coin && atk.coin.type === 'perHeads' ? `${atk.coin.amount}×` : '';
+  return atk.dmg + ((atk.coin && atk.coin.type === 'bonus') || atk.repeatBonus || atk.bonusIfSelfHpBelow ? '+' : '');
+}
+
+function faceHTML(card, print){
+  const art = print && artOf(print);
+  const img = art ? `<img class="art-img" loading="lazy" src="${esc(art)}" alt="${esc(card.name)}" onerror="this.remove()">` : '';
+  return genFace(card).replace('<div class="face">', '<div class="face">' + img);
+}
+function genFace(card){
+  if(card.kind === 'creature'){
+    return `<div class="face"><div class="gen ${esc(card.type)}">
+      <div class="row"><span class="nm">${esc(card.name)}</span><span class="hp">${card.hp}</span></div>
+      <div class="art">${TYPE_ICON[card.type]||''}</div>
+      <div class="tx">${(card.attacks||[]).map(a => esc(a.name) + (a.dmg ? ' ' + a.dmg : '')).join('<br>')}</div>
+    </div></div>`;
+  }
+  return `<div class="face"><div class="gen trainer">
+    <div class="row"><span class="nm">${esc(card.name)}</span></div>
+    <div class="art">${TRAINER_ICON[card.kind]||''}</div>
+    <div class="tx">${esc(KIND_LABEL[card.kind]||'')}</div>
+  </div></div>`;
+}
+
+const F = { q:'', type:'all', kind:'all', pack:'all' };
+function chips(el, key, opts){
+  el.innerHTML = opts.map(([v,l]) => `<button type="button" class="chip${F[key]===v?' on':''}" data-v="${esc(v)}">${l}</button>`).join('');
+  el.onclick = e => { const b = e.target.closest('.chip'); if(!b) return; F[key] = b.dataset.v; chips(el, key, opts); renderGrid(); };
+}
+function cardKindKey(c){ return c.kind === 'creature' ? (c.basic ? 'basic' : 'kaika') : c.kind; }
+function renderGrid(){
+  const q = F.q.trim().toLowerCase();
+  const list = Object.values(D.CARDS).filter(c => {
+    if(F.type !== 'all' && c.type !== F.type) return false;
+    if(F.kind !== 'all' && cardKindKey(c) !== F.kind) return false;
+    if(F.pack !== 'all' && !printsOf(c.id).some(p => packsOfPrint(p).includes(F.pack))) return false;
+    if(q){
+      const hay = [c.name, c.desc, c.ability && c.ability.name, c.ability && c.ability.desc, ...(c.attacks||[]).map(a => a.name + attackDesc(a,c))].join(' ').toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  }).sort((a,b) => {
+    const art = c => printsOf(c.id).some(artOf) ? 0 : 1;
+    const ko = c => c.kind === 'creature' ? 0 : 1;
+    return art(a)-art(b) || ko(a)-ko(b) || ['格闘','悪','超','無色'].indexOf(a.type)-['格闘','悪','超','無色'].indexOf(b.type);
+  });
+  const grid = document.getElementById('grid');
+  if(!list.length){ grid.innerHTML = '<div class="empty" style="grid-column:1/-1">当てはまるカードが無い</div>'; return; }
+  grid.innerHTML = list.map(c => {
+    const ps = printsOf(c.id);
+    const shown = ps.find(artOf) || ps[0];
+    const rar = ps.map(p => D.RARITY_LABEL[p.rarity]).filter(Boolean).join(' / ');
+    return `<button type="button" class="card" data-id="${esc(c.id)}">${faceHTML(c, shown)}<div class="cap">${esc(c.name)}</div><div class="rar">${esc(rar)}</div></button>`;
+  }).join('');
+}
+function openCard(id){
+  const c = D.CARDS[id]; const ps = printsOf(id);
+  const shown = ps.find(artOf) || ps[0];
+  const tags = [];
+  if(c.kind === 'creature'){
+    tags.push(`<span class="type ${esc(c.type)}">${TYPE_ICON[c.type]} ${esc(c.type)}</span>`);
+    tags.push(`<span class="tag">${c.basic ? 'たね' : '怪化'}</span>`);
+    if(c.isEx) tags.push(`<span class="tag ex">ex(倒されると2点)</span>`);
+    tags.push(`<span class="tag">HP ${c.hp}</span>`);
+  }else{
+    tags.push(`<span class="tag">${TRAINER_ICON[c.kind]||''} ${esc(KIND_LABEL[c.kind]||c.kind)}</span>`);
+  }
+  let body = '';
+  if(c.kind === 'creature'){
+    if(c.kaikaOf && D.CARDS[c.kaikaOf]) body += `<p style="margin:0 0 6px;font-size:13.5px;">「${esc(D.CARDS[c.kaikaOf].name)}」から怪化</p>`;
+    if(c.kaikaTo && D.CARDS[c.kaikaTo]) body += `<p style="margin:0 0 6px;font-size:13.5px;">「${esc(D.CARDS[c.kaikaTo].name)}」に怪化できる</p>`;
+    if(c.ability) body += `<div class="move"><div class="hd"><span class="tag" style="background:#ffe9ec;border-color:#f5bcc5;color:#b0283f;">特性・${esc(TIMING_LABEL[c.ability.timing]||'')}</span>${esc(c.ability.name)}</div><div class="ds">${esc(c.ability.desc)}</div></div>`;
+    (c.attacks||[]).forEach(a => {
+      const ds = attackDesc(a, c);
+      body += `<div class="move"><div class="hd">${orbs(a.cost)} ${esc(a.name)}<span class="dmg">${esc(dmgText(a))}</span></div>${ds ? `<div class="ds">${esc(ds)}</div>` : ''}</div>`;
+    });
+    const wk = weaknessOf(c.type);
+    body += `<div class="move" style="font-size:13.5px;">弱点:${wk ? `<span class="type ${esc(wk)}">${TYPE_ICON[wk]} ${esc(wk)}</span> +20` : 'なし'}　にげる:${'⭐'.repeat(c.retreatCost||0) || 'なし'}</div>`;
+  }else{
+    body += `<div class="move"><div class="ds" style="color:var(--ink);">${esc(c.desc)}</div></div>`;
+  }
+  const rows = ps.map(p => {
+    const pk = packsOfPrint(p).map(pid => D.PACKS[pid].name);
+    const where = p.rarity === 'promo' ? '配布' : (pk.length ? (pk.length === Object.keys(D.PACKS).length ? '全パック' : pk.join('・')) : 'パックに出ない');
+    return `<tr><td>${esc(D.RARITY_LABEL[p.rarity]||'')} <span style="color:var(--ink-dim);font-size:12px;">${esc(D.RARITY_NAME[p.rarity]||'')}</span></td><td>${esc(where)}</td></tr>`;
+  }).join('');
+  document.getElementById('dlgBody').innerHTML = `
+    <div class="big">${faceHTML(c, shown)}</div>
+    <h4>${esc(c.name)}</h4>
+    <div class="meta">${tags.join('')}</div>
+    ${body}
+    <h3 style="margin-top:12px;">入手</h3>
+    <table><tr><th>レアリティ</th><th>出るところ</th></tr>${rows}</table>
+    <button type="button" class="close" onclick="document.getElementById('dlg').close()">閉じる</button>`;
+  document.getElementById('dlg').showModal();
+}
+
+function renderPacks(){
+  const el = document.getElementById('packList');
+  el.innerHTML = Object.values(D.PACKS).map(pk => {
+    const own = [], common = [];
+    Object.values(D.PRINTS).forEach(p => {
+      if(!packsOfPrint(p).includes(pk.id)) return;
+      const c = D.CARDS[p.cardId];
+      const label = `${c.name}${D.RARITY_LABEL[p.rarity] ? '(' + D.RARITY_LABEL[p.rarity] + ')' : ''}`;
+      const isCommon = !p.packId && (c.kind !== 'creature' || c.type === '無色');
+      (isCommon ? common : own).push(label);
+    });
+    return `<div class="pack">
+      <img src="${esc(pk.image)}" alt="" loading="lazy">
+      <div><div class="nm">${esc(pk.name)} <span class="type ${esc(pk.type)}" style="font-size:12px;">${TYPE_ICON[pk.type]} ${esc(pk.type)}</span></div>
+      <div class="list"><b>このパックのカード:</b>${own.length ? esc(own.join('、')) : 'まだ無い(準備中)'}</div>
+      <div class="list"><b>全パック共通:</b>${common.length ? esc(common.join('、')) : 'なし'}</div></div>
+    </div>`;
+  }).join('');
+}
+function renderRates(){
+  const w = D.SLOT_RARITY_WEIGHTS;
+  const tiers = RARITY_ORDER.filter(t => (w[4]&&w[4][t]) || (w[5]&&w[5][t]));
+  const pct = (slot, t) => { const s = w[slot]; if(!s || !s[t]) return '—'; const tot = Object.values(s).reduce((a,b)=>a+b,0); const v = s[t]/tot*100; return (v >= 1 ? v.toFixed(1) : v.toFixed(3)) + '%'; };
+  document.getElementById('rateTable').innerHTML =
+    `<tr><th>レアリティ</th><th class="num">4枚目</th><th class="num">5枚目</th></tr>` +
+    tiers.map(t => `<tr><td><b>${esc(D.RARITY_LABEL[t])}</b> <span style="color:var(--ink-dim);font-size:12px;">${esc(D.RARITY_NAME[t])}</span></td><td class="num">${pct(4,t)}</td><td class="num">${pct(5,t)}</td></tr>`).join('');
+}
+
+(async () => {
+  try{ D = await loadData(); }
+  catch(e){
+    console.error(e);
+    ['grid','packList'].forEach(id => document.getElementById(id).innerHTML = '<div class="empty">カードデータを読み込めなかった。ページを開き直してみて。</div>');
+    document.getElementById('rateTable').innerHTML = '<tr><td class="empty">読み込めなかった</td></tr>';
+    return;
+  }
+  chips(document.getElementById('fType'), 'type', [['all','すべてのタイプ'],['格闘','👊 格闘'],['悪','🌙 悪'],['超','🔮 超'],['無色','⭐ 無色']]);
+  chips(document.getElementById('fKind'), 'kind', [['all','すべての種類'],['basic','たね'],['kaika','怪化'],['item','グッズ'],['support','サポート'],['tool','どうぐ']]);
+  chips(document.getElementById('fPack'), 'pack', [['all','すべてのパック'], ...Object.values(D.PACKS).map(p => [p.id, esc(p.name)])]);
+  document.getElementById('q').addEventListener('input', e => { F.q = e.target.value; renderGrid(); });
+  document.getElementById('grid').addEventListener('click', e => { const b = e.target.closest('.card'); if(b) openCard(b.dataset.id); });
+  document.getElementById('dlg').addEventListener('click', e => { if(e.target.id === 'dlg') e.target.close(); });
+  renderGrid(); renderPacks(); renderRates();
+})();
+</script>
+</body>
+</html>
