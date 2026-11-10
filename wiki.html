@@ -3,522 +3,219 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>メガポケ攻略wiki</title>
-<meta name="description" content="メガポケ(MEGAMI Trading Card Game Pocket)の攻略wiki。最強ランキング・おすすめデッキ・カード図鑑・初心者ガイド">
+<title>メガポケ 公式Wiki</title>
+<meta name="description" content="メガポケ(MEGAMI Trading Card Game Pocket)の公式Wiki。カード図鑑・最強ランキング・おすすめデッキ・遊び方・ルール">
+<meta name="theme-color" content="#07080c">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@600;700&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
-  :root{
-    color-scheme: light;
-    --sky:#e6f0ff; --lav:#efe8ff; --panel:#ffffff; --panel2:#f3f6fd;
-    --ink:#27304a; --ink-dim:#6b7493; --line:rgba(39,48,74,0.12);
-    --halo:#f5b82e; --halo-deep:#d8920c; --violet:#6a4cff; --violet-deep:#4b30d6; --night:#241a5c;
-    --fight:#ea7a3c; --dark:#5b4a9e; --psy:#d65bb6; --colorless:#9aa3b8;
-    --s:#ff4d6d; --a:#ff9f1c; --b:#2ec4b6; --c:#8d99ae;
-  }
-  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  html,body{ margin:0; }
-  body{
-    min-height:100dvh; color:var(--ink);
-    background:linear-gradient(180deg, var(--sky) 0%, var(--lav) 100%); background-attachment:fixed;
-    font-family:'Zen Maru Gothic','Hiragino Maru Gothic ProN',sans-serif; font-weight:500; line-height:1.7; font-size:15px;
-  }
-  a{ color:var(--violet-deep); }
-  button{ font:inherit; color:inherit; }
-  .wrap{ max-width:760px; margin:0 auto; padding:0 14px 90px; }
-
-  /* ===== ヘッダー ===== */
-  header.top{
-    position:sticky; top:0; z-index:30; color:#fff;
-    background:linear-gradient(90deg,#3b25b8,#6a4cff 55%,#b04ad6);
-    box-shadow:0 2px 12px rgba(36,26,92,.35);
-  }
-  header.top .in{ max-width:760px; margin:0 auto; padding:8px 14px; display:flex; align-items:center; gap:10px; }
-  .logo{ font-weight:900; font-size:18px; white-space:nowrap; text-decoration:none; color:#fff; display:flex; align-items:center; gap:6px; }
-  .logo .halo{ width:20px; height:8px; border:3px solid var(--halo); border-radius:50%; box-shadow:0 0 8px rgba(245,184,46,.9); }
-  .logo .tag{ font-size:10.5px; background:var(--halo); color:#4a2c00; border-radius:5px; padding:0 5px; line-height:17px; }
-  .play-btn{
-    margin-left:auto; text-decoration:none; color:#4a2c00; font-weight:900; font-size:13px; white-space:nowrap;
-    background:linear-gradient(180deg,#ffd76a,var(--halo)); padding:6px 14px; border-radius:999px; box-shadow:0 2px 0 var(--halo-deep);
-  }
-  nav.tabs{ max-width:760px; margin:0 auto; display:flex; overflow-x:auto; scrollbar-width:none; padding:0 6px; }
-  nav.tabs::-webkit-scrollbar{ display:none; }
-  nav.tabs a{
-    flex:none; text-decoration:none; color:rgba(255,255,255,.85); font-weight:700; font-size:13px; padding:6px 10px 8px;
-    border-bottom:3px solid transparent;
-  }
-  nav.tabs a.on{ color:#fff; border-bottom-color:var(--halo); }
-
-  .crumb{ font-size:12px; color:var(--ink-dim); margin:12px 2px 6px; }
-  .crumb a{ color:var(--ink-dim); }
-
-  /* ===== 見出し(攻略サイト風の帯) ===== */
-  h2.band{
-    margin:26px 0 12px; font-size:17px; font-weight:900; color:#fff; padding:8px 14px; border-radius:10px;
-    background:linear-gradient(90deg,var(--violet-deep),var(--violet) 70%,#9a6bff); position:relative;
-    box-shadow:0 3px 0 #3a22b0;
-  }
-  h2.band small{ font-size:11.5px; font-weight:700; opacity:.85; margin-left:6px; }
-  h3.line{ font-size:16px; font-weight:900; margin:18px 0 8px; padding-left:10px; border-left:5px solid var(--halo); }
-  .panel{ background:var(--panel); border-radius:16px; padding:14px; box-shadow:0 2px 0 #dbe1ef, 0 6px 18px rgba(39,48,74,.06); }
-  .panel + .panel{ margin-top:12px; }
-  .panel > :first-child{ margin-top:0; } .panel > :last-child{ margin-bottom:0; }
-  ul, ol{ padding-left:1.3em; margin:6px 0; } li{ margin:3px 0; }
-  .point{
-    background:linear-gradient(180deg,#fffaf0,#fff3d6); border:2px solid #f5d27a; border-radius:14px; padding:10px 12px 10px 44px;
-    position:relative; font-size:14px; margin:10px 0;
-  }
-  .point::before{ content:"POINT"; position:absolute; left:8px; top:10px; font-size:9px; font-weight:900; color:#fff; background:var(--halo-deep); border-radius:4px; padding:1px 4px; transform:rotate(-8deg); }
-  .gold{ color:var(--halo-deep); font-weight:900; }
-  .mark{ background:linear-gradient(transparent 60%, #ffe58a 60%); font-weight:900; }
-
-  /* ===== トップ ===== */
-  .hero{
-    position:relative; overflow:hidden; border-radius:22px; margin-top:14px; padding:20px 16px 18px; color:#fff;
-    background:
-      radial-gradient(60% 80% at 85% 20%, rgba(255,120,220,.55), transparent 70%),
-      radial-gradient(70% 90% at 10% 100%, rgba(80,170,255,.5), transparent 70%),
-      linear-gradient(135deg,#1f1660,#4b30d6 60%,#8a3fd1);
-    box-shadow:0 10px 30px rgba(36,26,92,.35);
-    min-height:250px;
-  }
-  .hero .sparkle{ position:absolute; inset:0; pointer-events:none;
-    background-image:radial-gradient(2px 2px at 20% 30%,#fff,transparent),radial-gradient(1.5px 1.5px at 70% 15%,#fff,transparent),radial-gradient(2px 2px at 45% 75%,#fff,transparent),radial-gradient(1.5px 1.5px at 90% 60%,#fff,transparent),radial-gradient(1.5px 1.5px at 10% 80%,#fff,transparent),radial-gradient(2px 2px at 60% 45%,rgba(255,230,150,1),transparent);
-    animation:tw 3s ease-in-out infinite alternate; }
-  @keyframes tw{ from{opacity:.5} to{opacity:1} }
-  .hero .txt{ position:relative; z-index:2; max-width:56%; }
-  .hero .txt p{ text-shadow:0 1px 3px rgba(20,10,60,.6); }
-  .hero .badge{ display:inline-block; font-size:11px; font-weight:900; background:var(--halo); color:#4a2c00; border-radius:999px; padding:1px 10px; }
-  .hero h1{ font-size:30px; line-height:1.15; margin:8px 0 6px; font-weight:900; text-shadow:0 2px 0 rgba(0,0,0,.25); }
-  .hero h1 span{ display:block; font-size:15px; letter-spacing:.2em; color:#ffd76a; }
-  .hero p{ margin:0 0 12px; font-size:13px; opacity:.92; }
-  .hero .rings{ display:flex; gap:6px; margin:4px 0 10px; }
-  .hero .rings i{ width:24px; height:10px; border:3px solid var(--halo); border-radius:50%; box-shadow:0 0 10px rgba(245,184,46,.9); }
-  .btn{ display:inline-block; text-decoration:none; font-weight:900; font-size:14px; padding:8px 16px; border-radius:999px; border:0; cursor:pointer; }
-  .btn.gold{ color:#4a2c00; background:linear-gradient(180deg,#ffe28a,var(--halo)); box-shadow:0 3px 0 var(--halo-deep); }
-  .btn.white{ color:var(--violet-deep); background:#fff; box-shadow:0 3px 0 #c9c2f2; }
-  .fan{ position:absolute; right:-22px; bottom:14px; width:44%; height:200px; z-index:1; }
-  .fan .fc{ position:absolute; width:62%; bottom:0; border-radius:8px; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,.45); transform-origin:50% 120%; }
-  .fan .fc:nth-child(1){ left:0; transform:rotate(-14deg); }
-  .fan .fc:nth-child(2){ left:20%; transform:rotate(0deg) translateY(-10px); z-index:2; }
-  .fan .fc:nth-child(3){ left:40%; transform:rotate(14deg); }
-
-  .pickups{ display:grid; gap:10px; margin-top:14px; }
-  .pick{
-    display:flex; align-items:center; gap:12px; text-decoration:none; color:#fff; border-radius:16px; padding:12px 14px; position:relative; overflow:hidden;
-    box-shadow:0 4px 0 rgba(0,0,0,.15);
-  }
-  .pick .ic{ font-size:30px; width:46px; height:46px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,.22); border-radius:12px; flex:none; }
-  .pick b{ display:block; font-size:16px; font-weight:900; }
-  .pick span{ font-size:12px; opacity:.92; }
-  .pick::after{ content:"›"; margin-left:auto; font-size:26px; font-weight:900; opacity:.9; }
-  .pick.p1{ background:linear-gradient(110deg,#ff4d6d,#ff9f1c); }
-  .pick.p2{ background:linear-gradient(110deg,#4b30d6,#d65bb6); }
-  .pick.p3{ background:linear-gradient(110deg,#11998e,#38c7a6); }
-  .pick .new{ position:absolute; top:6px; right:30px; font-size:10px; font-weight:900; background:#fff; color:#ff4d6d; border-radius:4px; padding:0 5px; }
-
-  .menu{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
-  .menu a{
-    display:flex; flex-direction:column; align-items:center; gap:4px; text-decoration:none; color:var(--ink); font-size:11.5px; font-weight:700;
-    background:#fff; border-radius:14px; padding:10px 2px 8px; box-shadow:0 2px 0 #dbe1ef; text-align:center; line-height:1.3;
-  }
-  .menu a .ic{ font-size:24px; width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; }
-
-  .strip{ display:flex; gap:10px; overflow-x:auto; padding:9px 6px 10px; scroll-snap-type:x mandatory; scrollbar-width:none; }
-  .strip::-webkit-scrollbar{ display:none; }
-  .strip .card{ width:96px; flex:none; scroll-snap-align:start; }
-
-  /* ===== カード ===== */
-  .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(100px,1fr)); gap:10px; }
-  .card{ border:0; padding:0; background:none; cursor:pointer; text-align:center; position:relative; }
-  .face{ aspect-ratio:745/1040; border-radius:7px; overflow:hidden; position:relative; box-shadow:0 3px 8px rgba(39,48,74,.25); background:#dfe5f2; }
-  .face img.art-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; z-index:1; }
-  .card:active .face{ transform:scale(.97); }
-  .gen{ width:100%; height:100%; display:flex; flex-direction:column; padding:7px 6px; text-align:left; color:#fff; font-size:10px; line-height:1.35; }
-  .gen.格闘{ background:linear-gradient(160deg,#f3a06f,var(--fight)); } .gen.悪{ background:linear-gradient(160deg,#8a7bc6,var(--dark)); }
-  .gen.超{ background:linear-gradient(160deg,#ec93d5,var(--psy)); } .gen.無色{ background:linear-gradient(160deg,#c4cad8,#7f889e); }
-  .gen.trainer{ background:linear-gradient(160deg,#c9d4ea,#8e9bbd); }
-  .gen .nm{ font-weight:900; font-size:11.5px; } .gen .hp{ margin-left:auto; font-weight:900; }
-  .gen .row{ display:flex; gap:4px; align-items:baseline; }
-  .gen .art{ flex:1; margin:5px 0; border-radius:4px; background:rgba(255,255,255,.25); display:flex; align-items:center; justify-content:center; font-size:26px; }
-  .gen .tx{ font-size:9.5px; }
-  .card .cap{ font-size:12px; font-weight:700; margin-top:5px; line-height:1.3; }
-  .card .rar{ font-size:10.5px; color:var(--halo-deep); font-weight:900; }
-  .card .ribbon{ position:absolute; top:-5px; left:-5px; z-index:3; font-size:10px; font-weight:900; color:#fff; padding:1px 6px; border-radius:6px; box-shadow:0 2px 0 rgba(0,0,0,.2); }
-  .empty{ color:var(--ink-dim); text-align:center; padding:20px 0; }
-
-  .filters{ display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
-  .filters input{ width:100%; font:inherit; font-size:16px; padding:10px 12px 10px 36px; border-radius:999px; border:2px solid #d9d2ff; background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236a4cff' stroke-width='3' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-4-4'/%3E%3C/svg%3E") 13px 50% no-repeat; color:var(--ink); }
-  .chips{ display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; padding-bottom:2px; }
-  .chips::-webkit-scrollbar{ display:none; }
-  .chip{ flex:none; font-size:12.5px; font-weight:700; padding:4px 11px; border-radius:999px; border:1px solid var(--line); background:#fff; cursor:pointer; }
-  .chip.on{ background:var(--violet); color:#fff; border-color:var(--violet); }
-  .count{ font-size:12px; color:var(--ink-dim); margin:-4px 0 8px; }
-
-  /* タイプ */
-  .type{ display:inline-flex; align-items:center; gap:3px; font-weight:700; color:#fff; border-radius:999px; padding:0 9px; font-size:12.5px; line-height:22px; white-space:nowrap; }
-  .type.格闘{ background:var(--fight); } .type.悪{ background:var(--dark); } .type.超{ background:var(--psy); } .type.無色{ background:var(--colorless); }
-  .orb{ width:18px; height:18px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:10px; color:#fff; vertical-align:middle; box-shadow:inset 0 -2px 0 rgba(0,0,0,.2); }
-  .orb.格闘{ background:var(--fight); } .orb.悪{ background:var(--dark); } .orb.超{ background:var(--psy); } .orb.無色{ background:var(--colorless); }
-  .cost{ display:inline-flex; gap:2px; }
-
-  /* ===== ランキング ===== */
-  .tier{ display:flex; gap:0; background:#fff; border-radius:14px; overflow:hidden; box-shadow:0 2px 0 #dbe1ef; margin-bottom:10px; }
-  .tier .lb{ width:54px; flex:none; display:flex; align-items:center; justify-content:center; font-size:28px; font-weight:900; color:#fff; text-shadow:0 2px 0 rgba(0,0,0,.2); }
-  .tier.S .lb{ background:linear-gradient(180deg,#ff6b8a,var(--s)); } .tier.A .lb{ background:linear-gradient(180deg,#ffbe5c,var(--a)); }
-  .tier.B .lb{ background:linear-gradient(180deg,#5fe0d3,var(--b)); } .tier.C .lb{ background:linear-gradient(180deg,#aab4c7,var(--c)); }
-  .tier .cs{ display:grid; grid-template-columns:repeat(auto-fill,minmax(72px,1fr)); gap:8px; padding:10px; flex:1; }
-  .tier .cs .cap{ font-size:11px; }
-  .rank-row{ display:flex; gap:12px; padding:12px 0; border-top:1px solid var(--line); align-items:flex-start; }
-  .rank-row:first-child{ border-top:0; padding-top:0; }
-  .rank-row .card{ width:84px; flex:none; }
-  .rank-row .why b{ font-size:15px; } .rank-row .why p{ margin:4px 0 0; font-size:13.5px; }
-  .tlabel{ display:inline-block; font-weight:900; color:#fff; border-radius:6px; padding:0 7px; font-size:12px; margin-right:4px; }
-  .tlabel.S{ background:var(--s); } .tlabel.A{ background:var(--a); } .tlabel.B{ background:var(--b); } .tlabel.C{ background:var(--c); }
-  .stars{ color:var(--halo); letter-spacing:1px; font-size:13px; }
-
-  /* ===== デッキ ===== */
-  .deck{ background:#fff; border-radius:18px; overflow:hidden; box-shadow:0 2px 0 #dbe1ef, 0 6px 18px rgba(39,48,74,.06); margin-bottom:16px; }
-  .deck .dh{ padding:12px 14px; color:#fff; position:relative; }
-  .deck .dh.悪{ background:linear-gradient(110deg,#2b1f5e,var(--dark) 60%,#8a7bc6); }
-  .deck .dh.超{ background:linear-gradient(110deg,#6b1f5e,var(--psy) 60%,#f0a5dc); }
-  .deck .dh .nm{ font-size:18px; font-weight:900; }
-  .deck .dh .sub{ font-size:12px; opacity:.9; }
-  .deck .db{ padding:12px 14px; }
-  .deck .list{ display:grid; grid-template-columns:repeat(auto-fill,minmax(64px,1fr)); gap:8px; }
-  .deck .list .card .cap{ font-size:10.5px; }
-  .deck .x{ position:absolute; right:-4px; top:-6px; z-index:3; background:var(--night); color:#fff; font-size:11px; font-weight:900; border-radius:999px; padding:0 6px; border:2px solid #fff; }
-  .meter{ display:grid; grid-template-columns:auto 1fr; gap:4px 10px; align-items:center; font-size:12.5px; margin:10px 0; }
-  .meter .bar{ height:8px; border-radius:999px; background:#eef0f7; overflow:hidden; }
-  .meter .bar i{ display:block; height:100%; background:linear-gradient(90deg,var(--halo),#ff9f1c); border-radius:999px; }
-
-  /* ===== ガイド ===== */
-  .steps{ counter-reset:st; display:grid; gap:12px; }
-  .step{ background:#fff; border-radius:16px; padding:14px 14px 14px 62px; position:relative; box-shadow:0 2px 0 #dbe1ef; }
-  .step::before{ counter-increment:st; content:counter(st); position:absolute; left:12px; top:12px; width:38px; height:38px; border-radius:50%;
-    background:linear-gradient(180deg,#8f78ff,var(--violet-deep)); color:#fff; font-weight:900; font-size:19px; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 0 #3a22b0; }
-  .step b{ font-size:15.5px; } .step p{ margin:4px 0 0; font-size:13.5px; }
-  .board{ border-radius:16px; padding:10px; background:linear-gradient(180deg,#d9e7ff,#ece4ff); display:grid; gap:6px; font-size:11.5px; font-weight:700; text-align:center; }
-  .board .z{ border-radius:10px; padding:6px; background:rgba(255,255,255,.75); border:2px dashed rgba(106,76,255,.3); }
-  .board .z.opp{ background:rgba(255,235,240,.8); border-color:rgba(255,77,109,.3); }
-  .board .z.mid{ background:linear-gradient(90deg,#fff6db,#fff); border:2px solid #f5d27a; }
-  .board .row3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; }
-  .board .mini{ display:inline-block; width:26px; height:36px; border-radius:4px; background:linear-gradient(160deg,#ec93d5,var(--psy)); vertical-align:middle; margin:2px; box-shadow:0 1px 3px rgba(0,0,0,.2); }
-  .board .mini.d{ background:linear-gradient(160deg,#8a7bc6,var(--dark)); }
-  .board .mini.big{ width:34px; height:47px; }
-
-  .tri{ display:block; width:100%; max-width:300px; margin:6px auto; }
-  table{ width:100%; border-collapse:collapse; font-size:13.5px; }
-  th, td{ text-align:left; padding:8px; border-bottom:1px solid var(--line); vertical-align:top; }
-  th{ font-size:12px; color:#fff; background:var(--violet); font-weight:700; white-space:nowrap; }
-  th:first-child{ border-top-left-radius:8px; } th:last-child{ border-top-right-radius:8px; }
-  tr:nth-child(even) td{ background:#f8f7ff; }
-  .num{ text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
-  .sbadge{ display:inline-block; color:#fff; font-weight:900; border-radius:6px; padding:0 8px; font-size:12.5px; white-space:nowrap; }
-
-  .packs{ display:grid; gap:14px; }
-  .packc{ background:#fff; border-radius:18px; overflow:hidden; box-shadow:0 2px 0 #dbe1ef; }
-  .packc .ph{ display:flex; gap:12px; align-items:center; padding:12px; color:#fff; }
-  .packc .ph.超{ background:linear-gradient(110deg,#6b1f5e,var(--psy)); } .packc .ph.悪{ background:linear-gradient(110deg,#2b1f5e,var(--dark)); } .packc .ph.格闘{ background:linear-gradient(110deg,#7a2e08,var(--fight)); }
-  .packc .ph img{ width:64px; border-radius:6px; box-shadow:0 4px 10px rgba(0,0,0,.35); flex:none; }
-  .packc .ph .nm{ font-size:18px; font-weight:900; }
-  .packc .pb{ padding:12px; }
-  .packc .lab{ font-size:12px; font-weight:900; color:var(--ink-dim); margin:2px 0 6px; }
-  .soon{ text-align:center; padding:14px; border-radius:12px; background:repeating-linear-gradient(45deg,#fff4e8,#fff4e8 10px,#ffeedd 10px,#ffeedd 20px); font-weight:900; color:#a35a1a; }
-
-  .faq details{ background:#fff; border-radius:14px; box-shadow:0 2px 0 #dbe1ef; margin-bottom:8px; }
-  .faq summary{ padding:12px 14px; font-weight:900; cursor:pointer; list-style:none; display:flex; gap:8px; }
-  .faq summary::before{ content:"Q"; color:#fff; background:var(--violet); border-radius:6px; padding:0 6px; font-size:13px; height:22px; }
-  .faq summary::-webkit-details-marker{ display:none; }
-  .faq details p{ margin:0; padding:0 14px 12px 44px; font-size:14px; }
-  dl.gl{ margin:0; } dl.gl dt{ font-weight:900; margin-top:10px; color:var(--violet-deep); } dl.gl dd{ margin:2px 0 0; font-size:14px; }
-
-  /* 詳細 */
-  dialog{ border:0; padding:0; width:min(92vw,420px); max-height:88dvh; border-radius:22px; background:var(--panel); color:var(--ink); box-shadow:0 20px 50px rgba(39,48,74,.4); }
-  dialog::backdrop{ background:rgba(28,22,60,.6); backdrop-filter:blur(3px); }
-  .dlg{ padding:16px; overflow:auto; max-height:88dvh; }
-  .dlg .big{ width:64%; margin:0 auto 12px; }
-  .dlg h4{ margin:0; font-size:20px; font-weight:900; }
-  .meta{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin:6px 0 10px; }
-  .tag{ background:var(--panel2); border:1px solid var(--line); border-radius:999px; padding:0 9px; font-weight:700; font-size:12px; line-height:22px; white-space:nowrap; }
-  .tag.ex{ background:#fff1c9; border-color:#f1d27a; color:#8a5a00; }
-  .move{ border-top:1px solid var(--line); padding:9px 0; }
-  .move .hd{ display:flex; align-items:center; gap:6px; font-weight:900; }
-  .move .hd .dmg{ margin-left:auto; font-size:18px; }
-  .move .ds{ font-size:13.5px; color:var(--ink-dim); margin-top:2px; }
-  .close{ display:block; width:100%; margin-top:12px; font-weight:900; padding:11px; border-radius:999px; border:0; background:var(--violet); color:#fff; box-shadow:0 3px 0 #3a22b0; }
-
-  .view{ display:none; animation:fadein .25s ease; } .view.on{ display:block; }
-  @keyframes fadein{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
-  .more{ display:block; text-align:center; margin-top:10px; font-weight:900; font-size:13.5px; text-decoration:none; }
-  footer{ text-align:center; color:var(--ink-dim); font-size:12px; margin-top:36px; }
+/* BOWFLIT 公式Wikiと同じ見た目(ほぼ黒・紫の差し色・斜めに切った角) */
+:root{
+  --bg:#07080c; --bg2:#0e1018; --bg3:#151826; --line:rgba(255,255,255,.09); --line2:rgba(255,255,255,.18);
+  --ink:#eeedf5; --sub:#8d91a6; --accent:#a24bff; --accent2:#c58bff; --good:#5fe08a; --bad:#ff5a6a; --gold:#ffc446;
+  --en:"Bebas Neue","Zen Kaku Gothic New",sans-serif; --ui:"Rajdhani","Zen Kaku Gothic New",sans-serif; --jp:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",sans-serif;
+  --t-格闘:#ff8a3c; --t-悪:#8a7cff; --t-超:#ff5cc8; --t-無色:#9aa4b4; --t-tr:#54d6ff;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{margin:0;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--jp);font-weight:500;font-size:15.5px;line-height:1.85;-webkit-font-smoothing:antialiased}
+a{color:var(--accent2)}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--accent2);outline-offset:3px}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}
+/* 上のバー */
+header{position:sticky;top:0;z-index:30;background:rgba(7,8,12,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
+header .wrap{display:flex;align-items:center;gap:18px;height:60px}
+.brand{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--ink);flex:none}
+.brand .logo{font-family:var(--en);font-size:22px;letter-spacing:.06em;line-height:1;color:#fff}
+.brand b{font-family:var(--en);font-weight:400;font-size:22px;letter-spacing:.08em;color:var(--accent2);line-height:1}
+header nav{display:flex;gap:22px;margin-left:auto}
+header nav a{font-family:var(--ui);font-weight:700;font-size:14px;letter-spacing:.12em;color:var(--sub);text-decoration:none;text-transform:uppercase}
+header nav a:hover,header nav a.on{color:#fff}
+.search{position:relative;flex:none}
+.search input{width:180px;font:inherit;font-size:14px;color:var(--ink);background:var(--bg3);border:1px solid var(--line2);border-radius:0;padding:6px 10px;-webkit-appearance:none}
+.menu-btn{display:none;width:40px;height:40px;border:1px solid var(--line2);background:transparent;color:#fff;cursor:pointer;flex:none;padding:0}
+.menu-btn svg{width:20px;height:20px;display:block;margin:auto}
+@media (max-width:1240px){
+  header nav{display:none;position:absolute;left:0;right:0;top:100%;flex-direction:column;gap:0;background:#07080c;border-bottom:1px solid var(--line);padding:6px 18px 12px;margin:0}
+  header.open nav{display:flex}
+  header nav a{padding:12px 0;border-bottom:1px solid var(--line)}
+  .menu-btn{display:block;margin-left:auto}
+  .search input{width:130px}
+}
+@media (max-width:420px){.brand .logo{display:none}.search input{width:110px}}
+.results{position:absolute;right:0;top:calc(100% + 4px);width:min(320px,80vw);background:var(--bg2);border:1px solid var(--line2);z-index:40;max-height:60vh;overflow:auto}
+.results a{display:flex;gap:10px;align-items:center;padding:8px 12px;color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line);font-size:14px}
+.results a:hover{background:var(--bg3)}
+.results img,.results i{width:24px;height:34px;object-fit:cover;flex:none;background:var(--bg3)}
+.results small{color:var(--sub);margin-left:auto;white-space:nowrap}
+/* 共通 */
+main{min-height:70vh;padding-bottom:80px}
+.crumb{font-family:var(--ui);font-weight:700;font-size:13px;letter-spacing:.12em;color:var(--sub);margin:22px 0 8px}
+.crumb a{color:var(--sub);text-decoration:none}.crumb a:hover{color:#fff}
+h1.t{font-family:var(--en);font-weight:400;font-size:clamp(48px,8vw,96px);line-height:.9;margin:0 0 8px;letter-spacing:.02em}
+h1.t i{font-style:normal;color:var(--accent)}
+.lead{color:var(--sub);max-width:46em;margin:0 0 30px}
+h2.s{font-weight:900;font-size:20px;margin:44px 0 14px;display:flex;align-items:center;gap:12px}
+h2.s::before{content:"";width:10px;height:10px;background:var(--accent);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);flex:none}
+h2.s small{font-family:var(--ui);font-weight:700;font-size:12px;letter-spacing:.18em;color:var(--sub);text-transform:uppercase}
+.card{background:var(--bg2);border:1px solid var(--line);padding:18px 20px}
+.card p:first-child{margin-top:0}.card p:last-child{margin-bottom:0}
+.card ul,.card ol{margin:0;padding-left:1.3em}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}
+.tabs button{font-family:var(--ui);font-weight:700;font-size:13px;letter-spacing:.1em;border:1px solid var(--line2);background:transparent;color:var(--sub);padding:6px 14px;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.tabs button[style]{color:var(--tc)}
+.tabs button[style][aria-pressed="true"]{background:var(--tc);border-color:var(--tc);color:#07080c}
+.note{border-left:3px solid var(--gold);padding:4px 0 4px 16px;color:#d6d8e4;margin:0 0 18px}
+.gold{color:var(--gold);font-weight:900}
+/* ホーム */
+.home-hero{position:relative;padding:40px 0 10px}
+.story{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:28px;align-items:center}
+.story p{margin:0 0 12px;color:#c9cbd8}
+.story .cast{display:flex;justify-content:center;align-items:flex-end;padding:10px 0;width:100%}
+.story .cast .cf{width:34%;margin:0 -4%;transform:rotate(-8deg);box-shadow:0 10px 24px rgba(0,0,0,.6)}
+.story .cast .cf:nth-child(2){width:40%;z-index:1;transform:translateY(-8px)}
+.story .cast .cf:nth-child(3){transform:rotate(8deg)}
+@media (max-width:760px){.story{grid-template-columns:minmax(0,1fr)}.story .cast{order:-1;max-width:360px;margin:0 auto}}
+.quick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:30px}
+.quick a{display:block;background:var(--bg2);border:1px solid var(--line);padding:16px 18px;text-decoration:none;color:var(--ink);clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px)}
+.quick a:hover{border-color:var(--accent);background:var(--bg3)}
+.quick b{display:block;font-family:var(--en);font-weight:400;font-size:28px;letter-spacing:.04em;line-height:1}
+.quick span{font-size:13px;color:var(--sub)}
+@media (max-width:760px){.quick{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:22px 0}
+.stats div{background:var(--bg2);border:1px solid var(--line);padding:12px 14px;clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
+.stats b{display:block;font-family:var(--en);font-weight:400;font-size:40px;line-height:1;color:var(--ink)}
+.stats span{font-size:12.5px;color:var(--sub)}
+/* カード一覧 */
+.ugrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr));gap:10px}
+@media (max-width:420px){.ugrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.ucard{position:relative;display:block;background:var(--bg2);border:1px solid var(--line);text-decoration:none;color:var(--ink);overflow:hidden;transition:border-color .15s,transform .15s}
+.ucard:hover{border-color:var(--uc);transform:translateY(-2px)}
+.ucard .pic{padding:12px 14px 10px;background:radial-gradient(70% 60% at 50% 60%,color-mix(in srgb,var(--uc) 35%,transparent),transparent 72%);border-bottom:3px solid var(--uc)}
+.ucard .nm{padding:8px 12px 10px}
+.ucard b{font-weight:900;font-size:15px;line-height:1.3;display:block}
+.ucard span{font-size:12px;color:var(--sub)}
+.ucard .role{display:block;font-family:var(--ui);font-weight:700;font-size:10.5px;letter-spacing:.16em;line-height:1.2;margin-bottom:2px;color:var(--uc)}
+.ucard .tier{position:absolute;top:8px;right:8px;z-index:2;font-family:var(--en);font-size:22px;line-height:1;padding:3px 7px 1px;background:var(--bg);color:var(--rk);border:1px solid var(--rk)}
+.ucard .cnt{position:absolute;top:8px;left:8px;z-index:2;font-family:var(--en);font-size:20px;line-height:1;padding:3px 7px 1px;background:var(--accent);color:#fff}
+/* カードの絵 */
+.face{aspect-ratio:745/1040;position:relative;overflow:hidden;border-radius:6px;background:var(--bg3)}
+.face img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:1}
+.gen{position:absolute;inset:0;display:flex;flex-direction:column;padding:8px 7px;color:#fff;font-size:10px;line-height:1.35;background:linear-gradient(160deg,color-mix(in srgb,var(--uc) 70%,#fff),color-mix(in srgb,var(--uc) 70%,#000))}
+.gen .row{display:flex;gap:4px;align-items:baseline}.gen .row b{font-size:11.5px;font-weight:900}.gen .row em{margin-left:auto;font-style:normal;font-family:var(--en);font-size:14px}
+.gen .art{flex:1;margin:5px 0;background:rgba(255,255,255,.18);display:grid;place-items:center;font-family:var(--en);font-size:22px;letter-spacing:.04em}
+/* カードのページ */
+.uhead{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:32px;align-items:end;margin-top:6px}
+.uhead .pic{padding:18px;background:radial-gradient(60% 55% at 50% 60%,color-mix(in srgb,var(--uc) 40%,transparent),transparent 72%);border-bottom:3px solid var(--uc)}
+.uhead .motif{font-family:var(--ui);font-weight:700;letter-spacing:.16em;color:var(--uc);margin:0}
+.uhead h1{font-weight:900;font-size:clamp(36px,7vw,64px);line-height:1.05;margin:4px 0 10px;letter-spacing:.01em}
+.meta{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 16px}
+.meta div{background:var(--bg2);border:1px solid var(--line);padding:6px 14px}
+.meta span{display:block;font-family:var(--ui);font-weight:700;font-size:11px;letter-spacing:.16em;color:var(--sub)}
+.meta b{font-family:var(--en);font-weight:400;font-size:24px;letter-spacing:.04em;line-height:1.1}
+.stars{color:var(--gold);letter-spacing:.1em}
+.ability{border-left:3px solid var(--uc);padding:4px 0 4px 16px;color:#d6d8e4;margin:0}
+@media (max-width:760px){.uhead{grid-template-columns:minmax(0,1fr)}.uhead .pic{max-width:260px;margin:0 auto;width:100%}}
+.rel{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:10px}
+.rel > div,.rel > a{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:start;background:var(--bg2);border:1px solid var(--line);padding:14px 16px;text-decoration:none;color:var(--ink)}
+.rel a:hover{border-color:var(--line2);background:var(--bg3)}
+.rel b{font-weight:900}
+.rel em{font-style:normal;font-family:var(--en);font-size:24px;letter-spacing:.04em;color:var(--accent2);margin-left:8px;line-height:1}
+.rel p{margin:2px 0 0;color:var(--sub);font-size:14.5px}
+.rel .k{font-family:var(--ui);font-weight:700;font-size:11px;letter-spacing:.16em;color:var(--uc,var(--accent2))}
+.orbs{display:flex;gap:3px;padding-top:3px}
+.orb{width:22px;height:22px;display:grid;place-items:center;font-size:11px;font-weight:900;line-height:1;color:#07080c;background:var(--oc);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+.tips{counter-reset:t;display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.tips li{counter-increment:t;display:grid;grid-template-columns:40px minmax(0,1fr);gap:10px;background:var(--bg2);border:1px solid var(--line);padding:12px 16px}
+.tips li::before{content:counter(t,decimal-leading-zero);font-family:var(--en);font-size:26px;line-height:1.1;color:var(--uc,var(--accent2))}
+.tips b{display:block;font-weight:900}
+.tips p{margin:2px 0 0;color:var(--sub);font-size:14.5px}
+.pn{display:flex;justify-content:space-between;gap:10px;margin-top:40px}
+.pn a{display:flex;overflow:hidden;align-items:center;gap:10px;text-decoration:none;color:var(--ink);background:var(--bg2);border:1px solid var(--line);padding:10px 14px;min-width:0;font-weight:700;font-size:14px}
+.pn a:hover{border-color:var(--line2)}
+.pn span{font-family:var(--en);font-size:22px;letter-spacing:.04em;color:var(--sub)}
+/* 表 */
+.tbl{width:100%;border-collapse:collapse;font-size:14.5px}
+.tbl th,.tbl td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:0}
+.tbl th{font-family:var(--ui);font-weight:700;font-size:12px;letter-spacing:.14em;color:var(--sub);text-transform:uppercase;white-space:nowrap}
+.tbl td.num{font-family:var(--en);font-size:20px;letter-spacing:.04em;white-space:nowrap}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);background:var(--bg2)}
+.rar{font-family:var(--ui);font-weight:700;font-size:12px;letter-spacing:.08em;padding:1px 8px;border:1px solid currentColor;white-space:nowrap}
+.tp{font-family:var(--ui);font-weight:700;font-size:12px;letter-spacing:.1em;padding:1px 8px;border:1px solid var(--tc);color:var(--tc);white-space:nowrap}
+.basic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:10px}
+.basic-grid .card b{display:block;font-weight:900;margin-bottom:4px}
+.basic-grid .card .k{font-family:var(--ui);font-weight:700;font-size:12px;letter-spacing:.16em;color:var(--accent2)}
+.basic-grid .card p{margin:0;color:var(--sub);font-size:14.5px}
+.empty{color:var(--sub)}
+/* ランキング */
+.tierrow{display:grid;grid-template-columns:64px minmax(0,1fr);border:1px solid var(--line);background:var(--bg2);margin-bottom:10px}
+.tierrow .lb{display:grid;place-items:center;font-family:var(--en);font-size:44px;line-height:1;color:#07080c;background:var(--rk)}
+.tierrow .cs{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:10px;padding:12px}
+.tierrow .cs a{text-decoration:none;color:var(--ink);font-size:12px;font-weight:700;text-align:center;line-height:1.3}
+.tierrow .cs a .face{margin-bottom:5px}
+/* デッキ */
+.deck{border:1px solid var(--line);background:var(--bg2);margin-bottom:22px}
+.deck .dh{padding:16px 18px;border-bottom:3px solid var(--uc);background:linear-gradient(110deg,color-mix(in srgb,var(--uc) 22%,transparent),transparent 70%)}
+.deck .dh .k{font-family:var(--ui);font-weight:700;font-size:12px;letter-spacing:.16em;color:var(--uc)}
+.deck .dh h3{font-weight:900;font-size:22px;margin:2px 0 0;line-height:1.3}
+.deck .db{padding:16px 18px}
+.deck .db > p{margin:0 0 14px;color:#c9cbd8}
+.deck .ugrid{grid-template-columns:repeat(auto-fill,minmax(96px,1fr))}
+.deck .ucard .pic{padding:8px 9px 7px}.deck .ucard .nm{padding:5px 8px 7px}.deck .ucard b{font-size:12.5px}
+.bars{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 12px;align-items:center;margin:16px 0}
+.bars span{font-family:var(--ui);font-weight:700;font-size:12px;letter-spacing:.14em;color:var(--sub)}
+.bars i{display:block;height:6px;background:var(--bg3);position:relative}
+.bars i::after{content:"";position:absolute;inset:0;width:var(--v);background:var(--uc)}
+/* 弱点の図 */
+.cycle{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin:6px 0 14px}
+.cycle .n{font-weight:900;padding:8px 16px;border:1px solid var(--tc);color:var(--tc);background:color-mix(in srgb,var(--tc) 12%,transparent);clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
+.cycle .a{font-family:var(--en);font-size:22px;color:var(--sub)}
+/* 盤面図 */
+.board{display:grid;gap:6px;text-align:center;font-size:13px;font-weight:700}
+.board div{border:1px solid var(--line2);padding:8px;background:var(--bg3);color:#c9cbd8}
+.board .o{border-color:color-mix(in srgb,var(--bad) 45%,transparent);background:color-mix(in srgb,var(--bad) 7%,var(--bg2))}
+.board .m{border-color:var(--gold);color:var(--gold);background:color-mix(in srgb,var(--gold) 8%,var(--bg2))}
+.board .y{border-color:color-mix(in srgb,var(--accent) 60%,transparent);background:color-mix(in srgb,var(--accent) 9%,var(--bg2))}
+.board small{display:block;color:var(--sub);font-weight:500;font-size:12px}
+footer{border-top:1px solid var(--line);color:var(--sub);font-size:12.5px;padding-block:22px calc(22px + env(safe-area-inset-bottom,0px))}
+footer .wrap{display:flex;gap:14px;justify-content:space-between;flex-wrap:wrap}
 </style>
 </head>
 <body>
-<header class="top">
-  <div class="in">
-    <a class="logo" href="#top"><span class="halo"></span>メガポケ<span class="tag">攻略wiki</span></a>
-    <a class="play-btn" href="megapoke.html">▶ あそぶ</a>
+<header id="hd">
+  <div class="wrap">
+    <a class="brand" href="#/"><span class="logo">MEGAPOKE</span><b>WIKI</b></a>
+    <div class="search"><input type="search" id="q" placeholder="さがす" autocomplete="off" aria-label="Wikiの中をさがす"><div class="results" id="res" hidden></div></div>
+    <nav id="nav">
+      <a href="#/cards" data-r="cards">Cards</a>
+      <a href="#/tier" data-r="tier">ランキング</a>
+      <a href="#/decks" data-r="decks">デッキ</a>
+      <a href="#/basics" data-r="basics">遊び方</a>
+      <a href="#/rules" data-r="rules">ルール</a>
+      <a href="#/packs" data-r="packs">パック</a>
+      <a href="#/faq" data-r="faq">Q&amp;A</a>
+      <a href="megapoke.html">ゲームへ</a>
+    </nav>
+    <button class="menu-btn" id="mb" aria-label="メニュー"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
   </div>
-  <nav class="tabs" id="tabs">
-    <a href="#top">トップ</a>
-    <a href="#tier">最強ランキング</a>
-    <a href="#decks">おすすめデッキ</a>
-    <a href="#cards">カード図鑑</a>
-    <a href="#guide">初心者ガイド</a>
-    <a href="#rules">ルール</a>
-    <a href="#packs">パック</a>
-    <a href="#faq">Q&amp;A・用語</a>
-  </nav>
 </header>
-
-<main class="wrap">
-
-<!-- ===================== トップ ===================== -->
-<div class="view" id="v-top">
-  <div class="hero">
-    <div class="sparkle"></div>
-    <div class="txt">
-      <span class="badge">★ 最新カード対応</span>
-      <h1><span>MEGAMI TCG POCKET</span>メガポケ<br>攻略wiki</h1>
-      <div class="rings"><i></i><i></i><i></i></div>
-      <p>最強ランキング・おすすめデッキ・全カードのデータをまとめてるよ!</p>
-      <a class="btn gold" href="#tier">ランキングを見る</a>
-    </div>
-    <div class="fan" id="fan"></div>
-  </div>
-
-  <div class="pickups">
-    <a class="pick p1" href="#tier"><span class="ic">👑</span><div><b>最強カードランキング</b><span>いま強いメガモンはこれ!</span></div><em class="new">HOT</em></a>
-    <a class="pick p2" href="#decks"><span class="ic">🃏</span><div><b>おすすめデッキレシピ</b><span>コピーしてすぐ勝てる2デッキ</span></div></a>
-    <a class="pick p3" href="#guide"><span class="ic">🔰</span><div><b>初心者ガイド</b><span>はじめての1戦までを5ステップで</span></div></a>
-  </div>
-
-  <h2 class="band">✨ 新着・注目カード</h2>
-  <div class="strip" id="newStrip"></div>
-  <a class="more" href="#cards">カード図鑑を全部見る ›</a>
-
-  <h2 class="band">📚 メニュー</h2>
-  <div class="menu">
-    <a href="#tier"><span class="ic" style="background:#ffe3e9">👑</span>ランキング</a>
-    <a href="#decks"><span class="ic" style="background:#ece6ff">🃏</span>デッキ</a>
-    <a href="#cards"><span class="ic" style="background:#e3f0ff">🔍</span>カード図鑑</a>
-    <a href="#packs"><span class="ic" style="background:#fff2d6">🎁</span>パック</a>
-    <a href="#guide"><span class="ic" style="background:#dff7ee">🔰</span>初心者</a>
-    <a href="#rules"><span class="ic" style="background:#ffe9dc">⚔️</span>ルール</a>
-    <a href="#rules-status"><span class="ic" style="background:#f3e3ff">💫</span>状態異常</a>
-    <a href="#faq"><span class="ic" style="background:#eef0f7">💬</span>Q&amp;A</a>
-  </div>
-
-  <h2 class="band">👑 Sランクのメガモン</h2>
-  <div class="panel"><div class="grid" id="topS"></div><a class="more" href="#tier">ランキングを全部見る ›</a></div>
-</div>
-
-<!-- ===================== ランキング ===================== -->
-<div class="view" id="v-tier">
-  <div class="crumb"><a href="#top">TOP</a> › 最強カードランキング</div>
-  <h2 class="band">👑 最強カードランキング <small>wiki編集部の評価</small></h2>
-  <div class="point">ランキングは「単体の強さ」と「デッキでの使いやすさ」で評価してるよ。カードをタップすると性能が見られる。</div>
-  <div id="tierBoard"></div>
-  <h2 class="band">📝 評価のくわしい理由</h2>
-  <div class="panel" id="tierWhy"></div>
-</div>
-
-<!-- ===================== デッキ ===================== -->
-<div class="view" id="v-decks">
-  <div class="crumb"><a href="#top">TOP</a> › おすすめデッキ</div>
-  <h2 class="band">🃏 おすすめデッキレシピ</h2>
-  <div class="point">同じカードは2枚まで。持ってないカードがあったら、同じタイプのたねメガモンで埋めればOK。</div>
-  <div id="deckList"></div>
-</div>
-
-<!-- ===================== 図鑑 ===================== -->
-<div class="view" id="v-cards">
-  <div class="crumb"><a href="#top">TOP</a> › カード図鑑</div>
-  <h2 class="band">🔍 カード図鑑</h2>
-  <div class="filters">
-    <input type="search" id="q" placeholder="カード名・ワザ・特性で検索" autocomplete="off">
-    <div class="chips" id="fType"></div>
-    <div class="chips" id="fKind"></div>
-    <div class="chips" id="fPack"></div>
-  </div>
-  <div class="count" id="count"></div>
-  <div class="grid" id="grid"><div class="empty">カードを読み込み中…</div></div>
-</div>
-
-<!-- ===================== ガイド ===================== -->
-<div class="view" id="v-guide">
-  <div class="crumb"><a href="#top">TOP</a> › 初心者ガイド</div>
-  <h2 class="band">🔰 はじめての1戦まで</h2>
-  <div class="steps">
-    <div class="step"><b>パックを開ける</b><p>ホームの「パック開封」へ。<span class="mark">最初は無料で3回</span>、そのあとは1日1回開けられる。特典コードがあればここで入れよう。</p></div>
-    <div class="step"><b>デッキを作る</b><p>「デッキ構築」で持ってるカードから選ぶ。迷ったら<a href="#decks">おすすめデッキ</a>をマネしよう。使うエネルギーのタイプも選ぶ。</p></div>
-    <div class="step"><b>部屋を作る・入る</b><p>「対戦する」→「部屋を作る」で6文字のコードが出る。友だちはそのコードで「入る」。</p></div>
-    <div class="step"><b>メガモンを並べる</b><p>コイントスで先攻が決まったら、たねメガモンを<span class="mark">裏向き</span>でバトル場に1体、ベンチに3体まで置く。2人とも準備完了で同時にオープン!</p></div>
-    <div class="step"><b>ワザで攻撃!</b><p>毎ターンもらえるエネルギーを付けて、ワザで相手を倒す。<span class="mark">3ポイント先取で勝ち</span>。exを倒すと一気に2ポイント!</p></div>
-  </div>
-
-  <h2 class="band">🗺 盤面の見方</h2>
-  <div class="panel">
-    <div class="board">
-      <div class="z opp">相手の手札(裏)</div>
-      <div class="z opp">相手のベンチ(3体まで)<br><i class="mini d"></i><i class="mini d"></i><i class="mini d"></i></div>
-      <div class="z opp">相手のバトル場<br><i class="mini d big"></i></div>
-      <div class="z mid">⚡ 状況メッセージ ＋ <b>エネルギーの玉</b>(次のエネルギーも予告)</div>
-      <div class="z">自分のバトル場 <span style="color:var(--violet-deep)">← タップでワザ</span><br><i class="mini big"></i></div>
-      <div class="z">自分のベンチ <span style="color:var(--violet-deep)">← タップでにげる</span><br><i class="mini"></i><i class="mini"></i><i class="mini"></i></div>
-      <div class="z">山札 ＋ 手札 <span style="color:var(--violet-deep)">← 上スワイプで出す・長押しで拡大</span></div>
-    </div>
-  </div>
-
-  <h2 class="band">🎮 操作まとめ</h2>
-  <table>
-    <tr><th>やりたいこと</th><th>操作</th></tr>
-    <tr><td><b>ワザ・特性</b></td><td>自分のバトル場をタップ → シートから選ぶ</td></tr>
-    <tr><td><b>エネルギー</b></td><td>光る玉をタップ → 付けたいメガモンをタップ</td></tr>
-    <tr><td><b>にげる</b></td><td>ベンチのメガモンをタップ</td></tr>
-    <tr><td><b>カードを出す</b></td><td>手札を上にスワイプ</td></tr>
-    <tr><td><b>カードを見る</b></td><td>手札を長押し</td></tr>
-    <tr><td><b>対象を選ぶ</b></td><td>金色に光ってる場所をタップ</td></tr>
-  </table>
-
-  <h2 class="band">💡 勝つためのコツ</h2>
-  <div class="panel">
-    <ul>
-      <li><b>ベンチにもエネルギーを貯める。</b>バトル場がやられても、次のメガモンがすぐ攻撃できる</li>
-      <li><b>弱点を狙う。</b>格闘→悪→超→格闘。弱点を突くと<span class="gold">+20ダメージ</span></li>
-      <li><b>exは慎重に。</b>強いけど、倒されると相手に2ポイント入る</li>
-      <li><b>次のエネルギーを見る。</b>玉の横の予告を見て、どこに付けるか先に決めよう</li>
-    </ul>
-  </div>
-</div>
-
-<!-- ===================== ルール ===================== -->
-<div class="view" id="v-rules">
-  <div class="crumb"><a href="#top">TOP</a> › ルール</div>
-  <h2 class="band">⚔️ タイプと弱点</h2>
-  <div class="panel">
-    <svg class="tri" viewBox="0 0 300 250" aria-label="格闘は悪に強い、悪は超に強い、超は格闘に強い">
-      <defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#f5b82e"/></marker></defs>
-      <path d="M170,52 Q240,90 238,150" stroke="#f5b82e" stroke-width="5" fill="none" marker-end="url(#ar)"/>
-      <path d="M205,205 Q150,232 95,205" stroke="#f5b82e" stroke-width="5" fill="none" marker-end="url(#ar)"/>
-      <path d="M62,150 Q60,90 130,52" stroke="#f5b82e" stroke-width="5" fill="none" marker-end="url(#ar)"/>
-      <circle cx="150" cy="40" r="32" fill="#ea7a3c"/><text x="150" y="38" text-anchor="middle" font-size="22">👊</text><text x="150" y="60" text-anchor="middle" font-size="12" fill="#fff" font-weight="900">格闘</text>
-      <circle cx="245" cy="190" r="32" fill="#5b4a9e"/><text x="245" y="188" text-anchor="middle" font-size="22">🌙</text><text x="245" y="210" text-anchor="middle" font-size="12" fill="#fff" font-weight="900">悪</text>
-      <circle cx="55" cy="190" r="32" fill="#d65bb6"/><text x="55" y="188" text-anchor="middle" font-size="22">🔮</text><text x="55" y="210" text-anchor="middle" font-size="12" fill="#fff" font-weight="900">超</text>
-      <text x="150" y="140" text-anchor="middle" font-size="15" fill="#27304a" font-weight="900">弱点を突くと</text>
-      <text x="150" y="164" text-anchor="middle" font-size="22" fill="#d8920c" font-weight="900">+20</text>
-    </svg>
-    <p style="text-align:center;font-size:13.5px;margin:0;">矢印の向きに強い。<span class="type 無色">⭐ 無色</span> は弱点なし・弱点も突かない</p>
-  </div>
-
-  <h2 class="band">⚡ エネルギー</h2>
-  <div class="panel">
-    <ul>
-      <li>毎ターン<b>1個</b>自動でもらえる。山札から引く必要はない</li>
-      <li>出てくるのは <span class="orb 格闘">👊</span> <span class="orb 悪">🌙</span> <span class="orb 超">🔮</span> の3種類。デッキで選んだタイプ(1〜3種類)からランダム</li>
-      <li>コストの <span class="orb 無色">⭐</span> は<b>どのエネルギーでも払える</b></li>
-      <li>バトル場にもベンチにも付けられる</li>
-    </ul>
-    <div class="point">使うタイプを1種類にしぼると、欲しいエネルギーが確実に来る!</div>
-  </div>
-
-  <h2 class="band">🦋 怪化(かいか)</h2>
-  <div class="panel">
-    <p style="margin:0">メガモンの進化。手札の怪化カードを、場の怪化前のメガモンに重ねる。</p>
-    <ul>
-      <li>出したばかりのメガモンは、<b>次の自分の番から</b>怪化できる</li>
-      <li>ダメージとエネルギーはそのまま引き継ぐ</li>
-      <li>怪化すると、まひ・ねむり・こんらんが治る</li>
-    </ul>
-  </div>
-
-  <h2 class="band">🏆 勝ち方・ポイント</h2>
-  <div class="panel">
-    <table>
-      <tr><th>倒した相手</th><th class="num">もらえるポイント</th></tr>
-      <tr><td>ふつうのメガモン</td><td class="num"><b class="gold">1点</b></td></tr>
-      <tr><td>exのメガモン</td><td class="num"><b class="gold">2点</b></td></tr>
-    </table>
-    <p style="margin:10px 0 0;font-size:14px;"><b>3点先取で勝ち。</b>バトル場がきぜつしたら、次に出すメガモンはベンチから自分で選ぶ。山札が無くなっても引けないだけで負けにはならない。</p>
-  </div>
-
-  <h2 class="band">🏃 にげる</h2>
-  <div class="panel"><p style="margin:0">バトル場とベンチを入れ替える。カードに書かれた数だけエネルギーをトラッシュ。<b>1ターンに1回</b>。にげるとこんらんが治る。まひ・ねむりの間はにげられない。</p></div>
-
-  <h2 class="band" id="rules-status">💫 状態異常</h2>
-  <table>
-    <tr><th>状態</th><th>効果</th><th>治り方</th></tr>
-    <tr><td><span class="sbadge" style="background:#8a52d6">どく</span></td><td>自分の番のはじめに<b>10</b>ダメージ</td><td>回復カード(万能薬など)</td></tr>
-    <tr><td><span class="sbadge" style="background:#ef6a3a">やけど</span></td><td>自分の番のはじめに<b>20</b>ダメージ</td><td>そのあとコインでオモテなら治る</td></tr>
-    <tr><td><span class="sbadge" style="background:#e3b51e;color:#3b2c00">まひ</span></td><td>その番はワザもにげるも使えない</td><td>1ターンで治る</td></tr>
-    <tr><td><span class="sbadge" style="background:#4e86e0">ねむり</span></td><td>ワザもにげるも使えない</td><td>番のはじめにコインでオモテなら起きる</td></tr>
-    <tr><td><span class="sbadge" style="background:#d453a6">こんらん</span></td><td>ワザの時にコイン。ウラだと失敗</td><td>にげる・怪化</td></tr>
-  </table>
-
-  <h2 class="band">🃏 カードの種類</h2>
-  <table>
-    <tr><th>種類</th><th>ポイント</th></tr>
-    <tr><td><b>たね</b></td><td>そのまま場に出せるメガモン</td></tr>
-    <tr><td><b>怪化</b></td><td>場のたねに重ねて出す</td></tr>
-    <tr><td><b>🧪 グッズ</b></td><td>使い切り。1ターンに何枚でもOK</td></tr>
-    <tr><td><b>🤝 サポート</b></td><td>強力。<b>1ターンに1枚</b>まで</td></tr>
-    <tr><td><b>⚙️ どうぐ</b></td><td>メガモンに付ける。1体に1枚</td></tr>
-  </table>
-  <div class="point">特性は3タイプ。<b>場に出た時</b>(バトル場に出た時だけ)/<b>常時</b>/<b>ターン1回</b>(ワザ・特性シートから使う)</div>
-</div>
-
-<!-- ===================== パック ===================== -->
-<div class="view" id="v-packs">
-  <div class="crumb"><a href="#top">TOP</a> › パック</div>
-  <h2 class="band">🎁 パック一覧 <small>どれを開ける?</small></h2>
-  <div class="point">1パック5枚。メガモンはパックと同じタイプが出る。無色と、指定の無いトレーナーズは全パック共通。</div>
-  <div class="packs" id="packList"><div class="empty">読み込み中…</div></div>
-  <h2 class="band">💎 レアリティと排出率</h2>
-  <p style="font-size:13.5px;margin:0 0 8px;">1〜3枚目は必ず ◇。<b>4・5枚目</b>がレアのチャンス!(パックに無いレアリティは除いて抽選)</p>
-  <table id="rateTable"><tr><td class="empty">読み込み中…</td></tr></table>
-  <p style="font-size:12.5px;color:var(--ink-dim);margin-top:8px;">配布でもらえる <b>PROMO</b> もある。</p>
-</div>
-
-<!-- ===================== Q&A ===================== -->
-<div class="view" id="v-faq">
-  <div class="crumb"><a href="#top">TOP</a> › Q&amp;A・用語集</div>
-  <h2 class="band">💬 よくある質問</h2>
-  <div class="faq">
-    <details><summary>カードの絵が出ない・「？」になる</summary><p>画像サーバーが一時的に止まっていることがある。少し待ってから開き直してみて。</p></details>
-    <details><summary>相手の動きが反映されない</summary><p>数秒ごとに自動で同期してる。止まって見えたらページを読み込み直すと戻る。</p></details>
-    <details><summary>特典コードはどこで入れる?</summary><p>「パック開封」の画面から。コードは女神鯖のお知らせをチェック!</p></details>
-    <details><summary>同じカードは何枚入れられる?</summary><p>2枚まで。レアリティ違いも合わせて2枚。</p></details>
-    <details><summary>先攻は有利?</summary><p>先攻は最初の番だけ山札を引けない。そのかわり先に動ける。</p></details>
-  </div>
-  <h2 class="band">📖 用語集</h2>
-  <div class="panel">
-    <dl class="gl">
-      <dt>メガモン</dt><dd>女神鯖のメンバーがモチーフのモンスター。</dd>
-      <dt>たね</dt><dd>そのまま場に出せるメガモン。</dd>
-      <dt>怪化(かいか)</dt><dd>メガモンの進化。たねの上に重ねて出す。</dd>
-      <dt>バトル場 / ベンチ</dt><dd>戦うのはバトル場の1体。ベンチは控え(3体まで)。</dd>
-      <dt>ex</dt><dd>強いメガモン。倒されると相手に2ポイント。</dd>
-      <dt>トラッシュ</dt><dd>使い終わったカードやエネルギーの捨て場。</dd>
-      <dt>トレーナーズ</dt><dd>グッズ・サポート・どうぐの総称。</dd>
-    </dl>
-  </div>
-</div>
-
-<footer>メガポケ攻略wiki ・ カードデータはゲーム本体から自動で読み込み</footer>
-</main>
-
-<dialog id="dlg"><div class="dlg" id="dlgBody"></div></dialog>
+<main><div class="wrap" id="app"><p class="empty" style="padding-top:40px">読み込み中…</p></div></main>
+<footer><div class="wrap"><span>メガポケ 公式Wiki · カードはゲームとあわせて自動で更新されます</span><span>女神鯖</span></div></footer>
 
 <script>
-const TYPE_ICON = { '格闘':'👊', '悪':'🌙', '超':'🔮', '無色':'⭐' };
-const TRAINER_ICON = { item:'🧪', support:'🤝', tool:'⚙️' };
+const TYPE_EN = { '格闘':'FIGHTING', '悪':'DARK', '超':'PSYCHIC', '無色':'COLORLESS' };
 const KIND_LABEL = { item:'グッズ', support:'サポート', tool:'どうぐ' };
+const KIND_EN = { item:'ITEM', support:'SUPPORTER', tool:'TOOL' };
 const STATUS_LABEL = { poison:'どく', burn:'やけど', paralysis:'まひ', sleep:'ねむり', confusion:'こんらん' };
 const TIMING_LABEL = { onPlay:'場に出た時', passive:'常時', activated:'ターン1回' };
 const RARITY_ORDER = ['diamond1','diamond2','diamond3','diamond4','star1','star2','star3','spade','club','crown','dopa','promo'];
 const TYPES = ['格闘','悪','超','無色'];
+const RANK_COLOR = { S:'#ff5a6a', A:'#ffc446', B:'#5fe08a', C:'#8d91a6' };
 
 /* ---- wiki編集部の評価(手書き)。カードIDで書く。載ってないカードはランキングに出ない ---- */
 const TIERS = [
@@ -540,16 +237,17 @@ const DECKS = [
   { name:'みーつEX 悪ビートダウン', type:'悪', energy:['悪'],
     lead:'HPの多い悪メガモンで殴り合い、スイカと赤マルで回復して押し切るデッキ。',
     cards:[['mitsu_base',2],['mitsu_ex',2],['pom_ex',2],['kagame_base',2],['bird_base',1],['item_watermelon',2],['item_akamaru',2],['item_ball',2]],
-    power:{ 攻撃:5, 耐久:5, 安定:4 },
+    power:{ ATTACK:5, DEFENSE:5, STABILITY:4 },
     how:['最初はばーどやかがめで場をつなぎ、裏でみーつを育てる','みーつEXに怪化したら、HP80以下で130ダメージの大技を狙う','ぽむEXがいる時に「ぽむのスイカ」を使うと全員回復'] },
   { name:'ろいex 超コントロール', type:'超', energy:['超'],
     lead:'ベンチにダメージをばらまきつつ、エネルギーを削って相手に何もさせないデッキ。',
     cards:[['roy_base',2],['roy_kaika',2],['ikoma_ex',2],['villager',2],['family_rabbit',2],['tool_gtx',1],['item_ball',2]],
-    power:{ 攻撃:4, 耐久:4, 安定:5 },
+    power:{ ATTACK:4, DEFENSE:4, STABILITY:5 },
     how:['ろいの「プロデュース」でベンチにエネルギーを先に貯める','ろいexの「まかない」で相手のベンチごと削る','いこまexで相手のエネルギーを剥がし、村人兵士は0コストで入れ替え'] },
 ];
 
 let D = null;
+const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 // ゲーム本体からデータ定義の部分だけ切り出して読む(カードを追加すると自動で反映される)
@@ -560,31 +258,31 @@ function slice(src, start, end){
 }
 async function loadData(){
   const src = await (await fetch('megapoke.html', { cache:'no-cache' })).text();
-  const code = [
+  return new Function([
     slice(src, 'const CARDS = {', 'const ALL_PRINT_IDS'),
     slice(src, 'const RARITY_LABEL = {', '\n};'),
     slice(src, 'const RARITY_NAME = {', '\n};'),
     slice(src, 'const PACKS = {', '\n};'),
     slice(src, 'const SLOT_RARITY_WEIGHTS = {', '\n};'),
     'return { CARDS, PRINTS, WEAKNESS, PACKS, SLOT_RARITY_WEIGHTS, RARITY_LABEL, RARITY_NAME };'
-  ].join('\n');
-  return new Function(code)();
+  ].join('\n'))();
 }
 
-const printsOf = cardId => Object.values(D.PRINTS).filter(p => p.cardId === cardId)
-  .sort((a,b) => RARITY_ORDER.indexOf(a.rarity) - RARITY_ORDER.indexOf(b.rarity));
-const artOf = p => p.image || D.CARDS[p.cardId].image || null;
+/* ---- データの小道具 ---- */
+const C = id => D.CARDS[id];
+const allCards = () => Object.values(D.CARDS);
+const printsOf = id => Object.values(D.PRINTS).filter(p => p.cardId === id).sort((a,b) => RARITY_ORDER.indexOf(a.rarity) - RARITY_ORDER.indexOf(b.rarity));
+const artOf = p => p && (p.image || C(p.cardId).image) || null;
 const hasArt = id => printsOf(id).some(artOf);
-const bestPrint = id => { const ps = printsOf(id); return [...ps].reverse().find(artOf) || ps[0]; };
-const firstArtPrint = id => { const ps = printsOf(id); return ps.find(artOf) || ps[0]; };
+const bestArt = id => { const ps = printsOf(id); return artOf([...ps].reverse().find(artOf)); };
+const firstArt = id => artOf(printsOf(id).find(artOf));
+const tc = c => c.kind === 'creature' ? `var(--t-${c.type})` : 'var(--t-tr)';
+const typeLabel = c => c.kind === 'creature' ? `${c.type} · ${c.basic ? 'たね' : '怪化'}${c.isEx ? ' · ex' : ''}` : KIND_LABEL[c.kind];
+const roleLabel = c => c.kind === 'creature' ? TYPE_EN[c.type] + (c.isEx ? ' · EX' : '') : KIND_EN[c.kind];
 function packsOfPrint(p){
-  const c = D.CARDS[p.cardId];
+  const c = C(p.cardId);
   if(!artOf(p)) return [];
-  return Object.values(D.PACKS).filter(pk => {
-    if(p.packId) return p.packId === pk.id;
-    if(c.kind !== 'creature') return true;
-    return c.type === pk.type || c.type === '無色';
-  }).map(pk => pk.id);
+  return Object.values(D.PACKS).filter(pk => p.packId ? p.packId === pk.id : (c.kind !== 'creature' || c.type === pk.type || c.type === '無色')).map(pk => pk.id);
 }
 const weaknessOf = type => Object.keys(D.WEAKNESS).find(k => D.WEAKNESS[k] === type) || null;
 function attackDesc(atk, card){
@@ -597,181 +295,223 @@ function attackDesc(atk, card){
   }
   if(atk.attackEffect === 'attachBenchEnergy') parts.push(`エネルギーゾーンから${atk.energyType||''}エネルギーを1個出し、ベンチのメガモンにつける。`);
   if(atk.inflicts) parts.push(`相手のバトルメガモンを${STATUS_LABEL[atk.inflicts]||atk.inflicts}にする。`);
-  return parts.join('');
+  return parts.join('') || 'ダメージを与える。';
 }
-const orbs = cost => `<span class="cost">${(cost||[]).map(t => `<span class="orb ${esc(t)}">${TYPE_ICON[t]||''}</span>`).join('')}</span>`;
 function dmgText(atk){
   if(!atk.dmg) return atk.coin && atk.coin.type === 'perHeads' ? `${atk.coin.amount}×` : '';
   return atk.dmg + ((atk.coin && atk.coin.type === 'bonus') || atk.repeatBonus || atk.bonusIfSelfHpBelow ? '+' : '');
 }
-function genFace(card){
-  if(card.kind === 'creature'){
-    return `<div class="face"><div class="gen ${esc(card.type)}">
-      <div class="row"><span class="nm">${esc(card.name)}</span><span class="hp">${card.hp}</span></div>
-      <div class="art">${TYPE_ICON[card.type]||''}</div>
-      <div class="tx">${(card.attacks||[]).map(a => esc(a.name) + (a.dmg ? ' ' + a.dmg : '')).join('<br>')}</div></div></div>`;
-  }
-  return `<div class="face"><div class="gen trainer"><div class="row"><span class="nm">${esc(card.name)}</span></div>
-    <div class="art">${TRAINER_ICON[card.kind]||''}</div><div class="tx">${esc(KIND_LABEL[card.kind]||'')}</div></div></div>`;
+const orb = t => `<span class="orb" style="--oc:var(--t-${esc(t)})">${esc(t[0])}</span>`;
+function face(c, art){
+  const gen = `<div class="gen"><div class="row"><b>${esc(c.name)}</b>${c.hp ? `<em>HP${c.hp}</em>` : ''}</div><div class="art">${esc(c.kind === 'creature' ? TYPE_EN[c.type] : KIND_EN[c.kind])}</div></div>`;
+  return `<div class="face" style="--uc:${tc(c)}">${gen}${art ? `<img loading="lazy" src="${esc(art)}" alt="" onerror="this.remove()">` : ''}</div>`;
 }
-function faceHTML(card, print){
-  const art = print && artOf(print);
-  const img = art ? `<img class="art-img" loading="lazy" src="${esc(art)}" alt="${esc(card.name)}" onerror="this.remove()">` : '';
-  return genFace(card).replace('<div class="face">', '<div class="face">' + img);
+function ucard(id, extra = ''){
+  const c = C(id); if(!c) return '';
+  const t = TIERS.find(x => x.id === id);
+  return `<a class="ucard" href="#/card/${esc(id)}" style="--uc:${tc(c)}">${extra}${t && !extra ? `<span class="tier" style="--rk:${RANK_COLOR[t.t]}">${t.t}</span>` : ''}
+    <div class="pic">${face(c, bestArt(id))}</div>
+    <div class="nm"><span class="role">${esc(roleLabel(c))}</span><b>${esc(c.name)}</b><span>${esc(printsOf(id).map(p => D.RARITY_LABEL[p.rarity]).filter(Boolean).join(' / '))}</span></div></a>`;
 }
-function cardBtn(id, opts = {}){
-  const c = D.CARDS[id]; if(!c) return '';
-  const p = opts.best ? bestPrint(id) : firstArtPrint(id);
-  const rar = opts.noRar ? '' : `<div class="rar">${esc(printsOf(id).map(p => D.RARITY_LABEL[p.rarity]).filter(Boolean).join(' / '))}</div>`;
-  return `<button type="button" class="card" data-id="${esc(id)}">${opts.ribbon||''}${opts.extra||''}${faceHTML(c, p)}<div class="cap">${esc(c.name)}</div>${rar}</button>`;
-}
+const crumb = s => `<div class="crumb"><a href="#/">WIKI</a> / ${s}</div>`;
+const T1 = (t, lead) => `<h1 class="t">${t}</h1>${lead ? `<p class="lead">${lead}</p>` : ''}`;
+const head2 = (jp, en, id) => `<h2 class="s"${id ? ` id="${id}"` : ''}>${jp} <small>${en}</small></h2>`;
+const set = (title, html) => { $('#app').innerHTML = html; document.title = (title ? title + ' | ' : '') + 'メガポケ 公式Wiki'; };
+const grid4 = rows => `<div class="basic-grid">${rows.map(([k,b,p]) => `<div class="card"><div class="k">${k}</div><b>${b}</b><p>${p}</p></div>`).join('')}</div>`;
 
-/* ---- 図鑑 ---- */
-const F = { q:'', type:'all', kind:'all', pack:'all' };
-function chips(el, key, opts){
-  el.innerHTML = opts.map(([v,l]) => `<button type="button" class="chip${F[key]===v?' on':''}" data-v="${esc(v)}">${l}</button>`).join('');
-  el.onclick = e => { const b = e.target.closest('.chip'); if(!b) return; F[key] = b.dataset.v; chips(el, key, opts); renderGrid(); };
-}
-const kindKey = c => c.kind === 'creature' ? (c.basic ? 'basic' : 'kaika') : c.kind;
-function renderGrid(){
-  const q = F.q.trim().toLowerCase();
-  const list = Object.values(D.CARDS).filter(c => {
-    if(F.type !== 'all' && c.type !== F.type) return false;
-    if(F.kind !== 'all' && kindKey(c) !== F.kind) return false;
-    if(F.pack !== 'all' && !printsOf(c.id).some(p => packsOfPrint(p).includes(F.pack))) return false;
-    if(q){
-      const hay = [c.name, c.desc, c.ability && c.ability.name, c.ability && c.ability.desc, ...(c.attacks||[]).map(a => a.name + attackDesc(a,c))].join(' ').toLowerCase();
-      if(!hay.includes(q)) return false;
-    }
-    return true;
-  }).sort((a,b) => (hasArt(a.id)?0:1)-(hasArt(b.id)?0:1) || (a.kind==='creature'?0:1)-(b.kind==='creature'?0:1) || TYPES.indexOf(a.type)-TYPES.indexOf(b.type));
-  document.getElementById('count').textContent = `${list.length}枚`;
-  document.getElementById('grid').innerHTML = list.length ? list.map(c => cardBtn(c.id, { ribbon: c.isEx ? '<span class="ribbon" style="background:linear-gradient(90deg,#ffb800,#ff6a00)">ex</span>' : '' })).join('')
-    : '<div class="empty" style="grid-column:1/-1">当てはまるカードが無い</div>';
-}
+/* ---- ページ ---- */
+const PAGES = {
+  '': () => {
+    const mons = allCards().filter(c => c.kind === 'creature');
+    const S = TIERS.filter(t => t.t === 'S' && C(t.id)).map(t => t.id);
+    set('', `<section class="home-hero">${T1('Official <i>Wiki</i>', 'メガポケのことは、ここに全部。カード図鑑・最強ランキング・おすすめデッキ・遊び方・ルール・パックまで。')}
+      <div class="stats">${[[allCards().length,'カード'],[mons.length,'メガモン'],[mons.filter(c => c.isEx).length,'ex'],[allCards().length - mons.length,'トレーナーズ'],[Object.keys(D.PACKS).length,'パック']].map(([n,l]) => `<div><b>${n}</b><span>${l}</span></div>`).join('')}</div>
+      <div class="story card"><div><h2 class="s" style="margin-top:0">メガポケとは</h2>
+        <p>女神鯖のメンバーが「メガモン」になって戦う、2人対戦のカードゲーム。正式名は MEGAMI Trading Card Game Pocket。スマホのブラウザだけで遊べる。</p>
+        <p>エネルギーは毎ターン自動でもらえる。メガモンにエネルギーを付けてワザを使い、相手をきぜつさせてポイントを取る。<span class="gold">3ポイント先取</span>で勝ち。exを倒せば一気に2ポイント。</p>
+        <p>パックを開けてカードを集め、自分だけのデッキで友だちと戦おう。</p></div>
+        <div class="cast">${S.slice(0,3).map(id => `<div class="cf">${face(C(id), bestArt(id))}</div>`).join('')}</div></div>
+      <div class="quick">${[['cards','Cards',`${allCards().length}枚のカード`],['tier','Tier list','最強カードランキング'],['decks','Decks','おすすめデッキ'],['basics','How to play','はじめての1戦まで'],['rules','Rules','タイプ・エネルギー・怪化'],['rules/status','Status','状態異常の効果'],['packs','Packs','中身と排出率'],['faq','Q&A','よくある質問・用語']].map(([r,b,s]) => `<a href="#/${r}"><b>${b}</b><span>${s}</span></a>`).join('')}</div>
+      ${head2('Sランクのメガモン','Top tier')}<div class="ugrid">${S.map(id => ucard(id)).join('')}</div><p><a href="#/tier">ランキングをぜんぶ見る →</a></p>
+      ${head2('絵のあるカード','Illustrated cards')}<div class="ugrid">${allCards().filter(c => hasArt(c.id)).map(c => ucard(c.id)).join('')}</div><p><a href="#/cards">カード図鑑をぜんぶ見る →</a></p>
+      </section>`);
+  },
+  cards: () => {
+    set('カード図鑑', `${crumb('CARDS')}${T1('Card <i>List</i>', 'メガポケの全カード。押すと性能・弱点・入手できるパックが見られる。')}
+      <div class="tabs" id="ft"><button aria-pressed="true" data-v="">ALL</button>${TYPES.map(t => `<button aria-pressed="false" data-v="${t}" style="--tc:var(--t-${t})">${TYPE_EN[t]}</button>`).join('')}<button aria-pressed="false" data-v="tr" style="--tc:var(--t-tr)">TRAINERS</button></div>
+      <div class="tabs" id="fp"><button aria-pressed="true" data-v="">全パック</button>${Object.values(D.PACKS).map(p => `<button aria-pressed="false" data-v="${esc(p.id)}">${esc(p.name)}</button>`).join('')}</div>
+      <p class="empty" id="cnt" style="margin:6px 0 12px;font-size:13px"></p><div class="ugrid" id="cg"></div>`);
+    const st = { t:'', p:'' };
+    const draw = () => {
+      const list = allCards().filter(c => (!st.t || (st.t === 'tr' ? c.kind !== 'creature' : c.type === st.t)) && (!st.p || printsOf(c.id).some(p => packsOfPrint(p).includes(st.p))))
+        .sort((a,b) => (hasArt(a.id)?0:1)-(hasArt(b.id)?0:1) || (a.kind==='creature'?0:1)-(b.kind==='creature'?0:1) || TYPES.indexOf(a.type)-TYPES.indexOf(b.type));
+      $('#cnt').textContent = `${list.length}枚`;
+      $('#cg').innerHTML = list.map(c => ucard(c.id)).join('') || '<p class="empty">当てはまるカードが無い</p>';
+    };
+    [['#ft','t'],['#fp','p']].forEach(([sel,k]) => $(sel).onclick = e => { const b = e.target.closest('button'); if(!b) return; st[k] = b.dataset.v; $(sel).querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); draw(); });
+    draw();
+  },
+  card: id => {
+    const c = C(id); if(!c) return PAGES.cards();
+    const tier = TIERS.find(t => t.id === id);
+    const ps = printsOf(id);
+    let meta = '';
+    if(c.kind === 'creature'){
+      const wk = weaknessOf(c.type);
+      meta = [['HP', c.hp], ['TYPE', c.type], ['WEAK', wk ? wk + '+20' : 'なし'], ['RETREAT', c.retreatCost || 0]].concat(tier ? [['RANK', tier.t]] : []).map(([k,v]) => `<div><span>${k}</span><b>${esc(v)}</b></div>`).join('');
+    }else meta = `<div><span>KIND</span><b>${esc(KIND_LABEL[c.kind])}</b></div>` + (tier ? `<div><span>RANK</span><b>${tier.t}</b></div>` : '');
+    let moves = '';
+    if(c.ability) moves += `<div><div class="k" style="padding-top:2px">ABILITY</div><div><b>${esc(c.ability.name)}</b> <span class="tp" style="--tc:var(--bad)">${esc(TIMING_LABEL[c.ability.timing]||'')}</span><p>${esc(c.ability.desc)}</p></div></div>`;
+    (c.attacks||[]).forEach(a => { moves += `<div><div class="orbs">${(a.cost||[]).map(orb).join('')}</div><div><b>${esc(a.name)}</b><em>${esc(dmgText(a))}</em><p>${esc(attackDesc(a,c))}</p></div></div>`; });
+    const evo = [c.kaikaOf && C(c.kaikaOf) ? `<a href="#/card/${esc(c.kaikaOf)}"><div class="k">FROM</div><div><b>${esc(C(c.kaikaOf).name)}</b><p>から怪化する</p></div></a>` : '', c.kaikaTo && C(c.kaikaTo) ? `<a href="#/card/${esc(c.kaikaTo)}"><div class="k">TO</div><div><b>${esc(C(c.kaikaTo).name)}</b><p>に怪化できる</p></div></a>` : ''].join('');
+    const rows = ps.map(p => {
+      const pk = packsOfPrint(p).map(pid => D.PACKS[pid].name);
+      const where = p.rarity === 'promo' ? '配布' : (pk.length ? (pk.length === Object.keys(D.PACKS).length ? '全パック' : pk.join('・')) : 'パックに出ない(試作カード)');
+      return `<tr><td><span class="rar" style="color:var(--gold)">${esc(D.RARITY_LABEL[p.rarity]||'')}</span></td><td>${esc(D.RARITY_NAME[p.rarity]||'')}</td><td>${esc(where)}</td></tr>`;
+    }).join('');
+    const list = allCards(); const i = list.findIndex(x => x.id === id);
+    const prev = list[(i - 1 + list.length) % list.length], next = list[(i + 1) % list.length];
+    set(c.name, `${crumb(`<a href="#/cards">CARDS</a> / ${esc(c.name)}`)}
+      <div class="uhead" style="--uc:${tc(c)}"><div class="pic">${face(c, bestArt(id))}</div>
+        <div><p class="motif">${esc(roleLabel(c))}</p><h1>${esc(c.name)}</h1><div class="meta">${meta}</div>
+        ${c.kind !== 'creature' ? `<p class="ability">${esc(c.desc)}</p>` : ''}${tier ? `<p class="stars" style="margin:12px 0 0">${'★'.repeat(tier.stars)}${'☆'.repeat(5 - tier.stars)}</p>` : ''}</div></div>
+      ${moves ? head2('ワザ・特性','Moves') + `<div class="rel" style="--uc:${tc(c)}">${moves}</div>` : ''}
+      ${tier ? head2('評価','Review') + `<p class="ability" style="--uc:${RANK_COLOR[tier.t]}">${esc(tier.why)}</p>` : ''}
+      ${evo ? head2('怪化','Evolution') + `<div class="rel" style="--uc:${tc(c)}">${evo}</div>` : ''}
+      ${head2('入手方法','How to get')}<div class="tbl-wrap"><table class="tbl"><tr><th>Rarity</th><th>名前</th><th>出るところ</th></tr>${rows}</table></div>
+      <div class="pn"><a href="#/card/${esc(prev.id)}"><span>‹</span>${esc(prev.name)}</a><a href="#/card/${esc(next.id)}">${esc(next.name)}<span>›</span></a></div>`);
+  },
+  tier: () => {
+    const live = TIERS.filter(t => C(t.id));
+    set('最強ランキング', `${crumb('TIER LIST')}${T1('Tier <i>List</i>', '単体の強さとデッキでの使いやすさで評価した、wiki編集部のランキング。')}
+      ${['S','A','B','C'].map(r => { const ids = live.filter(t => t.t === r).map(t => t.id); return ids.length ? `<div class="tierrow" style="--rk:${RANK_COLOR[r]}"><div class="lb">${r}</div><div class="cs">${ids.map(id => `<a href="#/card/${esc(id)}">${face(C(id), bestArt(id))}${esc(C(id).name)}</a>`).join('')}</div></div>` : ''; }).join('')}
+      ${head2('評価の理由','Reviews')}<ol class="tips">${live.map(t => `<li style="--uc:${RANK_COLOR[t.t]}"><div><b><a href="#/card/${esc(t.id)}" style="color:var(--ink);text-decoration:none">${esc(C(t.id).name)}</a> <span class="tp" style="--tc:${RANK_COLOR[t.t]}">${t.t}</span> <span class="stars">${'★'.repeat(t.stars)}${'☆'.repeat(5 - t.stars)}</span></b><p>${esc(t.why)}</p></div></li>`).join('')}</ol>`);
+  },
+  decks: () => {
+    set('おすすめデッキ', `${crumb('DECKS')}${T1('Deck <i>Recipes</i>', 'そのままマネして使えるデッキ。同じカードは2枚まで。持ってないカードは、同じタイプのたねメガモンで埋めればOK。')}
+      ${DECKS.map(d => { const cards = d.cards.filter(([id]) => C(id)); const total = cards.reduce((s,[,n]) => s + n, 0);
+        return `<div class="deck" style="--uc:var(--t-${d.type})"><div class="dh"><div class="k">${TYPE_EN[d.type]} DECK · ${total} CARDS · ENERGY ${d.energy.map(e => TYPE_EN[e]).join(' / ')}</div><h3>${esc(d.name)}</h3></div>
+          <div class="db"><p>${esc(d.lead)}</p><div class="ugrid">${cards.map(([id,n]) => ucard(id, `<span class="cnt">×${n}</span>`)).join('')}</div>
+          <div class="bars">${Object.entries(d.power).map(([k,v]) => `<span>${k}</span><i style="--v:${v * 20}%"></i>`).join('')}</div>
+          <ol class="tips">${d.how.map(h => `<li><div><p style="color:var(--ink);margin:0">${esc(h)}</p></div></li>`).join('')}</ol></div></div>`; }).join('')}`);
+  },
+  basics: () => {
+    set('遊び方', `${crumb('HOW TO PLAY')}${T1('How to <i>Play</i>', 'はじめての1戦まで。部屋の作り方から勝ち方まで。')}
+      ${head2('試合までの流れ','Steps')}<ol class="tips">
+        <li><div><b>パックを開ける</b><p>ホームの「パック開封」へ。最初は無料で3回、そのあとは1日1回。特典コードもここで入れる。</p></div></li>
+        <li><div><b>デッキを作る</b><p>「デッキ構築」で持ってるカードから選ぶ。使うエネルギーのタイプ(1〜3種類)も選ぶ。迷ったら<a href="#/decks">おすすめデッキ</a>。</p></div></li>
+        <li><div><b>部屋を作る・入る</b><p>「対戦する」→「部屋を作る」で6文字のコードが出る。相手はそのコードで「入る」。</p></div></li>
+        <li><div><b>メガモンを並べる</b><p>コイントスで先攻が決まる。たねメガモンを裏向きでバトル場に1体、ベンチに3体まで。2人とも「準備完了」で同時に公開。</p></div></li>
+        <li><div><b>ワザで戦う</b><p>エネルギーを付けてワザを使い、相手をきぜつさせてポイントを取る。3ポイント先取で勝ち。</p></div></li></ol>
+      ${head2('自分の番にできること','Your turn')}${grid4([
+        ['DRAW','山札から1枚引く','番のはじめに自動。先攻の最初の番だけは引かない。'],
+        ['ENERGY','エネルギーを1個付ける','毎ターン1個もらえる。バトル場にもベンチにも付けられる。'],
+        ['BENCH','たねをベンチに出す','ベンチは3体まで。'],
+        ['EVOLVE','怪化させる','場に出て1ターンたったメガモンに重ねる。'],
+        ['TRAINERS','トレーナーズを使う','グッズは何枚でも、サポートは1ターン1枚まで。'],
+        ['RETREAT','にげる','バトル場とベンチを入れ替える。1ターン1回。'],
+        ['ATTACK','ワザを使う','使うと番が終わる。使わずに終えてもいい。']])}
+      ${head2('盤面の見方','Board')}<div class="card"><div class="board">
+        <div class="o">相手の手札(裏)</div><div class="o">相手のベンチ<small>3体まで</small></div><div class="o">相手のバトル場</div>
+        <div class="m">状況メッセージ + エネルギーの玉<small>次の番のエネルギーも予告される</small></div>
+        <div class="y">自分のバトル場<small>タップでワザ・特性</small></div><div class="y">自分のベンチ<small>タップでにげる</small></div><div class="y">山札 + 手札<small>上スワイプで出す・長押しで拡大</small></div></div></div>
+      ${head2('操作','Controls')}<div class="tbl-wrap"><table class="tbl"><tr><th>やりたいこと</th><th>操作</th></tr>
+        <tr><td>ワザ・特性</td><td>自分のバトル場をタップ → シートから選ぶ</td></tr><tr><td>エネルギー</td><td>光る玉をタップ → 付けたいメガモン</td></tr>
+        <tr><td>にげる</td><td>ベンチのメガモンをタップ</td></tr><tr><td>カードを出す</td><td>手札を上にスワイプ</td></tr>
+        <tr><td>カードを見る</td><td>手札を長押し</td></tr><tr><td>対象を選ぶ</td><td>金色に光っている場所をタップ</td></tr></table></div>
+      ${head2('勝つためのコツ','Tips')}<ol class="tips">
+        <li><div><b>ベンチにもエネルギーを貯める</b><p>バトル場がやられても、次のメガモンがすぐ攻撃できる。</p></div></li>
+        <li><div><b>弱点を狙う</b><p>格闘→悪→超→格闘。弱点を突くと+20ダメージ。</p></div></li>
+        <li><div><b>exは慎重に</b><p>強いけど、倒されると相手に2ポイント入る。</p></div></li>
+        <li><div><b>次のエネルギーを見る</b><p>玉の横の予告を見て、付け先を先に決めておく。</p></div></li></ol>`);
+  },
+  rules: () => {
+    set('ルール', `${crumb('RULES')}${T1('<i>Rules</i>', 'タイプと弱点・エネルギー・怪化・ポイント・状態異常。')}
+      ${head2('タイプと弱点','Types')}<div class="card"><div class="cycle">${['格闘','悪','超','格闘'].map((t,i) => `${i ? '<span class="a">›</span>' : ''}<span class="n" style="--tc:var(--t-${t})">${t}</span>`).join('')}</div>
+        <p>矢印の向きに強い。弱点を突くとワザのダメージが<span class="gold">+20</span>。<span class="tp" style="--tc:var(--t-無色)">無色</span> は弱点なしで、弱点も突かない。</p></div>
+      ${head2('エネルギー','Energy')}${grid4([
+        ['AUTO','毎ターン1個','山札から引く必要はない。付けられるのは1ターン1個まで。'],
+        ['TYPES','格闘・悪・超の3種類','デッキで選んだタイプ(1〜3種類)からランダムで出る。1種類にしぼると確実。'],
+        ['COLORLESS','無色はどれでもOK','ワザのコストの「無」は、どの種類のエネルギーでも払える。'],
+        ['WHERE','どこにでも付けられる','バトル場にもベンチにも付けられる。']])}
+      ${head2('怪化','Evolution')}<div class="card"><ul><li>メガモンの進化。手札の怪化カードを、場の怪化前のメガモンに重ねる</li><li>出したばかりのメガモンは、次の自分の番から怪化できる</li><li>ダメージとエネルギーはそのまま引き継ぐ</li><li>怪化すると、まひ・ねむり・こんらんが治る(どく・やけどは残る)</li></ul></div>
+      ${head2('ポイントと勝ち負け','Points')}<div class="tbl-wrap"><table class="tbl"><tr><th>倒した相手</th><th>ポイント</th></tr><tr><td>ふつうのメガモン</td><td class="num">1</td></tr><tr><td>exのメガモン</td><td class="num" style="color:var(--gold)">2</td></tr></table></div>
+        <p class="lead" style="margin:12px 0 0">3ポイント先取で勝ち。バトル場がきぜつしたら、次に出すメガモンはベンチから自分で選ぶ。山札が無くなっても、引けないだけで負けにはならない。</p>
+      ${head2('にげる','Retreat')}<div class="card"><p>バトル場とベンチを入れ替える。カードに書かれた数だけエネルギーをトラッシュ。1ターンに1回。にげるとこんらんが治る。まひ・ねむりの間はにげられない。</p></div>
+      ${head2('状態異常','Status', 'status')}<div class="tbl-wrap"><table class="tbl"><tr><th>状態</th><th>効果</th><th>治り方</th></tr>
+        <tr><td><span class="tp" style="--tc:#b07cff">どく</span></td><td>自分の番のはじめに10ダメージ</td><td>回復カード(万能薬など)</td></tr>
+        <tr><td><span class="tp" style="--tc:#ff7a4a">やけど</span></td><td>自分の番のはじめに20ダメージ</td><td>そのあとコインでオモテなら治る</td></tr>
+        <tr><td><span class="tp" style="--tc:#ffc446">まひ</span></td><td>その番はワザもにげるも使えない</td><td>1ターンで治る</td></tr>
+        <tr><td><span class="tp" style="--tc:#54a8ff">ねむり</span></td><td>ワザもにげるも使えない</td><td>番のはじめにコインでオモテなら起きる</td></tr>
+        <tr><td><span class="tp" style="--tc:#ff5cc8">こんらん</span></td><td>ワザの時にコイン。ウラだと失敗</td><td>にげる・怪化</td></tr></table></div>
+      ${head2('カードの種類','Card types')}${grid4([
+        ['BASIC','たね','そのまま場に出せるメガモン。'],['EVOLUTION','怪化','場のたねに重ねて出すメガモン。'],
+        ['ITEM','グッズ','使い切り。1ターンに何枚でも使える。'],['SUPPORTER','サポート','強力なお助け。1ターンに1枚まで。'],
+        ['TOOL','どうぐ','メガモンに付けて使う。1体に1枚。'],['ABILITY','特性','場に出た時(バトル場だけ)/常時/ターン1回の3タイプ。']])}`);
+  },
+  packs: () => {
+    const w = D.SLOT_RARITY_WEIGHTS;
+    const tiers = RARITY_ORDER.filter(t => (w[4]&&w[4][t]) || (w[5]&&w[5][t]));
+    const pct = (s, t) => { const o = w[s]; if(!o || !o[t]) return '—'; const v = o[t] / Object.values(o).reduce((a,b) => a + b, 0) * 100; return (v >= 1 ? v.toFixed(1) : v.toFixed(3)) + '%'; };
+    set('パック', `${crumb('PACKS')}${T1('<i>Packs</i>', '1パック5枚。初回は無料で3回、そのあとは1日1回。特典コードのボーナスパックは別枠。')}
+      <p class="note">メガモンはパックと同じタイプが出る。無色と、指定の無いトレーナーズは全パック共通。</p>
+      ${Object.values(D.PACKS).map(pk => {
+        const own = [], common = [];
+        allCards().forEach(c => { const ps = printsOf(c.id).filter(p => packsOfPrint(p).includes(pk.id)); if(!ps.length) return; ((!ps.some(p => p.packId) && (c.kind !== 'creature' || c.type === '無色')) ? common : own).push(c.id); });
+        return `${head2(esc(pk.name), TYPE_EN[pk.type] + ' PACK')}<div class="story card" style="--uc:var(--t-${pk.type});border-left:3px solid var(--uc)"><div>
+          <p><span class="tp" style="--tc:var(--t-${pk.type})">${esc(pk.type)}タイプ</span></p>
+          <p>${own.length ? `このパックだけのカード:${esc(own.map(id => C(id).name).join('、'))}` : 'このパックのカードは準備中。'}</p>
+          <p style="color:var(--sub);font-size:14px">全パック共通:${esc(common.map(id => C(id).name).join('、') || 'なし')}</p></div>
+          <div class="cast"><img src="${esc(pk.image)}" alt="" loading="lazy" style="width:50%;max-width:180px;box-shadow:0 10px 24px rgba(0,0,0,.6)" onerror="this.remove()"></div></div>
+          ${own.length ? `<div class="ugrid" style="margin-top:10px">${own.map(id => ucard(id)).join('')}</div>` : ''}`; }).join('')}
+      ${head2('排出率','Drop rates')}<p class="lead" style="margin:0 0 12px">1〜3枚目は必ず ◇。4枚目と5枚目がレアのチャンス(パックに無いレアリティは除いて抽選)。配布でもらえる PROMO もある。</p>
+      <div class="tbl-wrap"><table class="tbl"><tr><th>Rarity</th><th>名前</th><th>4枚目</th><th>5枚目</th></tr>${tiers.map(t => `<tr><td><span class="rar" style="color:var(--gold)">${esc(D.RARITY_LABEL[t])}</span></td><td>${esc(D.RARITY_NAME[t])}</td><td class="num">${pct(4,t)}</td><td class="num">${pct(5,t)}</td></tr>`).join('')}</table></div>`);
+  },
+  faq: () => {
+    const qa = [['カードの絵が出ない・「？」になる','画像サーバーが一時的に止まっていることがある。少し待ってから開き直してみて。'],
+      ['相手の動きが反映されない','数秒ごとに自動で同期してる。止まって見えたらページを読み込み直すと戻る。'],
+      ['特典コードはどこで入れる?','「パック開封」の画面から。コードは女神鯖のお知らせをチェック。'],
+      ['同じカードは何枚入れられる?','2枚まで。レアリティ違いも合わせて2枚。'],
+      ['先攻は有利?','先攻は最初の番だけ山札を引けない。そのかわり先に動ける。']];
+    const gl = [['メガモン','女神鯖のメンバーがモチーフのモンスター。'],['たね','そのまま場に出せるメガモン。'],['怪化(かいか)','メガモンの進化。たねの上に重ねて出す。'],['バトル場 / ベンチ','戦うのはバトル場の1体。ベンチは控え(3体まで)。'],['ex','強いメガモン。倒されると相手に2ポイント。'],['トラッシュ','使い終わったカードやエネルギーの捨て場。'],['トレーナーズ','グッズ・サポート・どうぐの総称。']];
+    set('Q&A', `${crumb('Q&amp;A')}${T1('Q&amp;<i>A</i>', 'よくある質問と用語集。')}
+      ${head2('よくある質問','FAQ')}<ol class="tips">${qa.map(([q,a]) => `<li><div><b>${esc(q)}</b><p>${esc(a)}</p></div></li>`).join('')}</ol>
+      ${head2('用語集','Glossary')}<div class="basic-grid">${gl.map(([k,v]) => `<div class="card"><b>${esc(k)}</b><p>${esc(v)}</p></div>`).join('')}</div>`);
+  },
+};
 
-/* ---- 詳細 ---- */
-function openCard(id){
-  const c = D.CARDS[id]; const ps = printsOf(id);
-  const tags = [];
-  if(c.kind === 'creature'){
-    tags.push(`<span class="type ${esc(c.type)}">${TYPE_ICON[c.type]} ${esc(c.type)}</span>`, `<span class="tag">${c.basic ? 'たね' : '怪化'}</span>`);
-    if(c.isEx) tags.push(`<span class="tag ex">ex(倒されると2点)</span>`);
-    tags.push(`<span class="tag">HP ${c.hp}</span>`);
-  }else tags.push(`<span class="tag">${TRAINER_ICON[c.kind]||''} ${esc(KIND_LABEL[c.kind]||c.kind)}</span>`);
-  const tier = TIERS.find(t => t.id === id);
-  if(tier) tags.push(`<span class="tlabel ${tier.t}">${tier.t}ランク</span>`);
-  let body = '';
-  if(c.kind === 'creature'){
-    if(c.kaikaOf && D.CARDS[c.kaikaOf]) body += `<p style="margin:0 0 6px;font-size:13.5px;">「${esc(D.CARDS[c.kaikaOf].name)}」から怪化</p>`;
-    if(c.kaikaTo && D.CARDS[c.kaikaTo]) body += `<p style="margin:0 0 6px;font-size:13.5px;">「${esc(D.CARDS[c.kaikaTo].name)}」に怪化できる</p>`;
-    if(c.ability) body += `<div class="move"><div class="hd"><span class="tag" style="background:#ffe9ec;border-color:#f5bcc5;color:#b0283f;">特性・${esc(TIMING_LABEL[c.ability.timing]||'')}</span>${esc(c.ability.name)}</div><div class="ds">${esc(c.ability.desc)}</div></div>`;
-    (c.attacks||[]).forEach(a => {
-      const ds = attackDesc(a, c);
-      body += `<div class="move"><div class="hd">${orbs(a.cost)} ${esc(a.name)}<span class="dmg">${esc(dmgText(a))}</span></div>${ds ? `<div class="ds">${esc(ds)}</div>` : ''}</div>`;
-    });
-    const wk = weaknessOf(c.type);
-    body += `<div class="move" style="font-size:13.5px;">弱点:${wk ? `<span class="type ${esc(wk)}">${TYPE_ICON[wk]} ${esc(wk)}</span> +20` : 'なし'}　にげる:${'⭐'.repeat(c.retreatCost||0) || 'なし'}</div>`;
-  }else body += `<div class="move"><div class="ds" style="color:var(--ink);">${esc(c.desc)}</div></div>`;
-  if(tier) body += `<div class="point">${esc(tier.why)}</div>`;
-  const rows = ps.map(p => {
-    const pk = packsOfPrint(p).map(pid => D.PACKS[pid].name);
-    const where = p.rarity === 'promo' ? '配布' : (pk.length ? (pk.length === Object.keys(D.PACKS).length ? '全パック' : pk.join('・')) : 'パックに出ない');
-    return `<tr><td>${esc(D.RARITY_LABEL[p.rarity]||'')} <span style="font-size:11.5px;color:var(--ink-dim)">${esc(D.RARITY_NAME[p.rarity]||'')}</span></td><td>${esc(where)}</td></tr>`;
-  }).join('');
-  document.getElementById('dlgBody').innerHTML = `
-    <div class="big">${faceHTML(c, bestPrint(id))}</div>
-    <h4>${esc(c.name)}</h4><div class="meta">${tags.join('')}</div>${body}
-    <h3 class="line">入手方法</h3><table><tr><th>レアリティ</th><th>出るところ</th></tr>${rows}</table>
-    <button type="button" class="close" onclick="document.getElementById('dlg').close()">閉じる</button>`;
-  document.getElementById('dlg').showModal();
-}
-
-/* ---- 各画面 ---- */
-function renderTop(){
-  const fanIds = TIERS.filter(t => t.t === 'S' && D.CARDS[t.id]).map(t => t.id).slice(0,3);
-  document.getElementById('fan').innerHTML = fanIds.map(id => `<div class="fc">${faceHTML(D.CARDS[id], bestPrint(id))}</div>`).join('');
-  const arts = Object.values(D.CARDS).filter(c => hasArt(c.id)).map(c => c.id).reverse();
-  document.getElementById('newStrip').innerHTML = arts.map((id,i) => cardBtn(id, { best:true, ribbon: i < 4 ? '<span class="ribbon" style="background:#ff4d6d">NEW</span>' : '' })).join('');
-  document.getElementById('topS').innerHTML = TIERS.filter(t => t.t === 'S' && D.CARDS[t.id]).map(t => cardBtn(t.id, { best:true, ribbon:'<span class="ribbon" style="background:var(--s)">S</span>' })).join('');
-}
-function renderTier(){
-  const live = TIERS.filter(t => D.CARDS[t.id]);
-  document.getElementById('tierBoard').innerHTML = ['S','A','B','C'].map(r => {
-    const ids = live.filter(t => t.t === r).map(t => t.id); if(!ids.length) return '';
-    return `<div class="tier ${r}"><div class="lb">${r}</div><div class="cs">${ids.map(id => cardBtn(id, { best:true, noRar:true })).join('')}</div></div>`;
-  }).join('');
-  document.getElementById('tierWhy').innerHTML = live.map((t,i) => `<div class="rank-row">${cardBtn(t.id, { best:true, noRar:true })}
-    <div class="why"><span class="tlabel ${t.t}">${t.t}</span><b>${i+1}位 ${esc(D.CARDS[t.id].name)}</b><div class="stars">${'★'.repeat(t.stars)}${'☆'.repeat(5-t.stars)}</div><p>${esc(t.why)}</p></div></div>`).join('');
-}
-function renderDecks(){
-  document.getElementById('deckList').innerHTML = DECKS.map(d => {
-    const cards = d.cards.filter(([id]) => D.CARDS[id]);
-    const total = cards.reduce((s,[,n]) => s+n, 0);
-    return `<div class="deck">
-      <div class="dh ${esc(d.type)}"><div class="sub">${TYPE_ICON[d.type]} ${esc(d.type)}デッキ ・ ${total}枚 ・ エネルギー ${d.energy.map(t => `<span class="orb ${esc(t)}">${TYPE_ICON[t]}</span>`).join('')}</div><div class="nm">${esc(d.name)}</div></div>
-      <div class="db">
-        <p style="margin:0 0 10px;font-size:14px;">${esc(d.lead)}</p>
-        <div class="list">${cards.map(([id,n]) => cardBtn(id, { noRar:true, extra:`<span class="x">×${n}</span>` })).join('')}</div>
-        <div class="meter">${Object.entries(d.power).map(([k,v]) => `<span>${esc(k)}</span><div class="bar"><i style="width:${v*20}%"></i></div>`).join('')}</div>
-        <h3 class="line">立ち回り</h3><ol style="font-size:14px;">${d.how.map(h => `<li>${esc(h)}</li>`).join('')}</ol>
-      </div></div>`;
-  }).join('');
-}
-function renderPacks(){
-  document.getElementById('packList').innerHTML = Object.values(D.PACKS).map(pk => {
-    const own = [], common = [];
-    Object.values(D.CARDS).forEach(c => {
-      const ps = printsOf(c.id).filter(p => packsOfPrint(p).includes(pk.id)); if(!ps.length) return;
-      const isCommon = !ps.some(p => p.packId) && (c.kind !== 'creature' || c.type === '無色');
-      (isCommon ? common : own).push(c.id);
-    });
-    const rare = own.filter(id => printsOf(id).some(p => /diamond4|star|crown|spade|club|dopa/.test(p.rarity)));
-    return `<div class="packc">
-      <div class="ph ${esc(pk.type)}"><img src="${esc(pk.image)}" alt="" loading="lazy"><div><div class="nm">${esc(pk.name)}</div><span class="type ${esc(pk.type)}" style="background:rgba(255,255,255,.25)">${TYPE_ICON[pk.type]} ${esc(pk.type)}タイプ</span>${rare.length ? `<div style="font-size:12px;margin-top:4px;">当たり:${esc(rare.map(id => D.CARDS[id].name).join('・'))}</div>` : ''}</div></div>
-      <div class="pb">
-        <div class="lab">このパックのカード</div>
-        ${own.length ? `<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(76px,1fr))">${own.map(id => cardBtn(id, { best:true })).join('')}</div>` : '<div class="soon">🔥 カード準備中!お楽しみに</div>'}
-        <div class="lab" style="margin-top:12px">全パック共通</div>
-        <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(64px,1fr))">${common.map(id => cardBtn(id, { noRar:true })).join('')}</div>
-      </div></div>`;
-  }).join('');
-  const w = D.SLOT_RARITY_WEIGHTS;
-  const tiers = RARITY_ORDER.filter(t => (w[4]&&w[4][t]) || (w[5]&&w[5][t]));
-  const pct = (slot, t) => { const s = w[slot]; if(!s || !s[t]) return '—'; const tot = Object.values(s).reduce((a,b)=>a+b,0); const v = s[t]/tot*100; return (v >= 1 ? v.toFixed(1) : v.toFixed(3)) + '%'; };
-  document.getElementById('rateTable').innerHTML = `<tr><th>レアリティ</th><th class="num">4枚目</th><th class="num">5枚目</th></tr>` +
-    tiers.map(t => `<tr><td><b>${esc(D.RARITY_LABEL[t])}</b> <span style="font-size:11.5px;color:var(--ink-dim)">${esc(D.RARITY_NAME[t])}</span></td><td class="num">${pct(4,t)}</td><td class="num">${pct(5,t)}</td></tr>`).join('');
-}
-
-/* ---- 画面の切り替え(#tier などのリンクで移動) ---- */
-const VIEWS = ['top','tier','decks','cards','guide','rules','packs','faq'];
+/* ---- 画面の切り替え(#/cards など) ---- */
 function route(){
-  const h = (location.hash || '#top').slice(1);
-  const sub = h.startsWith('rules-') ? h : null;
-  const v = sub ? 'rules' : (VIEWS.includes(h) ? h : 'top');
-  document.querySelectorAll('.view').forEach(el => el.classList.toggle('on', el.id === 'v-' + v));
-  document.querySelectorAll('#tabs a').forEach(a => { const on = a.getAttribute('href') === '#' + v; a.classList.toggle('on', on); if(on) a.scrollIntoView({ inline:'center', block:'nearest' }); });
-  if(sub){ const el = document.getElementById(sub); if(el) window.scrollTo(0, el.getBoundingClientRect().top + scrollY - 100); }
+  const h = location.hash.replace(/^#\/?/, '');
+  const [r, arg] = h.split('/');
+  $('#hd').classList.remove('open');
+  document.querySelectorAll('#nav a[data-r]').forEach(a => a.classList.toggle('on', a.dataset.r === r || (r === 'card' && a.dataset.r === 'cards')));
+  if(!D) return;
+  (PAGES[r] || PAGES[''])(decodeURIComponent(arg || ''));
+  if(r === 'rules' && arg === 'status'){ const el = document.getElementById('status'); if(el) window.scrollTo(0, el.getBoundingClientRect().top + scrollY - 80); }
   else window.scrollTo(0, 0);
 }
 window.addEventListener('hashchange', route);
-route();
+$('#mb').onclick = () => $('#hd').classList.toggle('open');
 
-document.addEventListener('click', e => { const b = e.target.closest('.card'); if(b && D) openCard(b.dataset.id); });
-document.getElementById('dlg').addEventListener('click', e => { if(e.target.id === 'dlg') e.target.close(); });
+/* ---- 検索 ---- */
+const SEARCH_PAGES = [['cards','カード図鑑'],['tier','最強ランキング'],['decks','おすすめデッキ'],['basics','遊び方'],['rules','ルール'],['rules/status','状態異常'],['packs','パック・排出率'],['faq','Q&A・用語集']];
+$('#q').addEventListener('input', e => {
+  const q = e.target.value.trim().toLowerCase(), res = $('#res');
+  if(!q || !D){ res.hidden = true; return; }
+  const hits = allCards().filter(c => [c.name, c.desc, c.type, c.ability && c.ability.name, c.ability && c.ability.desc, ...(c.attacks||[]).map(a => a.name + (a.desc||''))].join(' ').toLowerCase().includes(q)).slice(0, 12)
+    .map(c => { const a = firstArt(c.id); return `<a href="#/card/${esc(c.id)}">${a ? `<img src="${esc(a)}" alt="" onerror="this.replaceWith(document.createElement('i'))">` : '<i></i>'}${esc(c.name)}<small>${esc(typeLabel(c))}</small></a>`; });
+  SEARCH_PAGES.filter(([,n]) => n.toLowerCase().includes(q)).forEach(([r,n]) => hits.push(`<a href="#/${r}"><i></i>${esc(n)}<small>ページ</small></a>`));
+  res.innerHTML = hits.join('') || '<a><i></i>見つからなかった</a>';
+  res.hidden = false;
+});
+$('#res').addEventListener('click', () => { $('#res').hidden = true; $('#q').value = ''; $('#q').blur(); });
+document.addEventListener('click', e => { if(!e.target.closest('.search')) $('#res').hidden = true; });
 
 (async () => {
   try{ D = await loadData(); }
-  catch(e){
-    console.error(e);
-    document.querySelectorAll('#grid,#packList,#tierBoard,#deckList,#newStrip').forEach(el => el.innerHTML = '<div class="empty">カードデータを読み込めなかった。開き直してみて。</div>');
-    return;
-  }
-  chips(document.getElementById('fType'), 'type', [['all','すべて'],['格闘','👊 格闘'],['悪','🌙 悪'],['超','🔮 超'],['無色','⭐ 無色']]);
-  chips(document.getElementById('fKind'), 'kind', [['all','全種類'],['basic','たね'],['kaika','怪化'],['item','グッズ'],['support','サポート'],['tool','どうぐ']]);
-  chips(document.getElementById('fPack'), 'pack', [['all','全パック'], ...Object.values(D.PACKS).map(p => [p.id, esc(p.name)])]);
-  document.getElementById('q').addEventListener('input', e => { F.q = e.target.value; renderGrid(); });
-  renderTop(); renderTier(); renderDecks(); renderGrid(); renderPacks();
+  catch(err){ console.error(err); $('#app').innerHTML = '<p class="empty" style="padding-top:40px">カードデータを読み込めなかった。開き直してみて。</p>'; return; }
+  route();
 })();
 </script>
 </body>

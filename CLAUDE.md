@@ -16,7 +16,7 @@
 - ルールの決定事項(下記)を勝手に変えない
 
 ## wiki(wiki.html)
-- 公開URL: https://megapoke.pages.dev/wiki.html(ホーム下部からリンク)。攻略サイト風(Game8っぽい帯見出し・ピックアップバナー)。`#top`/`#tier`/`#decks`/`#cards`/`#guide`/`#rules`/`#packs`/`#faq`で画面切り替え
+- 公開URL: https://megapoke.pages.dev/wiki.html(ホーム下部からリンク)。**同じグループの作品のBOWFLIT公式Wiki(github.com/roytaroo/bowflit-site の`wiki/index.html`)と同じ形式**(黒地・紫の差し色・Bebas Neue+Zen Kaku Gothic New・角を切ったタイル)。`#/`・`#/cards`・`#/card/<id>`・`#/tier`・`#/decks`・`#/basics`・`#/rules`・`#/packs`・`#/faq`で画面切り替え
 - 最強ランキング(`TIERS`)とおすすめデッキ(`DECKS`)は手書き。新カードが来たら評価を足すか聞く
 - カードデータは`megapoke.html`をfetchして`CARDS`〜`PRINTS`・`RARITY_LABEL`・`RARITY_NAME`・`PACKS`・`SLOT_RARITY_WEIGHTS`の定義部分を切り出して読む。カード追加時のwiki更新は不要。これらの定数名や`const X = {`〜`\n};`の書き方を変えたらwikiも直す
 - ルールを変えたら、wikiのルール文(手書き)も直す
