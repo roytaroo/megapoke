@@ -17,7 +17,8 @@
 
 ## wiki(wiki.html)
 - 公開URL: https://megapoke.pages.dev/wiki.html(ホーム下部からリンク)。**同じグループの作品のBOWFLIT公式Wiki(github.com/roytaroo/bowflit-site の`wiki/index.html`)と同じ形式**(レイアウト・部品・Bebas Neueの英字見出し)。**色は白基調**(白地・薄い枠・紫の差し色1色、BOWFLITの紫寄り)。`<style>`末尾の「メガポケの配色」で上書きしている。黒地(揃えすぎ)もカラフルなポップ(派手すぎ)もNGだった
-- 最強ランキング(`TIERS`)とおすすめデッキ(`DECKS`)は手書き。新カードが来たら評価を足すか聞く
+- ティアリスト(`TIERS`)とデッキレシピ(`DECKS`)は手書き。新カードが来たら評価を足すか聞く
+- **文章は公式サイトの文体**(です・ます調、ポケモンカード公式ルールに近い用語)。タメ口・「!」・絵文字・架空の「編集部」・根拠のない数値・不要な補足は入れない(ユーザーに「AI臭い」と言われた)
 - カードデータは`megapoke.html`をfetchして`CARDS`〜`PRINTS`・`RARITY_LABEL`・`RARITY_NAME`・`PACKS`・`SLOT_RARITY_WEIGHTS`の定義部分を切り出して読む。カード追加時のwiki更新は不要。これらの定数名や`const X = {`〜`\n};`の書き方を変えたらwikiも直す
 - ルールを変えたら、wikiのルール文(手書き)も直す
 - カード画像の自動生成スクリプトは`tools/cardmaker/`(README参照)
