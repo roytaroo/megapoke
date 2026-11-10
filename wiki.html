@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>メガポケ 公式Wiki</title>
 <meta name="description" content="メガポケ(MEGAMI Trading Card Game Pocket)の公式Wiki。カード図鑑・最強ランキング・おすすめデッキ・遊び方・ルール">
-<meta name="theme-color" content="#07080c">
+<meta name="theme-color" content="#fff7ec">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@600;700&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@600;700&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
-/* BOWFLIT 公式Wikiと同じ見た目(ほぼ黒・紫の差し色・斜めに切った角) */
+/* 形はBOWFLIT 公式Wikiと同じ。色は下の「メガポケの配色」で上書きしてポップにしている */
 :root{
   --bg:#07080c; --bg2:#0e1018; --bg3:#151826; --line:rgba(255,255,255,.09); --line2:rgba(255,255,255,.18);
   --ink:#eeedf5; --sub:#8d91a6; --accent:#a24bff; --accent2:#c58bff; --good:#5fe08a; --bad:#ff5a6a; --gold:#ffc446;
@@ -184,6 +184,70 @@ h2.s small{font-family:var(--ui);font-weight:700;font-size:12px;letter-spacing:.
 .board small{display:block;color:var(--sub);font-weight:500;font-size:12px}
 footer{border-top:1px solid var(--line);color:var(--sub);font-size:12.5px;padding-block:22px calc(22px + env(safe-area-inset-bottom,0px))}
 footer .wrap{display:flex;gap:14px;justify-content:space-between;flex-wrap:wrap}
+
+/* ===== メガポケの配色(BOWFLITと形は同じ、色はポップに) ===== */
+:root{
+  --bg:#fff7ec; --bg2:#ffffff; --bg3:#f3eeff; --line:#2a2350; --line2:#2a2350;
+  --ink:#2a2350; --sub:#6f6a92; --accent:#ff4f9a; --accent2:#7b5cff; --good:#1fc98a; --bad:#ff4f6d; --gold:#ffb81c;
+  --jp:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif;
+  --t-格闘:#ff7a2f; --t-悪:#7b5cff; --t-超:#ff4fc0; --t-無色:#8e9ab3; --t-tr:#16b8e8;
+  --pop:4px 4px 0 var(--ink);
+  color-scheme:light;
+}
+body{background:
+  radial-gradient(circle at 12% 8%,rgba(255,79,154,.16),transparent 32%),
+  radial-gradient(circle at 92% 22%,rgba(123,92,255,.16),transparent 34%),
+  radial-gradient(circle at 50% 100%,rgba(255,184,28,.18),transparent 40%),
+  radial-gradient(rgba(42,35,80,.08) 1.2px,transparent 1.3px) 0 0/18px 18px,
+  var(--bg);background-attachment:fixed;font-weight:700}
+header{background:rgba(255,255,255,.88);border-bottom:3px solid var(--ink)}
+@media (max-width:1240px){header nav{background:#fff;border-bottom:3px solid var(--ink)} header nav a{border-bottom:1px dashed rgba(42,35,80,.2)}}
+header nav a:hover,header nav a.on{color:var(--accent)}
+.brand .logo{color:var(--ink)} .brand b{color:#fff;background:var(--accent);padding:3px 6px 1px;transform:rotate(-3deg)}
+.search input{background:#fff;border:2px solid var(--ink);border-radius:999px;padding:5px 14px}
+.menu-btn{color:var(--ink);border:2px solid var(--ink);background:var(--gold);box-shadow:2px 2px 0 var(--ink)}
+.results{border:2px solid var(--ink);box-shadow:var(--pop)}
+.results a{border-bottom:1px solid rgba(42,35,80,.12)}
+h1.t{color:var(--ink);text-shadow:3px 3px 0 #ffd6ea}
+h1.t i{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none}
+h2.s::before{width:14px;height:14px;background:linear-gradient(135deg,var(--accent),var(--gold))}
+h2.s small{color:var(--accent2)}
+.card,.stats div,.quick a,.ucard,.tbl-wrap,.tips li,.rel>div,.rel>a,.meta div,.pn a,.deck,.tierrow,.results{border:2px solid var(--ink)}
+.card,.ucard,.tbl-wrap,.tips li,.rel>div,.rel>a,.deck,.tierrow,.pn a{box-shadow:var(--pop)}
+.stats div,.quick a{clip-path:none;border-radius:4px 18px 4px 18px;box-shadow:var(--pop)}
+.stats div:nth-child(5n+1){background:#ffe3f0} .stats div:nth-child(5n+2){background:#ece6ff} .stats div:nth-child(5n+3){background:#fff1c7} .stats div:nth-child(5n+4){background:#dcf7ff} .stats div:nth-child(5n+5){background:#dcfbe9}
+.stats b{color:var(--ink)}
+.quick a{background:#fff;transition:transform .12s,box-shadow .12s}
+.quick a:hover,.quick a:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink);background:#fff}
+.quick a:nth-child(4n+1) b{color:var(--accent)} .quick a:nth-child(4n+2) b{color:var(--accent2)} .quick a:nth-child(4n+3) b{color:#ff8a00} .quick a:nth-child(4n+4) b{color:#0aa8d6}
+.story p,.deck .db>p{color:var(--ink);font-weight:500}
+.ability,.note{color:var(--ink);font-weight:500}
+.lead,.tips p,.rel p,.basic-grid .card p{font-weight:500}
+.ucard{border-radius:14px} .ucard:hover{border-color:var(--ink);transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+.ucard .pic{background:radial-gradient(70% 60% at 50% 60%,color-mix(in srgb,var(--uc) 30%,transparent),color-mix(in srgb,var(--uc) 8%,#fff) 75%);border-bottom:2px solid var(--ink)}
+.ucard .tier{background:var(--rk);color:#fff;border:2px solid var(--ink);transform:rotate(6deg)}
+.ucard .cnt{background:var(--accent);border:2px solid var(--ink)}
+.face{border-radius:8px;box-shadow:0 3px 8px rgba(42,35,80,.25)}
+.uhead .pic{border-bottom:3px solid var(--ink);border-radius:18px 18px 0 0;background:radial-gradient(60% 55% at 50% 60%,color-mix(in srgb,var(--uc) 35%,transparent),color-mix(in srgb,var(--uc) 8%,transparent) 75%)}
+.meta div{background:#fff;border-radius:10px}
+.meta div:nth-child(5n+1){background:#ffe3f0} .meta div:nth-child(5n+2){background:#ece6ff} .meta div:nth-child(5n+3){background:#fff1c7} .meta div:nth-child(5n+4){background:#dcf7ff} .meta div:nth-child(5n+5){background:#dcfbe9}
+.tabs button{border:2px solid var(--ink);border-radius:999px;color:var(--ink);background:#fff}
+.tabs button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.tabs button[style]{color:var(--ink);background:color-mix(in srgb,var(--tc) 18%,#fff)}
+.tabs button[style][aria-pressed="true"]{background:var(--tc);border-color:var(--ink);color:#fff}
+.tp,.rar{border-width:2px;border-radius:999px;background:#fff}
+.tbl{background:#fff} .tbl th{background:var(--ink);color:#fff} .tbl td{border-bottom:1px dashed rgba(42,35,80,.2)}
+.tbl tr:nth-child(odd) td{background:#fbf8ff}
+.tierrow{border-radius:14px;overflow:hidden} .tierrow .lb{color:#fff;-webkit-text-stroke:2px var(--ink);border-right:2px solid var(--ink)}
+.deck{border-radius:16px;overflow:hidden} .deck .dh{border-bottom:2px solid var(--ink);background:linear-gradient(110deg,color-mix(in srgb,var(--uc) 35%,#fff),#fff 80%)}
+.bars i{background:#eee8ff;border:2px solid var(--ink);height:12px;border-radius:999px;overflow:hidden} .bars i::after{background:linear-gradient(90deg,var(--accent),var(--gold))}
+.tips li{border-radius:14px} .tips li::before{color:var(--uc,var(--accent))}
+.cycle .n{border:2px solid var(--ink);color:#fff;background:var(--tc);clip-path:none;border-radius:999px;box-shadow:3px 3px 0 var(--ink)}
+.cycle .a{color:var(--accent)}
+.board div{border:2px solid var(--ink);border-radius:10px;color:var(--ink);background:#fff}
+.board .o{background:#ffe3ea} .board .m{background:#fff1c7;color:var(--ink)} .board .y{background:#ece6ff}
+.pn span{color:var(--accent)}
+footer{border-top:3px solid var(--ink);background:#fff}
 </style>
 </head>
 <body>
