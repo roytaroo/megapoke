@@ -16,7 +16,8 @@
 - ルールの決定事項(下記)を勝手に変えない
 
 ## wiki(wiki.html)
-- 公開URL: https://megapoke.pages.dev/wiki.html(ホーム下部からリンク)。遊び方・ルール・カード図鑑・パック・排出率
+- 公開URL: https://megapoke.pages.dev/wiki.html(ホーム下部からリンク)。攻略サイト風(Game8っぽい帯見出し・ピックアップバナー)。`#top`/`#tier`/`#decks`/`#cards`/`#guide`/`#rules`/`#packs`/`#faq`で画面切り替え
+- 最強ランキング(`TIERS`)とおすすめデッキ(`DECKS`)は手書き。新カードが来たら評価を足すか聞く
 - カードデータは`megapoke.html`をfetchして`CARDS`〜`PRINTS`・`RARITY_LABEL`・`RARITY_NAME`・`PACKS`・`SLOT_RARITY_WEIGHTS`の定義部分を切り出して読む。カード追加時のwiki更新は不要。これらの定数名や`const X = {`〜`\n};`の書き方を変えたらwikiも直す
 - ルールを変えたら、wikiのルール文(手書き)も直す
 - カード画像の自動生成スクリプトは`tools/cardmaker/`(README参照)
