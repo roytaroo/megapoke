@@ -1291,11 +1291,17 @@ function handleKnockoutIfNeeded(state, ownerSlot, causeText){
       log(state, `${nameOf(otherSlot(ownerSlot))}の${oppCard.name}の特性「${oppCard.ability.name}」でHPを${healAmt}回復`);
     }
   }
-  if(owner.bench.some(Boolean)) log(state, `${nameOf(ownerSlot)}は次に出すメガモンを選んでね`);
   if(opp.points >= 3){
     state.phase = 'finished';
     state.winner = otherSlot(ownerSlot);
     log(state, `${nameOf(otherSlot(ownerSlot))}の勝利！`);
+  }else if(!owner.bench.some(Boolean)){
+    // 場にメガモンがいなくなったら負け(本家と同じ)。これが無いと相手がワザを使えず試合が止まる
+    state.phase = 'finished';
+    state.winner = otherSlot(ownerSlot);
+    log(state, `${nameOf(ownerSlot)}の場にメガモンがいなくなった。${nameOf(otherSlot(ownerSlot))}の勝利！`);
+  }else{
+    log(state, `${nameOf(ownerSlot)}は次に出すメガモンを選んでね`);
   }
 }
 
@@ -1610,10 +1616,8 @@ function doRetreat(state, slot, benchIdx, skipCost){
     const cost = effectiveRetreatCost(state, slot);
     for(let i=0;i<cost;i++) outgoing.energy.pop();
   }
-  if(outgoing.status === 'confusion'){
-    outgoing.status = null;
-    outgoing.statusBlocked = false;
-  }
+  if(outgoing.status === 'confusion') outgoing.status = null;
+  outgoing.statusBlocked = false;
   const bench = p.bench[benchIdx];
   p.bench[benchIdx] = outgoing;
   p.active = bench;
@@ -1655,6 +1659,7 @@ function doKaika(state, slot, cardId){
     status: (before.status === 'poison' || before.status === 'burn') ? before.status : null,
     statusBlocked: false,
     abilityUsedThisTurn: false,
+    tool: before.tool || null, shield: before.shield || 0, hidden: false, lastAttackName: null, lastAttackTurn: null,
   };
   if(target.where === 'active') p.active = evolved; else p.bench[target.idx] = evolved;
   log(state, `${nameOf(slot)}の${CARDS[before.cardId].name}が${card.name}に怪化した！`);
@@ -1694,6 +1699,7 @@ function canAttack(state, slot, attackIdx){
   const p = state.players[slot];
   if(!p.active) return false;
   if(p.active.statusBlocked) return false;
+  if(!state.players[otherSlot(slot)].active) return false; // 相手が次のメガモンを出すまではワザを使えない
   const atk = getEffectiveAttacks(p.active)[attackIdx];
   if(!atk) return false;
   return canPayCost(p.active.energy, effectiveAttackCost(state, slot, atk));
@@ -1717,10 +1723,6 @@ function doAttack(state, slot, attackIdx, targetBenchIdx){
   }
 
   let dmg = atk.dmg;
-  if(attacker.nextAttackBonus){
-    dmg += attacker.nextAttackBonus;
-    attacker.nextAttackBonus = 0;
-  }
   if(atk.bonusIfSelfHpBelow && attacker.active.hp <= atk.bonusIfSelfHpBelow.threshold){
     dmg += atk.bonusIfSelfHpBelow.bonus;
     log(state, `${nameOf(slot)}の${attackerCard.name}は残りHPが少なく、追加${atk.bonusIfSelfHpBelow.bonus}ダメージ！`);
@@ -1759,7 +1761,12 @@ function doAttack(state, slot, attackIdx, targetBenchIdx){
   }
 
   const defenderCard = CARDS[defender.active.cardId];
-  const isWeak = WEAKNESS[attackerCard.type] === defenderCard.type;
+  // 「次の攻撃+20」と弱点+20は、ダメージを与えるワザにだけ乗る(0ダメージのワザや、コインが全部ウラの時は乗らない)
+  if(attacker.nextAttackBonus){
+    if(dmg > 0) dmg += attacker.nextAttackBonus;
+    attacker.nextAttackBonus = 0;
+  }
+  const isWeak = dmg > 0 && WEAKNESS[attackerCard.type] === defenderCard.type;
   if(isWeak) dmg += 20;
 
   if(defenderCard.ability && defenderCard.ability.timing === 'passive' && defenderCard.ability.effect.startsWith('dmgReduce')){
