@@ -732,6 +732,7 @@
           <input type="text" id="joinCodeInput" placeholder="部屋コード" maxlength="6" style="text-transform:uppercase;">
           <button id="joinRoomBtn" class="ghost">入る</button>
         </div>
+        <button id="botMatchBtn" class="ghost" style="width:100%;position:relative;background:rgba(255,255,255,0.16);color:#fff;border-color:rgba(255,255,255,0.45);">BOTと対戦(1人用)</button>
       </div>
       <div class="home-menu">
         <button type="button" class="home-tile t-pack" id="openPackNavBtn">
@@ -2069,6 +2070,7 @@ function startHeartbeat(){
 }
 
 async function pushState(){
+  if(BOT_MODE){ botRun(); return true; } // BOT戦は通信しない。自分が動いたらBOTの番を進める
   if(!sb || !ROOM_CODE) return;
   const newUpdatedAt = new Date().toISOString();
   let query = sb.from('megapoke_rooms').update({ state: currentState, updated_at: newUpdatedAt }).eq('room_code', ROOM_CODE);
@@ -2101,6 +2103,178 @@ async function recordMatchIfFinished(){
       winner_name: currentState.winner === 'p1' ? ROOM_PLAYER_NAMES.p1 : ROOM_PLAYER_NAMES.p2,
     });
   }catch(e){ /* ignore */ }
+}
+
+/* ================= BOTマッチ(1人用。通信なしで、この端末の中だけで進む) ================= */
+let BOT_MODE = false;
+let botBusy = false;
+const BOT_SLOT = 'p2';
+const BOT_DECKS = [
+  { energy:['悪'], cards:[['mitsu_base',2],['mitsu_ex',2],['pom_ex',2],['kagame_base',2],['bird_base',2],['family_rabbit',2],['item_watermelon',2],['item_akamaru',2],['item_ball',2]] },
+  { energy:['超'], cards:[['roy_base',2],['roy_kaika',2],['ikoma_ex',2],['villager',2],['family_rabbit',2],['promo_launch',1],['tool_gtx',1],['item_ball',2]] },
+];
+function buildBotDeck(){
+  const d = BOT_DECKS[Math.floor(Math.random()*BOT_DECKS.length)];
+  const deck = [];
+  d.cards.forEach(([id,n]) => { if(CARDS[id]) for(let i=0;i<n;i++) deck.push(id); });
+  return { deck: shuffle(deck), energyTypes: d.energy };
+}
+async function startBotMatch(){
+  const btn = document.getElementById('botMatchBtn');
+  if(btn){ btn.disabled = true; btn.textContent = '準備中…'; }
+  try{
+    await ensureSb(); // 自分のデッキを読むためだけに使う。つながらなくてもテスト用デッキで遊べる
+    const mine = await buildDeckForPlayer(getMyName());
+    const bot = buildBotDeck();
+    BOT_MODE = true;
+    ROOM_CODE = null;
+    MY_SLOT = 'p1';
+    ROOM_PLAYER_NAMES.p1 = getMyName() || null;
+    ROOM_PLAYER_NAMES.p2 = 'BOT';
+    oppLastSeen = null;
+    matchRecorded = true; // BOT戦は戦績に残さない
+    currentState = newGameState(mine.deck, bot.deck, mine.energyTypes, bot.energyTypes);
+    showGame();
+    render();
+    botRun();
+  }catch(e){
+    setLandingStatus('BOTマッチを始められなかった: ' + (e && e.message ? e.message : String(e)), 'error');
+  }
+  if(btn){ btn.disabled = false; btn.textContent = 'BOTと対戦(1人用)'; }
+}
+// ワザの「だいたいの強さ」。相手を倒せるワザを最優先にする
+function botAttackValue(state, atk){
+  const me = state.players[BOT_SLOT], opp = state.players[otherSlot(BOT_SLOT)];
+  const myCard = CARDS[me.active.cardId];
+  let d = atk.dmg || 0;
+  if(atk.coin){
+    const n = atk.coin.countMode === 'boardCount' ? countOnField(me, me.active.cardId) : (atk.coin.count || 1);
+    if(atk.coin.type === 'perHeads') d = n * (atk.coin.amount || 0) / 2;
+    else if(atk.coin.type === 'bonus') d += n * (atk.coin.amount || 0) / 2;
+  }
+  if(atk.bonusIfSelfHpBelow && me.active.hp <= atk.bonusIfSelfHpBelow.threshold) d += atk.bonusIfSelfHpBelow.bonus;
+  if(d > 0 && opp.active && WEAKNESS[myCard.type] === CARDS[opp.active.cardId].type) d += 20;
+  let v = d;
+  if(opp.active && d >= opp.active.hp) v += 1000 + (CARDS[opp.active.cardId].isEx ? 500 : 0);
+  if(atk.coinKO && opp.active) v += opp.active.hp * 0.3;
+  if(atk.benchSplash) v += (atk.benchSplash.amount || 0) * opp.bench.length;
+  if(atk.inflicts || atk.discardDefenderEnergy || atk.selfShield) v += 8;
+  if(atk.attackEffect === 'attachBenchEnergy' && me.bench.length) v += 15;
+  return v;
+}
+const botNeedsEnergy = fc => {
+  const max = Math.max(0, ...getEffectiveAttacks(fc).map(a => a.cost.length));
+  return fc.energy.length < max;
+};
+const botCanPayAny = fc => getEffectiveAttacks(fc).some(a => canPayCost(fc.energy, a.cost));
+// BOTの1手。何かしたらtrue、やることが無ければfalse
+function botStep(){
+  const s = currentState;
+  if(!BOT_MODE || !s || !s.players || s.phase === 'finished') return false;
+  const me = s.players[BOT_SLOT], opp = s.players[otherSlot(BOT_SLOT)];
+  if(s.phase === 'setup'){
+    if(me.setupReady) return false;
+    const basics = me.hand.filter(id => CARDS[id].kind === 'creature' && CARDS[id].basic).sort((a,b) => CARDS[b].hp - CARDS[a].hp);
+    basics.slice(0, 4).forEach(id => { if(canPlaceSetupBasic(s, BOT_SLOT, id)) placeSetupBasic(s, BOT_SLOT, id); });
+    markSetupReady(s, BOT_SLOT);
+    return true;
+  }
+  // きぜつした後の入れ替えは、どちらの番でもすぐやる
+  if(!me.active && me.bench.length){
+    let best = 0;
+    me.bench.forEach((b,i) => { const sc = x => (botCanPayAny(x) ? 1000 : 0) + x.hp + x.energy.length * 20; if(sc(b) > sc(me.bench[best])) best = i; });
+    doPromote(s, BOT_SLOT, best);
+    return true;
+  }
+  if(s.activePlayer !== BOT_SLOT) return false;
+  // 1. たねを出す
+  const basic = me.hand.find(id => canPlayBasic(s, BOT_SLOT, id));
+  if(basic){ playBasic(s, BOT_SLOT, basic); return true; }
+  // 2. 怪化
+  const evo = me.hand.find(id => canKaika(s, BOT_SLOT, id));
+  if(evo){ doKaika(s, BOT_SLOT, evo); return true; }
+  // 3. どうぐ(怪化したメガモンに付ける)
+  const tool = me.hand.find(id => canPlayTool(s, BOT_SLOT, id));
+  if(tool){
+    const all = [{ fc: me.active, t:{ where:'active' } }, ...me.bench.map((b,i) => ({ fc:b, t:{ where:'bench', idx:i } }))].filter(x => x.fc && !x.fc.tool);
+    const pick = all.find(x => CARDS[x.fc.cardId].kaikaOf);
+    if(pick){ attachTool(s, BOT_SLOT, tool, pick.t); return true; }
+  }
+  // 4. エネルギー
+  if(canAttachEnergy(s, BOT_SLOT)){
+    let t = { where:'active' };
+    if(me.active && !botNeedsEnergy(me.active)){
+      const bi = me.bench.findIndex(botNeedsEnergy);
+      if(bi !== -1) t = { where:'bench', idx: bi };
+    }else if(!me.active){ t = { where:'bench', idx:0 }; }
+    attachEnergy(s, BOT_SLOT, t);
+    return true;
+  }
+  // 5. トレーナーズ
+  const dmg = me.active ? me.active.damage : 0;
+  const trainer = me.hand.find(id => {
+    const c = CARDS[id];
+    if(!canPlayTrainer(s, BOT_SLOT, id)) return false;
+    switch(c.effect){
+      case 'heal20': case 'heal20Return': return dmg >= 20;
+      case 'heal20DarkFullHeal': return dmg >= 20 || (me.active.status && CARDS[me.active.cardId].type === '悪');
+      case 'fullHeal': return dmg >= 40 || !!me.active.status;
+      case 'randomBasicToHand': return me.bench.length < 3;
+      case 'draw2': case 'energyBoost': case 'directDamage10': return true;
+      case 'attackBoost20': return getEffectiveAttacks(me.active).some((a,i) => a.dmg > 0 && canAttack(s, BOT_SLOT, i));
+      default: return false;
+    }
+  });
+  if(trainer){ playTrainer(s, BOT_SLOT, trainer); return true; }
+  // 6. 特性
+  if(canUseAbility(s, BOT_SLOT)){
+    const eff = CARDS[me.active.cardId].ability.effect;
+    let t = { where:'active' }, use = true;
+    if(eff === 'attachBenchEnergy') t = { where:'bench', idx:0 };
+    else if(eff === 'healOwnField10'){
+      const all = [{ fc: me.active, t:{ where:'active' } }, ...me.bench.map((b,i) => ({ fc:b, t:{ where:'bench', idx:i } }))].sort((a,b) => b.fc.damage - a.fc.damage);
+      t = all[0].t; use = all[0].fc.damage > 0;
+    }else if(eff === 'heal10') use = me.active.damage > 0;
+    if(use){ useAbility(s, BOT_SLOT, t); return true; }
+  }
+  // 7. にげる(バトル場がワザを使えず、ベンチに使えるメガモンがいる時)
+  if(me.active && !me.retreatedThisTurn && !getEffectiveAttacks(me.active).some((a,i) => canAttack(s, BOT_SLOT, i))){
+    const bi = me.bench.findIndex((b,i) => botCanPayAny(b) && canRetreat(s, BOT_SLOT, i));
+    if(bi !== -1){ doRetreat(s, BOT_SLOT, bi); return true; }
+  }
+  // 8. ワザ → 番を終える
+  if(me.active){
+    const atks = getEffectiveAttacks(me.active).map((a,i) => ({ a, i })).filter(x => canAttack(s, BOT_SLOT, x.i));
+    if(atks.length){
+      atks.sort((x,y) => botAttackValue(s, y.a) - botAttackValue(s, x.a));
+      const { a, i } = atks[0];
+      let target;
+      if(a.attackEffect === 'attachBenchEnergy' && me.bench.length){
+        const bi = me.bench.findIndex(botNeedsEnergy); target = bi === -1 ? 0 : bi;
+      }else if(a.coinBenchDamage && opp.bench.length){
+        target = 0; opp.bench.forEach((b,j) => { if(b.hp < opp.bench[target].hp) target = j; });
+      }
+      doAttack(s, BOT_SLOT, i, target);
+    }
+  }
+  if(s.phase === 'playing') endTurn(s);
+  return true;
+}
+async function botRun(){
+  if(botBusy || !BOT_MODE) return;
+  botBusy = true;
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  try{
+    for(let guard = 0; guard < 60; guard++){
+      const s = currentState;
+      if(!BOT_MODE || !s || s.phase === 'finished') break;
+      const acting = s.phase === 'playing' && (s.activePlayer === BOT_SLOT || !s.players[BOT_SLOT].active);
+      if(acting) await wait(guard === 0 ? 900 : 750); // 考えている間
+      if(currentState !== s) break; // 待っている間に再戦などで試合が入れ替わった
+      if(!botStep()) break;
+      render();
+    }
+  }finally{ botBusy = false; }
 }
 
 /* ================= rendering ================= */
@@ -3398,6 +3572,7 @@ document.getElementById('logToggleBtn').addEventListener('click', () => {
 });
 document.getElementById('createRoomBtn').addEventListener('click', createRoom);
 document.getElementById('joinRoomBtn').addEventListener('click', joinRoom);
+document.getElementById('botMatchBtn').addEventListener('click', startBotMatch);
 document.getElementById('backToLandingBtn').addEventListener('click', () => {
   clearRoomSession();
   const url = new URL(location.href);
@@ -3406,6 +3581,7 @@ document.getElementById('backToLandingBtn').addEventListener('click', () => {
 });
 document.getElementById('rematchBtn').addEventListener('click', async () => {
   const btn = document.getElementById('rematchBtn');
+  if(BOT_MODE){ startBotMatch(); return; }
   btn.disabled = true;
   btn.textContent = '準備中…';
   try{

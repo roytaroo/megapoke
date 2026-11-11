@@ -29,6 +29,7 @@
 - `CARDS`(性能データ)と`PRINTS`(刷り・レア度・絵・`packId`)を分離。1CARDに複数PRINTを持てる
 - 対戦: Supabaseの`megapoke_rooms`の1行(`state`列にJSON)を両者で共有。リアルタイム購読+3秒ポーリング+楽観的ロック。状態に項目を足すだけならSQLは不要
 - 描画: `render()`が毎回まるごと描き直す。演出は`runFx()`が「前回の状態との差分」から自動再生(ダメージ数字・攻撃の踏み込み・怪化・裏→表・エネルギー・状態異常・きぜつ・ポイント・ターン交代の帯)。決着時は1.5秒演出を見せてから勝敗画面
+- **BOTマッチ(1人用)**: ホームの「BOTと対戦(1人用)」。`BOT_MODE`の間は通信せず、`pushState()`が`botRun()`を呼んでBOT(p2)の番を進める。BOTの1手は`botStep()`(たね→怪化→どうぐ→エネルギー→トレーナーズ→特性→にげる→ワザ)。BOTのデッキは`BOT_DECKS`(絵のあるカードだけ)。戦績には残さない。新しい効果のカードを足したら`botStep()`のトレーナーズ・特性の判断にも足す
 - ワザ一覧は必ず`getEffectiveAttacks(fieldCard)`経由(どうぐで怪化前のワザが増えるため)
 - 対象を選ばせるUIは`pendingTarget`(type: energy / ability / attack / tool)の共通の仕組み
 - 絵が無いカード・画像が読めなかったカードは`cardFaceGenHTML()`が仮のカード面を自動生成。画像読み込み失敗は`handleImgFail()`が拾って「？」を出さない
