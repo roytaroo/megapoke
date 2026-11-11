@@ -328,10 +328,7 @@
     font-size:0.7rem; font-weight:900;
   }
   .slot-act.empty{ border-radius:12px; font-size:0.78rem; }
-  .slot.mine-hidden .mcard::after{
-    content:'ウラ'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-    background:rgba(107,82,201,0.45); color:#fff; font-weight:900; font-size:22cqw; letter-spacing:0.1em;
-  }
+  /* 配置中の自分のカードは、そのまま表で見せる(「ウラ」の文字や色のかぶせは出さない。相手には裏向きで見えている) */
   .slot.targetable{ cursor:pointer; }
   .slot.targetable .mcard, .slot.targetable.empty{
     box-shadow:0 0 0 3px var(--halo), 0 0 18px rgba(245,184,46,0.85);
