@@ -945,10 +945,10 @@
       <div id="deckListGrid" class="deck-list"></div>
     </div>
     <div class="card stack hidden" id="deckEditView">
-      <div class="page-head"><button type="button" class="back-btn" id="backToDeckListBtn" aria-label="デッキ一覧に戻る">‹</button><input type="text" id="deckNameInput" class="deck-name-input" maxlength="12" aria-label="デッキの名前"><span class="page-chip"><b id="deckCount">0</b> 枚</span></div>
+      <div class="page-head"><button type="button" class="back-btn" id="backToDeckListBtn" aria-label="デッキ一覧に戻る">‹</button><input type="text" id="deckNameInput" class="deck-name-input" maxlength="12" aria-label="デッキの名前"><span class="page-chip"><b id="deckCount">0</b> / 20</span></div>
       <div class="sec-label">エネルギー(3種類まで)</div>
       <div id="energyTypePicker" class="row" style="gap:8px; flex-wrap:wrap;"></div>
-      <div class="sec-label">カード(同じカードは2枚まで)</div>
+      <div class="sec-label">カード(20枚まで・同じカードは2枚まで)</div>
       <div id="deckBuilderGrid" class="deck-card-grid"></div>
       <p class="sub" id="deckSaveStatus"></p>
       <div class="deck-save-bar"><button type="button" class="ghost" id="deleteDeckBtn">削除</button><button type="button" class="ghost" id="useDeckBtn">対戦で使う</button><button type="button" id="saveDeckBtn" class="gold">保存</button></div>
@@ -1142,19 +1142,20 @@ function printsForCard(cardId){ return ALL_PRINT_IDS.filter(id => PRINTS[id].car
 
 const DECK_MIN_SIZE = 10;
 
-function buildTestDeck(){
-  // 3 copies of each basic + 2 copies of each kaika + 2 copies of each trainer = 24 cards
+// デッキを作っていない人が使う「おためしデッキ」。3タイプのうち1つをランダムで使う(エネルギーも1種類なので事故らない)
+const DECK_CARD_MAX = 20; // 1デッキは20枚まで
+const STARTER_DECKS = [
+  { energy:['悪'], cards:[['mitsu_base',2],['mitsu_ex',2],['pom_ex',1],['kagame_base',2],['bird_base',2],['family_rabbit',2],['item_ball',2],['item_watermelon',2],['item_akamaru',2]] },
+  { energy:['超'], cards:[['roy_base',2],['roy_kaika',2],['ikoma_ex',2],['villager',2],['family_rabbit',2],['psy_base',2],['psy_kaika',1],['tool_gtx',1],['item_ball',2]] },
+  { energy:['格闘'], cards:[['fight_base',2],['fight_kaika',2],['col_base',2],['col_kaika',2],['family_rabbit',2],['villager',2],['item_ball',2],['item_potion',2]] },
+];
+function buildStarterDeck(){
+  const d = STARTER_DECKS[Math.floor(Math.random()*STARTER_DECKS.length)];
   const deck = [];
-  Object.values(CARDS).forEach(c => {
-    if(c.kind === 'creature'){
-      const copies = c.basic ? 3 : 2;
-      for(let i=0;i<copies;i++) deck.push(c.id);
-    }else{
-      for(let i=0;i<2;i++) deck.push(c.id);
-    }
-  });
-  return shuffle(deck);
+  d.cards.forEach(([id,n]) => { if(CARDS[id]) for(let i=0;i<n;i++) deck.push(id); });
+  return { deck: shuffle(deck), energyTypes: d.energy };
 }
+function buildTestDeck(){ return buildStarterDeck().deck; }
 function shuffle(arr){
   const a = [...arr];
   for(let i=a.length-1;i>0;i--){
@@ -1345,7 +1346,7 @@ async function buildDeckForPlayer(name){
       }
     }catch(e){ /* fall through to test deck */ }
   }
-  return { deck: buildTestDeck(), energyTypes: null };
+  return buildStarterDeck();
 }
 function makeFieldCard(cardId){
   const card = CARDS[cardId];
@@ -3761,7 +3762,7 @@ async function refreshDeckBuilder(d){
         const ownedN = owned[id] || 0;
         const cur = deckCounts[id] || 0;
         const cardTotal = cardTotalInDeck(cardId);
-        if(cur < ownedN && cardTotal < 2){
+        if(cur < ownedN && cardTotal < 2 && totalInDeck() < DECK_CARD_MAX){
           deckCounts[id] = cur + 1;
           renderGrid();
         }
@@ -3791,6 +3792,7 @@ async function refreshDeckBuilder(d){
     const deckArr = [];
     Object.entries(deckCounts).forEach(([printId,n]) => { for(let i=0;i<n;i++) deckArr.push(PRINTS[printId].cardId); });
     if(deckArr.length === 0){ say('カードを1枚以上入れてください'); return false; }
+    if(deckArr.length > DECK_CARD_MAX){ say(`デッキは${DECK_CARD_MAX}枚までです`); return false; }
     if(selectedEnergy.size === 0){ say('エネルギーを1つ以上選んでください'); return false; }
     d.cards = deckArr;
     d.energy = Array.from(selectedEnergy);

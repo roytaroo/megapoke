@@ -328,7 +328,7 @@ const PAGES = {
       <div class="fan">${S.slice(0,3).map(id => `<a href="#/card/${esc(id)}">${face(C(id), bestArt(id))}</a>`).join('')}</div>
       <div class="stats">${[[CARD_LIST.length,'カード'],[mons.length,'メガモン'],[mons.filter(c => c.isEx).length,'ex'],[Object.keys(D.PACKS).length,'パック']].map(([n,l]) => `<div><b>${n}</b><span>${l}</span></div>`).join('')}</div>
       <div class="quick">${[['cards','Cards','カード一覧'],['tier','Tier list','ティアリスト'],['decks','Decks','デッキレシピ'],['basics','How to play','遊びかた'],['rules','Rules','ルール'],['packs','Packs','パック・封入率']].map(([r,b,s]) => `<a href="#/${r}"><b>${b}</b><span>${s}</span></a>`).join('')}</div>
-      ${head2('ゲーム概要','Overview')}${table(null, [['ジャンル','対戦カードゲーム'],['プレイ人数','2人'],['勝利条件','3ポイント先取'],['デッキ','同じ名前のカードは2枚まで'],['対応環境','ブラウザ(スマートフォン推奨)']])}
+      ${head2('ゲーム概要','Overview')}${table(null, [['ジャンル','対戦カードゲーム'],['プレイ人数','2人'],['勝利条件','3ポイント先取'],['デッキ','20枚まで。同じ名前のカードは2枚まで'],['対応環境','ブラウザ(スマートフォン推奨)']])}
       ${head2('ティアS','Tier S','tier')}<div class="cgrid">${S.map(id => cardLink(id)).join('')}</div>
       ${head2('パック','Packs','packs')}<div class="packrow">${Object.values(D.PACKS).map(pk => `<a href="#/packs">${imgTag(pk.image, '')}${esc(pk.name)}</a>`).join('')}</div>
       </section>`);
