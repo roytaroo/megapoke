@@ -7,7 +7,7 @@
 <title>メガポケ (β)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
   :root{
     color-scheme: light;
@@ -832,11 +832,11 @@
   body.has-tabbar .wrap{ padding-bottom:104px; }
   body.has-tabbar .deck-save-bar{ bottom:82px; }
 
-  /* ===== 文字と形の調整(ロゴに合わせたドット文字の見出し、角は小さめ、ぼかしの飾りは無し) ===== */
+  /* ===== 文字と形の調整(見出しは太いゴシック、角は小さめ、ぼかしの飾りは無し) ===== */
   body{ font-family:'Zen Kaku Gothic New','Hiragino Sans','Yu Gothic',sans-serif; }
   body::before{ display:none; }
   h1, h2, h3, .pixel, .page-title, .sel-title, .hero-label, .room-code, #tabbar button, .zone-label, button.gold, .hero-cta b, .rank-row b, .my-record b, .page-chip b, .ds-body b, .deck-in{
-    font-family:'DotGothic16','Zen Kaku Gothic New',sans-serif; font-weight:400; letter-spacing:.03em;
+    font-family:'Zen Kaku Gothic New','Hiragino Sans','Yu Gothic',sans-serif; font-weight:900; letter-spacing:.02em;
   }
   button, input[type=text]{ border-radius:14px; }
   button.back-btn, .icon-btn, .deck-qty-row button{ border-radius:50%; }
@@ -3032,6 +3032,11 @@ function render(){
     };
     // マウス操作: 出せるカードはクリックで出す、出せないカードはクリックで拡大
     div.addEventListener('click', () => { if(setupPlayable || playable) doPlayAction(); else openCardViewer(cardId); });
+    // PC(マウス): 右クリックで拡大。出せるカードはクリックすると出てしまうので、見るだけの操作を別に用意する
+    if(window.matchMedia('(hover: hover) and (pointer: fine)').matches){
+      div.title = '右クリックで拡大';
+      div.addEventListener('contextmenu', e => { e.preventDefault(); openCardViewer(cardId); });
+    }
     // タッチ操作: 長押しで拡大プレビュー、上スワイプで繰り出す(出せるカードのみ)、離すだけなら元に戻る
     let touchStartY = null;
     let swiped = false;
