@@ -702,6 +702,89 @@
     text-shadow:0 4px 0 #fff, 0 10px 24px rgba(106,76,255,0.3); letter-spacing:0.04em;
   }
   .hidden{ display:none !important; }
+
+  /* ===== 対戦以外の画面の仕上げ(ホーム・パック・デッキ・戦績・待機) ===== */
+  body::before{
+    content:""; position:fixed; inset:-20%; z-index:-1; pointer-events:none;
+    background:
+      radial-gradient(circle at 20% 28%, rgba(255,255,255,.95), transparent 22%),
+      radial-gradient(circle at 82% 18%, rgba(190,165,255,.45), transparent 26%),
+      radial-gradient(circle at 72% 82%, rgba(255,214,120,.35), transparent 24%),
+      radial-gradient(circle at 14% 86%, rgba(140,190,255,.45), transparent 28%);
+    animation:skyDrift 18s ease-in-out infinite alternate;
+  }
+  body:has(#game:not(.hidden))::before{ display:none; }
+  @keyframes skyDrift{ from{ transform:translate3d(-3%,-2%,0) scale(1); } to{ transform:translate3d(3%,3%,0) scale(1.08); } }
+  @keyframes riseIn{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:none; } }
+  @keyframes packFloat{ 0%,100%{ transform:translateY(0) rotate(-1.5deg); } 50%{ transform:translateY(-9px) rotate(1.5deg); } }
+  @keyframes packGlow{ from{ opacity:.55; transform:scale(.94); } to{ opacity:1; transform:scale(1.06); } }
+  @keyframes ringPulse{ 0%,100%{ transform:translateY(0); opacity:.45; } 50%{ transform:translateY(-6px); opacity:1; } }
+  @media (prefers-reduced-motion:reduce){ body::before, .pack-stage img, .pack-stage::before, .wait-rings i{ animation:none !important; } }
+  #roomActions > *{ animation:riseIn .45s cubic-bezier(.2,.8,.2,1) both; }
+  #roomActions > :nth-child(2){ animation-delay:.06s; } #roomActions > :nth-child(3){ animation-delay:.12s; }
+  .sel-title{ font-weight:900; font-size:1.2rem; text-align:center; margin-bottom:14px; line-height:1.3; }
+  .sel-title small{ display:block; font-size:.62rem; letter-spacing:.28em; color:var(--violet); }
+  .home-menu{ grid-template-columns:repeat(4, 1fr); gap:8px; }
+  .home-tile{ font-size:.74rem; padding-left:2px; padding-right:2px; }
+  .home-tile .tile-ic{ width:54px; height:54px; }
+  .home-tile .tile-ic img, .home-tile .tile-ic svg{ width:38px; height:38px; }
+  .home-tile.t-wiki .tile-ic{ background:#e4eeff; color:var(--violet-deep); }
+  #botMatchBtn{ width:100%; position:relative; background:rgba(255,255,255,.16); color:#fff; border:1.5px solid rgba(255,255,255,.5); box-shadow:none; }
+  /* 下の階層の画面の見出し */
+  #packPage .card, #deckPage .card, #statsPage .card{ background:rgba(255,255,255,.84); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); border:1.5px solid #fff; }
+  .page-head{ display:flex; align-items:center; gap:12px; }
+  button.back-btn{ width:42px; height:42px; padding:0; border-radius:50%; font-size:1.6rem; line-height:1; padding-bottom:3px; background:#fff; color:var(--violet-deep); box-shadow:0 3px 0 #dbe1ef, 0 6px 14px rgba(74,62,160,.12); flex:none; }
+  .page-title{ flex:1; min-width:0; font-weight:900; font-size:1.25rem; line-height:1.15; white-space:nowrap; }
+  .page-title small{ display:block; font-size:.6rem; letter-spacing:.24em; color:var(--violet); }
+  .page-chip{ background:linear-gradient(180deg,#fff7df,#ffe9ad); color:#7a4d00; font-weight:900; font-size:.68rem; padding:6px 10px; border-radius:999px; box-shadow:inset 0 0 0 1.5px #f1cf74; text-align:center; max-width:58%; line-height:1.3; }
+  .page-chip:empty{ display:none; }
+  .page-chip b{ font-size:1.05rem; }
+  .sec-label{ font-weight:900; font-size:.8rem; color:var(--ink-dim); display:flex; align-items:center; gap:8px; }
+  .sec-label::after{ content:""; flex:1; height:2px; border-radius:2px; background:linear-gradient(90deg,#ddd6ff,transparent); }
+  /* パック開封 */
+  .pack-select-grid{ gap:0; padding:8px 0 6px; margin:0 -20px; }
+  .pack-card{ flex:0 0 66%; width:66%; gap:8px; }
+  .pack-card:first-child{ margin-left:17%; } .pack-card:last-child{ margin-right:17%; }
+  .pack-stage{ position:relative; width:74%; padding:12px 0 28px; }
+  .pack-stage::before{ content:""; position:absolute; inset:4% -14% 14%; background:radial-gradient(closest-side, rgba(255,226,140,.8), rgba(180,150,255,.35) 60%, transparent); filter:blur(6px); animation:packGlow 3s ease-in-out infinite alternate; }
+  .pack-stage::after{ content:""; position:absolute; left:6%; right:6%; bottom:6px; height:22px; border-radius:50%; background:radial-gradient(closest-side, rgba(74,62,160,.38), transparent); }
+  .pack-stage img{ position:relative; animation:packFloat 3.2s ease-in-out infinite; }
+  .pack-card .ptype{ display:block; width:max-content; margin:4px auto 0; font-size:.68rem; color:#fff; border-radius:999px; padding:0 10px; line-height:1.7; }
+  .ptype.t-格闘{ background:var(--fight); } .ptype.t-悪{ background:var(--dark); } .ptype.t-超{ background:var(--psy); }
+  .pack-card .pack-open-btn{ font-size:1.02rem; padding:13px; }
+  .redeem summary{ font-weight:900; font-size:.82rem; color:var(--violet-deep); cursor:pointer; text-align:center; list-style:none; padding:4px; }
+  .redeem summary::-webkit-details-marker{ display:none; }
+  .redeem[open] summary{ margin-bottom:8px; }
+  /* デッキ構築 */
+  .deck-card-grid{ gap:14px 8px; }
+  .deck-card-tile{ background:#fff; border-radius:14px; padding:6px 5px 8px; box-shadow:0 2px 0 #e3e7f3; }
+  .deck-card-tile.in-deck{ box-shadow:0 0 0 2.5px var(--halo), 0 6px 16px rgba(245,184,46,.35); }
+  .deck-in{ position:absolute; top:-9px; right:-6px; z-index:2; background:linear-gradient(180deg,#ffd76a,var(--halo)); color:#5a3a00; font-weight:900; font-size:.78rem; border-radius:999px; padding:0 8px; line-height:1.6; box-shadow:0 2px 0 var(--halo-deep); }
+  .deck-save-bar{ position:sticky; bottom:10px; z-index:5; }
+  .deck-save-bar button{ width:100%; padding:14px; font-size:1.02rem; }
+  /* 戦績 */
+  #statsRanking, #statsHistory{ gap:8px; }
+  .my-record{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:4px; }
+  .my-record div{ background:linear-gradient(180deg,#f6f2ff,#ece6ff); border-radius:16px; padding:10px 4px 8px; text-align:center; }
+  .my-record b{ display:block; font-size:1.5rem; line-height:1.15; color:var(--violet-deep); }
+  .my-record span{ font-size:.7rem; color:var(--ink-dim); font-weight:700; }
+  .rank-row{ display:flex; align-items:center; gap:10px; background:#fff; border-radius:14px; padding:8px 14px 8px 10px; box-shadow:0 2px 0 #e3e7f3; font-weight:900; }
+  .rank-row.r1{ background:linear-gradient(90deg,#fff6d8,#fff 70%); box-shadow:0 2px 0 #f1dca0; }
+  .rank-no{ width:26px; height:26px; border-radius:50%; display:grid; place-items:center; background:#eef0f7; color:var(--ink-dim); font-size:.82rem; flex:none; }
+  .r1 .rank-no{ background:linear-gradient(180deg,#ffe28a,var(--halo)); color:#5a3a00; } .r2 .rank-no{ background:#dbe2ee; color:#4a5674; } .r3 .rank-no{ background:#f3cfae; color:#7a4520; }
+  .rank-row .name-avatar, .rank-row .name-avatar-img{ width:32px; height:32px; font-size:.9rem; }
+  .rank-name{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .rank-row b{ font-size:1.15rem; color:var(--violet-deep); } .rank-row b small{ font-size:.68rem; margin-left:2px; color:var(--ink-dim); }
+  .match-row{ display:grid; grid-template-columns:auto 1fr auto 1fr; gap:8px; align-items:center; background:#fff; border-radius:12px; padding:7px 10px; font-size:.82rem; font-weight:700; color:var(--ink-dim); box-shadow:0 1px 0 #e3e7f3; }
+  .m-date{ font-size:.66rem; } .m-vs{ font-size:.62rem; font-weight:900; color:var(--violet); }
+  .m-p{ text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; border-radius:999px; padding:1px 6px; }
+  .m-p.win{ background:#fff1c4; color:#7a4d00; font-weight:900; }
+  /* 待機 */
+  .wait-card{ padding:30px 20px; }
+  .wait-rings{ display:flex; gap:8px; justify-content:center; }
+  .wait-rings i{ width:30px; height:12px; border:4px solid var(--halo); border-radius:50%; box-shadow:0 0 10px rgba(245,184,46,.6); animation:ringPulse 1.2s ease-in-out infinite; }
+  .wait-rings i:nth-child(2){ animation-delay:.15s; } .wait-rings i:nth-child(3){ animation-delay:.3s; }
+  .room-code{ font-weight:900; font-size:2.5rem; letter-spacing:.22em; line-height:1.3; color:var(--violet-deep); background:linear-gradient(180deg,#f6f2ff,#ece6ff); border-radius:18px; padding:8px 8px 8px 20px; box-shadow:inset 0 0 0 2px #d9d0ff; }
 </style>
 </head>
 <body>
@@ -712,7 +795,7 @@
   <div id="landing">
     <img class="logo-img" src="https://kbsdvtjkczhnggamnggd.supabase.co/storage/v1/object/public/card-images/megapoke_logo.png" alt="メガポケ MEGA POKE">
     <div class="card" id="nameSelect">
-      <div class="zone-label">あなたは誰?</div>
+      <div class="sel-title"><small>PLAYER SELECT</small>プレイヤーを選んでね</div>
       <div class="row" style="flex-wrap:wrap; gap:8px;" id="nameButtons"></div>
     </div>
 
@@ -732,7 +815,7 @@
           <input type="text" id="joinCodeInput" placeholder="部屋コード" maxlength="6" style="text-transform:uppercase;">
           <button id="joinRoomBtn" class="ghost">入る</button>
         </div>
-        <button id="botMatchBtn" class="ghost" style="width:100%;position:relative;background:rgba(255,255,255,0.16);color:#fff;border-color:rgba(255,255,255,0.45);">BOTと対戦(1人用)</button>
+        <button id="botMatchBtn" class="ghost">BOTと対戦(1人用)</button>
       </div>
       <div class="home-menu">
         <button type="button" class="home-tile t-pack" id="openPackNavBtn">
@@ -744,8 +827,10 @@
         <button type="button" class="home-tile t-stats" id="openStatsNavBtn">
           <span class="tile-ic"><img src="https://kbsdvtjkczhnggamnggd.supabase.co/storage/v1/object/public/card-images/Untitled%20design%20(1).png" alt=""></span>戦績
         </button>
+        <button type="button" class="home-tile t-wiki" id="openWikiNavBtn">
+          <span class="tile-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/><path d="M8.5 8h7M8.5 12h5"/></svg></span>Wiki
+        </button>
       </div>
-      <a href="wiki.html" class="home-wiki" style="display:block;text-align:center;margin-top:12px;font-weight:700;font-size:14px;color:var(--violet-deep);text-decoration:none;">公式Wiki(遊びかた・カード一覧)</a>
     </div>
     <p id="landingStatus" class="sub" style="margin-top:14px;"></p>
   </div>
@@ -753,15 +838,14 @@
   <!-- ===== PACK OPENING ===== -->
   <div id="packPage" class="hidden">
     <div class="card stack">
-      <button type="button" class="ghost" id="backFromPackBtn" style="align-self:flex-start;">← 戻る</button>
-      <div class="zone-label">パック開封</div>
-      <p class="sub" id="packLimitStatus"></p>
+      <div class="page-head"><button type="button" class="back-btn" id="backFromPackBtn" aria-label="戻る">‹</button><div class="page-title"><small>PACK</small>パック開封</div><span class="page-chip" id="packLimitStatus"></span></div>
       <div id="packSelectGrid" class="pack-select-grid"></div>
+      <details class="redeem"><summary>特典コードを使う</summary>
       <div class="row" style="gap:8px;">
         <input type="text" id="redeemCodeInput" placeholder="特典コードを入力" style="flex:1;">
         <button type="button" class="ghost" id="redeemCodeBtn">使う</button>
       </div>
-      <p class="sub" id="redeemCodeStatus"></p>
+      <p class="sub" id="redeemCodeStatus"></p></details>
       <div id="packReveal" class="pack-reveal-row"></div>
     </div>
   </div>
@@ -769,14 +853,12 @@
   <!-- ===== DECK BUILDING ===== -->
   <div id="deckPage" class="hidden">
     <div class="card stack">
-      <button type="button" class="ghost" id="backFromDeckBtn" style="align-self:flex-start;">← 戻る</button>
-      <div class="zone-label">デッキ構築</div>
-      <p class="sub">1枚のカードは2枚まで採用可。目安は20枚。</p>
-      <div class="zone-label" style="font-size:0.8rem; margin-top:4px;">使うエネルギータイプ(1〜3種類選択)</div>
+      <div class="page-head"><button type="button" class="back-btn" id="backFromDeckBtn" aria-label="戻る">‹</button><div class="page-title"><small>DECK</small>デッキ構築</div><span class="page-chip"><b id="deckCount">0</b> 枚</span></div>
+      <div class="sec-label">使うエネルギー(1〜3種類)</div>
       <div id="energyTypePicker" class="row" style="gap:8px; flex-wrap:wrap;"></div>
-      <p class="sub">現在のデッキ枚数: <span id="deckCount">0</span>枚</p>
+      <div class="sec-label">カード(同じカードは2枚まで)</div>
       <div id="deckBuilderGrid" class="deck-card-grid"></div>
-      <button type="button" id="saveDeckBtn">デッキを保存</button>
+      <div class="deck-save-bar"><button type="button" id="saveDeckBtn" class="gold">デッキを保存</button></div>
       <p class="sub" id="deckSaveStatus"></p>
     </div>
   </div>
@@ -784,23 +866,24 @@
   <!-- ===== STATS ===== -->
   <div id="statsPage" class="hidden">
     <div class="card stack">
-      <button type="button" class="ghost" id="backFromStatsBtn" style="align-self:flex-start;">← 戻る</button>
-      <div class="zone-label">戦績</div>
-      <div class="zone-label" style="font-size:0.8rem; margin-top:4px;">勝利数ランキング</div>
+      <div class="page-head"><button type="button" class="back-btn" id="backFromStatsBtn" aria-label="戻る">‹</button><div class="page-title"><small>RECORD</small>戦績</div></div>
+      <div class="sec-label">勝利数ランキング</div>
       <div id="statsRanking" class="stack"></div>
-      <div class="zone-label" style="font-size:0.8rem; margin-top:12px;">最近の対戦</div>
+      <div class="sec-label">最近の対戦</div>
       <div id="statsHistory" class="stack"></div>
     </div>
   </div>
 
   <!-- ===== WAITING ===== -->
   <div id="waiting" class="hidden">
-    <div class="card center stack">
-      <div class="zone-label">部屋コード</div>
-      <h1 class="pixel" style="font-size:2.4rem; letter-spacing:0.15em; color:var(--gold);" id="roomCodeDisplay"></h1>
-      <p class="sub">この部屋コードを対戦相手に伝えてね。相手が入るとすぐ始まるよ。</p>
-      <button type="button" class="ghost" id="copyInviteBtn">招待リンクをコピー</button>
+    <div class="card center stack wait-card">
+      <div class="wait-rings"><i></i><i></i><i></i></div>
+      <div class="zone-label" style="margin:0">対戦相手を待っています</div>
+      <div class="room-code" id="roomCodeDisplay"></div>
+      <p class="sub">この部屋コードを相手に伝えてね。相手が入るとすぐ始まるよ。</p>
+      <button type="button" class="gold" id="copyInviteBtn">招待リンクをコピー</button>
       <p class="sub" id="copyInviteStatus"></p>
+      <button type="button" class="ghost" id="cancelWaitBtn">やめる</button>
     </div>
   </div>
 
@@ -3103,9 +3186,16 @@ async function refreshStatsPage(){
       if(r.winner_name) wins[r.winner_name] = (wins[r.winner_name] || 0) + 1;
     });
     const ranking = Object.entries(wins).sort((a,b) => b[1]-a[1]);
-    rankEl.innerHTML = ranking.length
-      ? ranking.map(([name,n]) => `<div class="atk-line">${name} : <b>${n}勝</b></div>`).join('')
-      : '<div class="sub">まだ対戦記録がないよ</div>';
+    const avatar = n => PLAYER_ICONS[n] ? `<img class="name-avatar-img" src="${PLAYER_ICONS[n]}" alt="">` : `<span class="name-avatar">${String(n).charAt(0)}</span>`;
+    const me = getMyName();
+    const mine = rows.filter(r => me && (r.player1_name === me || r.player2_name === me));
+    const myWins = mine.filter(r => r.winner_name === me).length;
+    const myRecord = mine.length
+      ? `<div class="my-record"><div><b>${myWins}</b><span>勝ち</span></div><div><b>${mine.length - myWins}</b><span>負け</span></div><div><b>${Math.round(myWins / mine.length * 100)}%</b><span>勝率</span></div></div>`
+      : '';
+    rankEl.innerHTML = myRecord + (ranking.length
+      ? ranking.map(([name,n], i) => `<div class="rank-row r${i+1}"><span class="rank-no">${i+1}</span>${avatar(name)}<span class="rank-name">${name}</span><b>${n}<small>勝</small></b></div>`).join('')
+      : '<div class="sub">まだ対戦記録がないよ</div>');
     histEl.innerHTML = rows.length
       ? rows.map(r => {
           const d = new Date(r.finished_at);
@@ -3113,7 +3203,7 @@ async function refreshStatsPage(){
           const p1 = r.player1_name || '?';
           const p2 = r.player2_name || '?';
           const winner = r.winner_name || '?';
-          return `<div class="atk-line">${dateStr} ${p1} vs ${p2} → <b>${winner}</b>の勝ち</div>`;
+          return `<div class="match-row"><span class="m-date">${dateStr}</span><span class="m-p${winner === p1 ? ' win' : ''}">${p1}</span><span class="m-vs">VS</span><span class="m-p${winner === p2 ? ' win' : ''}">${p2}</span></div>`;
         }).join('')
       : '';
   }catch(e){
@@ -3218,9 +3308,9 @@ function renderPackSelectGrid(row){
   const openable = canOpenPack(row);
   grid.innerHTML = Object.values(PACKS).map(pack => `
     <div class="pack-card">
-      <img src="${pack.image}" alt="${pack.name}">
-      <div class="pname">${pack.name}<br><span class="sub">${pack.type}タイプ中心</span></div>
-      <button type="button" class="pack-open-btn" data-pack="${pack.id}" ${openable ? '' : 'disabled'}>開ける(5枚)</button>
+      <div class="pack-stage"><img src="${pack.image}" alt="${pack.name}"></div>
+      <div class="pname">${pack.name}<span class="ptype t-${pack.type}">${pack.type}タイプ</span></div>
+      <button type="button" class="pack-open-btn gold" data-pack="${pack.id}" ${openable ? '' : 'disabled'}>開ける</button>
     </div>
   `).join('');
   grid.querySelectorAll('.pack-open-btn').forEach(btn => {
@@ -3425,7 +3515,8 @@ async function refreshDeckBuilder(){
         ? `<img src="${art}" alt="${c.name}" data-zoom-print="${id}" data-card="${print.cardId}">`
         : cardFaceHTML(print.cardId).replace('class="mcard', `data-zoom-print="${id}" class="mcard`);
       return `
-        <div class="deck-card-tile" data-print="${id}">
+        <div class="deck-card-tile${inDeck ? ' in-deck' : ''}" data-print="${id}">
+          ${inDeck ? `<span class="deck-in">×${inDeck}</span>` : ''}
           ${artHtml}
           ${rarityBadge(print)}
           <div class="dname">${c.name}</div>
@@ -3573,6 +3664,8 @@ document.getElementById('logToggleBtn').addEventListener('click', () => {
 document.getElementById('createRoomBtn').addEventListener('click', createRoom);
 document.getElementById('joinRoomBtn').addEventListener('click', joinRoom);
 document.getElementById('botMatchBtn').addEventListener('click', startBotMatch);
+document.getElementById('cancelWaitBtn').addEventListener('click', () => document.getElementById('backToLandingBtn').click());
+document.getElementById('openWikiNavBtn').addEventListener('click', () => { location.href = 'wiki.html'; });
 document.getElementById('backToLandingBtn').addEventListener('click', () => {
   clearRoomSession();
   const url = new URL(location.href);
