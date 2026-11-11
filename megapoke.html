@@ -785,6 +785,52 @@
   .wait-rings i{ width:30px; height:12px; border:4px solid var(--halo); border-radius:50%; box-shadow:0 0 10px rgba(245,184,46,.6); animation:ringPulse 1.2s ease-in-out infinite; }
   .wait-rings i:nth-child(2){ animation-delay:.15s; } .wait-rings i:nth-child(3){ animation-delay:.3s; }
   .room-code{ font-weight:900; font-size:2.5rem; letter-spacing:.22em; line-height:1.3; color:var(--violet-deep); background:linear-gradient(180deg,#f6f2ff,#ece6ff); border-radius:18px; padding:8px 8px 8px 20px; box-shadow:inset 0 0 0 2px #d9d0ff; }
+
+  /* ===== ホーム(パックの見せ場)と下のタブバー ===== */
+  @keyframes heroSpin{ to{ transform:rotate(360deg); } }
+  #roomActions{ display:flex; flex-direction:column; gap:14px; }
+  #landing:has(#roomActions:not(.hidden)) .logo-img{ max-width:150px; margin:0 auto 4px; }
+  .home-top{ display:flex; align-items:center; gap:10px; background:rgba(255,255,255,.86); border-radius:999px; padding:5px 6px; box-shadow:0 6px 18px rgba(74,62,160,.10); }
+  .home-top .name-avatar, .home-top .name-avatar-img{ width:42px; height:42px; }
+  .home-top #whoAmI{ flex:1; min-width:0; margin:0; font-weight:900; line-height:1.25; }
+  .home-top #whoAmI small{ display:block; font-size:.66rem; color:var(--ink-dim); font-weight:700; }
+  .home-top .home-rename{ padding:8px 14px; font-size:.72rem; }
+  button.home-hero{
+    all:unset; box-sizing:border-box; display:block; width:100%; height:292px; position:relative; overflow:hidden; cursor:pointer;
+    border-radius:28px; -webkit-tap-highlight-color:transparent;
+    background:radial-gradient(80% 60% at 50% 100%, #fff3c4 0%, transparent 62%), linear-gradient(180deg,#b9dcff 0%,#d6c8ff 55%,#f4e7ff 100%);
+    box-shadow:0 14px 30px rgba(75,48,214,.22), inset 0 0 0 2px rgba(255,255,255,.85);
+    transition:transform .15s;
+  }
+  button.home-hero:active{ transform:scale(.985); }
+  .hero-rays{ position:absolute; inset:-45%; background:repeating-conic-gradient(from 0deg at 50% 58%, rgba(255,255,255,.6) 0 7deg, transparent 7deg 20deg); -webkit-mask:radial-gradient(closest-side,#000 25%,transparent 72%); mask:radial-gradient(closest-side,#000 25%,transparent 72%); animation:heroSpin 50s linear infinite; }
+  .hero-label{ position:absolute; left:18px; top:14px; z-index:2; font-weight:900; font-size:1.2rem; line-height:1.2; color:var(--ink); text-shadow:0 1px 0 #fff; }
+  .hero-label small{ display:block; font-size:.6rem; letter-spacing:.26em; color:var(--violet-deep); }
+  .hero-packs{ position:absolute; left:0; right:0; bottom:50px; height:176px; display:flex; justify-content:center; align-items:flex-end; }
+  .hero-packs img{ height:142px; width:auto; margin:0 -12px; filter:drop-shadow(0 10px 12px rgba(74,62,160,.35)); }
+  .hero-packs .hp0{ transform:rotate(-9deg) translateY(6px); } .hero-packs .hp2{ transform:rotate(9deg) translateY(6px); }
+  .hero-packs .hp1{ height:172px; z-index:1; animation:packFloat 3.2s ease-in-out infinite; }
+  .hero-cta{ position:absolute; left:12px; right:12px; bottom:11px; z-index:2; display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .hero-cta span{ background:rgba(255,255,255,.92); border-radius:999px; padding:5px 11px; font-size:.68rem; font-weight:900; color:#7a4d00; }
+  .hero-cta span:empty{ visibility:hidden; }
+  .hero-cta b{ margin-left:auto; background:linear-gradient(180deg,#ffe28a,var(--halo)); color:#5a3a00; border-radius:999px; padding:8px 18px; font-size:.9rem; box-shadow:0 3px 0 var(--halo-deep); }
+  .battle-row{ display:grid; grid-template-columns:1.25fr 1fr; gap:8px; position:relative; }
+  .battle-row button{ padding:14px 6px; font-size:.98rem; width:100%; }
+  #tabbar{
+    position:fixed; left:0; right:0; bottom:0; z-index:6; display:flex; justify-content:space-around;
+    padding:4px 8px calc(4px + env(safe-area-inset-bottom, 0px)); background:rgba(255,255,255,.93);
+    -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); border-radius:22px 22px 0 0;
+    box-shadow:0 -8px 24px rgba(74,62,160,.14), inset 0 1.5px 0 #fff;
+  }
+  #tabbar.hidden{ display:none; }
+  #tabbar button{ all:unset; box-sizing:border-box; flex:1; display:flex; flex-direction:column; align-items:center; gap:1px; padding:4px 0 5px; font-size:.64rem; font-weight:900; color:#9aa1b8; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+  #tabbar button::before{ content:""; width:20px; height:5px; border:2.5px solid transparent; border-radius:50%; }
+  #tabbar button.on{ color:var(--violet-deep); }
+  #tabbar button.on::before{ border-color:var(--halo); box-shadow:0 0 6px rgba(245,184,46,.8); }
+  #tabbar svg{ width:25px; height:25px; transition:transform .15s; }
+  #tabbar button.on svg{ transform:scale(1.12); }
+  body.has-tabbar .wrap{ padding-bottom:104px; }
+  body.has-tabbar .deck-save-bar{ bottom:82px; }
 </style>
 </head>
 <body>
@@ -797,39 +843,32 @@
     <div class="card" id="nameSelect">
       <div class="sel-title"><small>PLAYER SELECT</small>プレイヤーを選んでね</div>
       <div class="row" style="flex-wrap:wrap; gap:8px;" id="nameButtons"></div>
+      <button type="button" class="ghost hidden" id="nameCancelBtn" style="width:100%; margin-top:14px;">戻る</button>
     </div>
 
     <div class="hidden" id="roomActions">
-      <div class="home-me">
+      <div class="home-top">
         <span id="homeAvatar"></span>
         <p id="whoAmI"></p>
-        <button type="button" class="ghost home-rename" id="changeNameBtn">
-          <img src="https://kbsdvtjkczhnggamnggd.supabase.co/storage/v1/object/public/card-images/name.PNG" alt="">名前を変える
-        </button>
+        <button type="button" class="ghost home-rename" id="changeNameBtn">プレイヤー変更</button>
       </div>
+      <button type="button" class="home-hero" id="homeHeroBtn">
+        <span class="hero-rays"></span>
+        <span class="hero-label"><small>PACK</small>パックを開けよう</span>
+        <span class="hero-packs" id="homeHeroPacks"></span>
+        <span class="hero-cta"><span id="homePackChip"></span><b>開封する ›</b></span>
+      </button>
       <div class="home-battle">
         <h2>対戦する</h2>
-        <p>部屋を作って、コードを友だちに送ろう</p>
-        <button id="createRoomBtn" class="gold">部屋を作る</button>
+        <p>友だちと部屋で対戦、または1人でBOTと対戦</p>
+        <div class="battle-row">
+          <button id="createRoomBtn" class="gold">部屋を作る</button>
+          <button id="botMatchBtn" class="ghost">BOTと対戦</button>
+        </div>
         <div class="home-join">
           <input type="text" id="joinCodeInput" placeholder="部屋コード" maxlength="6" style="text-transform:uppercase;">
           <button id="joinRoomBtn" class="ghost">入る</button>
         </div>
-        <button id="botMatchBtn" class="ghost">BOTと対戦(1人用)</button>
-      </div>
-      <div class="home-menu">
-        <button type="button" class="home-tile t-pack" id="openPackNavBtn">
-          <span class="tile-ic"><img src="https://kbsdvtjkczhnggamnggd.supabase.co/storage/v1/object/public/card-images/pack.PNG" alt=""></span>パック開封
-        </button>
-        <button type="button" class="home-tile t-deck" id="openDeckNavBtn">
-          <span class="tile-ic"><img src="https://kbsdvtjkczhnggamnggd.supabase.co/storage/v1/object/public/card-images/deck.PNG" alt=""></span>デッキ構築
-        </button>
-        <button type="button" class="home-tile t-stats" id="openStatsNavBtn">
-          <span class="tile-ic"><img src="https://kbsdvtjkczhnggamnggd.supabase.co/storage/v1/object/public/card-images/Untitled%20design%20(1).png" alt=""></span>戦績
-        </button>
-        <button type="button" class="home-tile t-wiki" id="openWikiNavBtn">
-          <span class="tile-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/><path d="M8.5 8h7M8.5 12h5"/></svg></span>Wiki
-        </button>
       </div>
     </div>
     <p id="landingStatus" class="sub" style="margin-top:14px;"></p>
@@ -894,6 +933,7 @@
       <div id="oppHandRow" class="opp-hand-row"></div>
       <div class="deck-chip" id="oppDeckChip"></div>
       <button type="button" class="icon-btn" id="logToggleBtn" aria-label="ログを見る">📜</button>
+      <button type="button" class="icon-btn" id="quitBtn" aria-label="対戦をやめる">✕</button>
     </div>
     <div id="disconnectBanner"></div>
     <div class="log-box hidden" id="logBox"></div>
@@ -922,6 +962,13 @@
 
 </div>
 
+<nav id="tabbar" class="hidden">
+  <button type="button" id="tabHomeBtn" data-tab="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/></svg><span>ホーム</span></button>
+  <button type="button" id="openPackNavBtn" data-tab="pack"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M6 7.5h12M6 16.5h12"/><path d="m12 10 .9 1.8 2 .3-1.4 1.4.3 2-1.8-1-1.8 1 .3-2L9.1 12.1l2-.3z"/></svg><span>パック</span></button>
+  <button type="button" id="openDeckNavBtn" data-tab="deck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="3.5" width="11" height="15" rx="2"/><path d="M5.5 7v11.5a2 2 0 0 0 2 2h8.5"/></svg><span>デッキ</span></button>
+  <button type="button" id="openStatsNavBtn" data-tab="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v1.5A3 3 0 0 0 7 10.5M17 6h3v1.5a3 3 0 0 1-3 3"/><path d="M12 14v4M8.5 20h7"/></svg><span>戦績</span></button>
+  <button type="button" id="openWikiNavBtn" data-tab="wiki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/><path d="M8.5 8h7M8.5 12h5"/></svg><span>Wiki</span></button>
+</nav>
 <div id="winOverlay">
   <div class="win-halo"></div>
   <h2 id="winText"></h2>
@@ -1097,6 +1144,8 @@ function initNameSelect(){
   if(existing){
     nameSelectEl.classList.add('hidden');
     roomActionsEl.classList.remove('hidden');
+    window._prevName = null;
+    setTimeout(() => { setTab(window._tab === undefined ? 'home' : window._tab || 'home'); renderHomeHero(); }, 0);
     document.getElementById('whoAmI').innerHTML = `<small>ようこそ</small>${existing}`;
     document.getElementById('homeAvatar').innerHTML = PLAYER_ICONS[existing]
       ? `<img class="name-avatar-img" src="${PLAYER_ICONS[existing]}" alt="">`
@@ -1105,6 +1154,8 @@ function initNameSelect(){
   }
   nameSelectEl.classList.remove('hidden');
   roomActionsEl.classList.add('hidden');
+  document.getElementById('nameCancelBtn').classList.toggle('hidden', !window._prevName);
+  setTimeout(() => setTab(null), 0);
   const box = document.getElementById('nameButtons');
   box.innerHTML = '';
   box.className = 'name-grid';
@@ -2082,12 +2133,14 @@ function setLandingStatus(msg, type){
 }
 
 function showWaiting(code){
-  document.getElementById('landing').classList.add('hidden');
+  setTab(null);
+  hidePages();
   document.getElementById('waiting').classList.remove('hidden');
   document.getElementById('roomCodeDisplay').textContent = code;
 }
 function showGame(){
-  document.getElementById('landing').classList.add('hidden');
+  setTab(null);
+  hidePages();
   document.getElementById('waiting').classList.add('hidden');
   document.getElementById('game').classList.remove('hidden');
 }
@@ -3147,24 +3200,46 @@ function exclusivePoolFor(packType, packId){
   });
 }
 
+function hidePages(){ ['landing','packPage','deckPage','statsPage'].forEach(id => document.getElementById(id).classList.add('hidden')); }
+// 下のタブバー。name=今いる画面('home'/'pack'/'deck'/'stats')。nullで隠す(対戦中・待機中・プレイヤー選択中)
+function setTab(name){
+  window._tab = name;
+  const bar = document.getElementById('tabbar');
+  const show = !!name && !!getMyName();
+  bar.classList.toggle('hidden', !show);
+  document.body.classList.toggle('has-tabbar', show);
+  bar.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.tab === name));
+  window.scrollTo(0, 0);
+}
+async function renderHomeHero(){
+  const box = document.getElementById('homeHeroPacks');
+  if(!box.children.length) box.innerHTML = Object.values(PACKS).map((p,i) => `<img class="hp${i}" src="${p.image}" alt="">`).join('');
+  const chip = document.getElementById('homePackChip');
+  if(!getMyName()) return;
+  try{ await ensureSb(); const row = await getCollectionRow(); chip.textContent = canOpenPack(row) ? packLimitLabel(row).replace('今日のパックを開ける(1日1回)', '今日のパックが開けられる') : '今日は開封済み'; }catch(e){ chip.textContent = ''; }
+}
 function showLanding(){
+  setTab('home'); renderHomeHero();
   document.getElementById('landing').classList.remove('hidden');
   document.getElementById('packPage').classList.add('hidden');
   document.getElementById('deckPage').classList.add('hidden');
   document.getElementById('statsPage').classList.add('hidden');
 }
 function showPackPage(){
-  document.getElementById('landing').classList.add('hidden');
+  setTab('pack');
+  hidePages();
   document.getElementById('packPage').classList.remove('hidden');
   refreshCollectionView();
 }
 function showDeckPage(){
-  document.getElementById('landing').classList.add('hidden');
+  setTab('deck');
+  hidePages();
   document.getElementById('deckPage').classList.remove('hidden');
   refreshDeckBuilder();
 }
 function showStatsPage(){
-  document.getElementById('landing').classList.add('hidden');
+  setTab('stats');
+  hidePages();
   document.getElementById('statsPage').classList.remove('hidden');
   refreshStatsPage();
 }
@@ -3615,7 +3690,9 @@ document.getElementById('copyInviteBtn').addEventListener('click', async () => {
   }
   setTimeout(() => { statusEl.textContent = ''; }, 4000);
 });
+document.getElementById('nameCancelBtn').addEventListener('click', () => { if(window._prevName){ setMyName(window._prevName); initNameSelect(); } });
 document.getElementById('changeNameBtn').addEventListener('click', () => {
+  window._prevName = getMyName();
   sessionStorage.removeItem('megapoke_player_name');
   initNameSelect();
 });
@@ -3666,6 +3743,19 @@ document.getElementById('joinRoomBtn').addEventListener('click', joinRoom);
 document.getElementById('botMatchBtn').addEventListener('click', startBotMatch);
 document.getElementById('cancelWaitBtn').addEventListener('click', () => document.getElementById('backToLandingBtn').click());
 document.getElementById('openWikiNavBtn').addEventListener('click', () => { location.href = 'wiki.html'; });
+document.getElementById('tabHomeBtn').addEventListener('click', showLanding);
+document.getElementById('homeHeroBtn').addEventListener('click', showPackPage);
+document.getElementById('quitBtn').addEventListener('click', () => {
+  if(!currentState) return;
+  const goHome = () => document.getElementById('backToLandingBtn').click();
+  if(currentState.phase === 'finished'){ goHome(); return; }
+  if(!confirm(BOT_MODE ? 'BOTとの対戦をやめて、ホームに戻る?' : '降参して対戦をやめる?(相手の勝ちになるよ)')) return;
+  if(BOT_MODE || currentState.phase !== 'playing'){ BOT_MODE = false; goHome(); return; }
+  currentState.phase = 'finished';
+  currentState.winner = otherSlot(MY_SLOT);
+  log(currentState, `${nameOf(MY_SLOT)}が降参した`);
+  pushState(); render();
+});
 document.getElementById('backToLandingBtn').addEventListener('click', () => {
   clearRoomSession();
   const url = new URL(location.href);
