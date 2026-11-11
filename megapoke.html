@@ -7,7 +7,7 @@
 <title>メガポケ (β)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
   :root{
     color-scheme: light;
@@ -831,6 +831,58 @@
   #tabbar button.on svg{ transform:scale(1.12); }
   body.has-tabbar .wrap{ padding-bottom:104px; }
   body.has-tabbar .deck-save-bar{ bottom:82px; }
+
+  /* ===== 文字と形の調整(ロゴに合わせたドット文字の見出し、角は小さめ、ぼかしの飾りは無し) ===== */
+  body{ font-family:'Zen Kaku Gothic New','Hiragino Sans','Yu Gothic',sans-serif; }
+  body::before{ display:none; }
+  h1, h2, h3, .pixel, .page-title, .sel-title, .hero-label, .room-code, #tabbar button, .zone-label, button.gold, .hero-cta b, .rank-row b, .my-record b, .page-chip b, .ds-body b, .deck-in{
+    font-family:'DotGothic16','Zen Kaku Gothic New',sans-serif; font-weight:400; letter-spacing:.03em;
+  }
+  button, input[type=text]{ border-radius:14px; }
+  button.back-btn, .icon-btn, .deck-qty-row button{ border-radius:50%; }
+  .card{ border-radius:18px; }
+  #packPage .card, #deckPage .card, #statsPage .card{ -webkit-backdrop-filter:none; backdrop-filter:none; background:#fff; }
+  .home-top{ border-radius:16px; background:#fff; }
+  button.home-hero{ border-radius:20px; height:186px; }
+  .home-battle{ border-radius:20px; padding:16px 16px 16px; }
+  .home-battle h2{ font-size:1.35rem; }
+  .hero-label{ font-size:1.3rem; }
+  .hero-packs{ bottom:44px; height:130px; }
+  .hero-packs img{ height:98px; } .hero-packs .hp1{ height:120px; }
+  #roomActions{ gap:12px; }
+  .hero-cta b{ border-radius:12px; } .hero-cta span, .page-chip{ border-radius:10px; }
+  #landing:has(#roomActions:not(.hidden)) .logo-img{ max-width:124px; margin:-6px auto 0; }
+  .page-title{ font-size:1.35rem; }
+  .energy-type-btn{ border-radius:12px; }
+  /* デッキ一覧と編集 */
+  .deck-list{ display:grid; gap:10px; }
+  button.deck-slot{ all:unset; box-sizing:border-box; display:grid; grid-template-columns:50px minmax(0,1fr) auto; gap:12px; align-items:center; width:100%; padding:8px 12px 8px 8px; background:#fff; border-radius:14px; box-shadow:0 0 0 1.5px #e3e7f3, 0 2px 0 #dfe4f2; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+  button.deck-slot.active{ box-shadow:0 0 0 2.5px var(--halo), 0 3px 0 var(--halo-deep); }
+  .ds-art{ width:50px; aspect-ratio:5/7; border-radius:5px; background:#e9ecf6; overflow:hidden; }
+  .ds-art img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .ds-body b{ display:block; font-size:1.05rem; line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .ds-body span{ display:flex; align-items:center; gap:4px; font-size:.75rem; color:var(--ink-dim); font-weight:700; margin-top:2px; }
+  .ds-body span img{ width:16px; height:16px; border-radius:50%; }
+  .ds-badge{ font-size:.68rem; font-weight:900; background:var(--halo); color:#5a3a00; border-radius:8px; padding:2px 8px; white-space:nowrap; }
+  button.deck-slot.new{ display:block; text-align:center; padding:16px; background:transparent; box-shadow:none; border:2px dashed #c4bcf0; color:var(--violet-deep); font-weight:900; }
+  input.deck-name-input{ flex:1; min-width:0; padding:8px 12px; font-size:1.05rem; font-weight:900; }
+  /* 保存などのボタンは、カードに重ならないよう画面下の帯に固定する */
+  .deck-save-bar{ position:fixed; left:0; right:0; bottom:0; z-index:5; display:grid; grid-template-columns:auto 1fr 1fr; gap:8px; padding:10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); background:#fff; box-shadow:0 -1.5px 0 #e3e7f3, 0 -8px 18px rgba(74,62,160,.08); }
+  body.has-tabbar .deck-save-bar{ bottom:calc(58px + env(safe-area-inset-bottom, 0px)); padding-bottom:14px; }
+  .deck-save-bar button{ width:auto; padding:12px 10px; font-size:.92rem; white-space:nowrap; }
+  #deckEditView{ margin-bottom:74px; }
+  #deckSaveStatus:empty{ display:none; }
+  .deck-in{ top:3px; right:3px; }
+  .deck-card-tile > .status-badge{ top:3px; left:3px; }
+
+  /* パックは1画面に1つずつ(となりのパックのボタンが見切れて重なって見えないように) */
+  .pack-select-grid{ margin:0; padding:4px 0 2px; scrollbar-width:none; }
+  .pack-select-grid::-webkit-scrollbar{ display:none; }
+  .pack-card{ flex:0 0 100%; width:100%; }
+  .pack-card:first-child{ margin-left:0; } .pack-card:last-child{ margin-right:0; }
+  .pack-stage{ width:50%; }
+  .pack-card .pack-open-btn{ width:70%; }
+  .pack-swipe-hint{ text-align:center; font-size:.72rem; font-weight:700; color:var(--ink-dim); margin:-4px 0 0; }
 </style>
 </head>
 <body>
@@ -841,7 +893,7 @@
   <div id="landing">
     <img class="logo-img" src="https://kbsdvtjkczhnggamnggd.supabase.co/storage/v1/object/public/card-images/megapoke_logo.png" alt="メガポケ MEGA POKE">
     <div class="card" id="nameSelect">
-      <div class="sel-title"><small>PLAYER SELECT</small>プレイヤーを選んでね</div>
+      <div class="sel-title">プレイヤーをえらぶ</div>
       <div class="row" style="flex-wrap:wrap; gap:8px;" id="nameButtons"></div>
       <button type="button" class="ghost hidden" id="nameCancelBtn" style="width:100%; margin-top:14px;">戻る</button>
     </div>
@@ -854,20 +906,19 @@
       </div>
       <button type="button" class="home-hero" id="homeHeroBtn">
         <span class="hero-rays"></span>
-        <span class="hero-label"><small>PACK</small>パックを開けよう</span>
+        <span class="hero-label">パック</span>
         <span class="hero-packs" id="homeHeroPacks"></span>
-        <span class="hero-cta"><span id="homePackChip"></span><b>開封する ›</b></span>
+        <span class="hero-cta"><span id="homePackChip"></span><b>あける</b></span>
       </button>
       <div class="home-battle">
-        <h2>対戦する</h2>
-        <p>友だちと部屋で対戦、または1人でBOTと対戦</p>
+        <h2>バトル</h2>
         <div class="battle-row">
-          <button id="createRoomBtn" class="gold">部屋を作る</button>
-          <button id="botMatchBtn" class="ghost">BOTと対戦</button>
+          <button id="createRoomBtn" class="gold">ルームをつくる</button>
+          <button id="botMatchBtn" class="ghost">ひとりで対戦</button>
         </div>
         <div class="home-join">
-          <input type="text" id="joinCodeInput" placeholder="部屋コード" maxlength="6" style="text-transform:uppercase;">
-          <button id="joinRoomBtn" class="ghost">入る</button>
+          <input type="text" id="joinCodeInput" placeholder="ルームコード" maxlength="6" style="text-transform:uppercase;">
+          <button id="joinRoomBtn" class="ghost">はいる</button>
         </div>
       </div>
     </div>
@@ -877,9 +928,10 @@
   <!-- ===== PACK OPENING ===== -->
   <div id="packPage" class="hidden">
     <div class="card stack">
-      <div class="page-head"><button type="button" class="back-btn" id="backFromPackBtn" aria-label="戻る">‹</button><div class="page-title"><small>PACK</small>パック開封</div><span class="page-chip" id="packLimitStatus"></span></div>
+      <div class="page-head"><button type="button" class="back-btn" id="backFromPackBtn" aria-label="戻る">‹</button><div class="page-title">パック</div><span class="page-chip" id="packLimitStatus"></span></div>
       <div id="packSelectGrid" class="pack-select-grid"></div>
-      <details class="redeem"><summary>特典コードを使う</summary>
+      <p class="pack-swipe-hint">‹ 左右にスワイプでパックを切り替え ›</p>
+      <details class="redeem"><summary>コードを入力</summary>
       <div class="row" style="gap:8px;">
         <input type="text" id="redeemCodeInput" placeholder="特典コードを入力" style="flex:1;">
         <button type="button" class="ghost" id="redeemCodeBtn">使う</button>
@@ -891,24 +943,27 @@
 
   <!-- ===== DECK BUILDING ===== -->
   <div id="deckPage" class="hidden">
-    <div class="card stack">
-      <div class="page-head"><button type="button" class="back-btn" id="backFromDeckBtn" aria-label="戻る">‹</button><div class="page-title"><small>DECK</small>デッキ構築</div><span class="page-chip"><b id="deckCount">0</b> 枚</span></div>
-      <div class="sec-label">使うエネルギー(1〜3種類)</div>
+    <div class="card stack" id="deckListView">
+      <div class="page-head"><button type="button" class="back-btn" id="backFromDeckBtn" aria-label="戻る">‹</button><div class="page-title">デッキ</div><span class="page-chip"><b id="deckListCount">0</b> / 20</span></div>
+      <div id="deckListGrid" class="deck-list"></div>
+    </div>
+    <div class="card stack hidden" id="deckEditView">
+      <div class="page-head"><button type="button" class="back-btn" id="backToDeckListBtn" aria-label="デッキ一覧に戻る">‹</button><input type="text" id="deckNameInput" class="deck-name-input" maxlength="12" aria-label="デッキの名前"><span class="page-chip"><b id="deckCount">0</b> 枚</span></div>
+      <div class="sec-label">エネルギー(3種類まで)</div>
       <div id="energyTypePicker" class="row" style="gap:8px; flex-wrap:wrap;"></div>
       <div class="sec-label">カード(同じカードは2枚まで)</div>
       <div id="deckBuilderGrid" class="deck-card-grid"></div>
-      <div class="deck-save-bar"><button type="button" id="saveDeckBtn" class="gold">デッキを保存</button></div>
       <p class="sub" id="deckSaveStatus"></p>
+      <div class="deck-save-bar"><button type="button" class="ghost" id="deleteDeckBtn">削除</button><button type="button" class="ghost" id="useDeckBtn">対戦で使う</button><button type="button" id="saveDeckBtn" class="gold">保存</button></div>
     </div>
   </div>
-
   <!-- ===== STATS ===== -->
   <div id="statsPage" class="hidden">
     <div class="card stack">
-      <div class="page-head"><button type="button" class="back-btn" id="backFromStatsBtn" aria-label="戻る">‹</button><div class="page-title"><small>RECORD</small>戦績</div></div>
-      <div class="sec-label">勝利数ランキング</div>
+      <div class="page-head"><button type="button" class="back-btn" id="backFromStatsBtn" aria-label="戻る">‹</button><div class="page-title">戦績</div></div>
+      <div class="sec-label">ランキング</div>
       <div id="statsRanking" class="stack"></div>
-      <div class="sec-label">最近の対戦</div>
+      <div class="sec-label">対戦履歴</div>
       <div id="statsHistory" class="stack"></div>
     </div>
   </div>
@@ -917,9 +972,9 @@
   <div id="waiting" class="hidden">
     <div class="card center stack wait-card">
       <div class="wait-rings"><i></i><i></i><i></i></div>
-      <div class="zone-label" style="margin:0">対戦相手を待っています</div>
+      <div class="zone-label" style="margin:0">相手を待っています</div>
       <div class="room-code" id="roomCodeDisplay"></div>
-      <p class="sub">この部屋コードを相手に伝えてね。相手が入るとすぐ始まるよ。</p>
+      <p class="sub">このコードを相手に伝えると、対戦がはじまります</p>
       <button type="button" class="gold" id="copyInviteBtn">招待リンクをコピー</button>
       <p class="sub" id="copyInviteStatus"></p>
       <button type="button" class="ghost" id="cancelWaitBtn">やめる</button>
@@ -1287,8 +1342,9 @@ async function buildDeckForPlayer(name){
   if(sb && name){
     try{
       const { data } = await sb.from('megapoke_decks').select('deck, energy_types').eq('player_name', name).maybeSingle();
-      if(data && Array.isArray(data.deck) && data.deck.length > 0){
-        return { deck: shuffle(data.deck), energyTypes: Array.isArray(data.energy_types) ? data.energy_types : null };
+      const cards = data && Array.isArray(data.deck) ? data.deck.filter(id => CARDS[id]) : []; // '@slot:1' などの印は捨てる
+      if(cards.length > 0){
+        return { deck: shuffle(cards), energyTypes: Array.isArray(data.energy_types) ? data.energy_types : null };
       }
     }catch(e){ /* fall through to test deck */ }
   }
@@ -2276,7 +2332,7 @@ async function startBotMatch(){
   }catch(e){
     setLandingStatus('BOTマッチを始められなかった: ' + (e && e.message ? e.message : String(e)), 'error');
   }
-  if(btn){ btn.disabled = false; btn.textContent = 'BOTと対戦(1人用)'; }
+  if(btn){ btn.disabled = false; btn.textContent = 'ひとりで対戦'; }
 }
 // ワザの「だいたいの強さ」。相手を倒せるワザを最優先にする
 function botAttackValue(state, atk){
@@ -3216,7 +3272,7 @@ async function renderHomeHero(){
   if(!box.children.length) box.innerHTML = Object.values(PACKS).map((p,i) => `<img class="hp${i}" src="${p.image}" alt="">`).join('');
   const chip = document.getElementById('homePackChip');
   if(!getMyName()) return;
-  try{ await ensureSb(); const row = await getCollectionRow(); chip.textContent = canOpenPack(row) ? packLimitLabel(row).replace('今日のパックを開ける(1日1回)', '今日のパックが開けられる') : '今日は開封済み'; }catch(e){ chip.textContent = ''; }
+  try{ await ensureSb(); const row = await getCollectionRow(); chip.textContent = packLimitLabel(row); }catch(e){ chip.textContent = ''; }
 }
 function showLanding(){
   setTab('home'); renderHomeHero();
@@ -3235,7 +3291,7 @@ function showDeckPage(){
   setTab('deck');
   hidePages();
   document.getElementById('deckPage').classList.remove('hidden');
-  refreshDeckBuilder();
+  refreshDeckList();
 }
 function showStatsPage(){
   setTab('stats');
@@ -3364,11 +3420,11 @@ async function refreshCollectionView(){
 
 function packLimitLabel(row){
   const bonus = row.bonus_packs || 0;
-  if(bonus > 0) return `ボーナスパック: 残り${bonus}回`;
+  if(bonus > 0) return `ボーナス あと${bonus}回`;
   const opened = row.packs_opened_total || 0;
-  if(opened < FREE_PACKS) return `初回無料パック: 残り${FREE_PACKS - opened}回`;
-  if(row.last_pack_date === todayStr()) return '今日はもう開封済み。また明日どうぞ。';
-  return '今日のパックを開ける(1日1回)';
+  if(opened < FREE_PACKS) return `無料 あと${FREE_PACKS - opened}回`;
+  if(row.last_pack_date === todayStr()) return 'つぎは明日';
+  return 'きょうの1パック';
 }
 function canOpenPack(row){
   if((row.bonus_packs || 0) > 0) return true;
@@ -3518,22 +3574,108 @@ function runPackBigReveal(drawn){
   });
 }
 
-async function refreshDeckBuilder(){
+/* ---- デッキは20個まで。保存先は megapoke_decks のまま(SQLは不要):
+   「名前#番号」の行に各デッキ、名前だけの行に「対戦で使うデッキ」のコピーを置く。
+   deck配列の先頭に '@name:デッキ名'(名前だけの行は '@slot:番号')を入れる。カードIDでない文字列は読む時に捨てる ---- */
+const DECK_MAX = 20;
+let deckList = [];        // [{ slot, name, cards:[カードID], energy:[タイプ] }]
+let deckActiveSlot = 1;   // 対戦で使うデッキ
+const deckMeta = (arr, key) => { const m = (arr || []).find(x => typeof x === 'string' && x.startsWith('@' + key + ':')); return m ? m.slice(key.length + 2) : null; };
+const deckCardsOnly = arr => (arr || []).filter(id => CARDS[id]);
+async function loadDeckList(){
+  const name = getMyName();
+  deckList = []; deckActiveSlot = 1;
+  if(!sb || !name) return;
+  const [mainRes, slotRes] = await Promise.all([
+    sb.from('megapoke_decks').select('deck, energy_types').eq('player_name', name).maybeSingle(),
+    sb.from('megapoke_decks').select('player_name, deck, energy_types').like('player_name', name + '#%'),
+  ]);
+  const main = mainRes.data, rows = Array.isArray(slotRes.data) ? slotRes.data : [];
+  rows.forEach(r => {
+    const slot = parseInt(String(r.player_name).split('#').pop(), 10);
+    if(slot >= 1 && slot <= DECK_MAX && Array.isArray(r.deck)){
+      deckList.push({ slot, name: deckMeta(r.deck, 'name') || `デッキ${slot}`, cards: deckCardsOnly(r.deck), energy: Array.isArray(r.energy_types) ? r.energy_types : [] });
+    }
+  });
+  deckList.sort((a,b) => a.slot - b.slot);
+  if(main && Array.isArray(main.deck)){
+    const s = parseInt(deckMeta(main.deck, 'slot'), 10);
+    if(s && deckList.some(d => d.slot === s)) deckActiveSlot = s;
+    else if(!deckList.length && deckCardsOnly(main.deck).length){
+      // デッキが1個だけだった頃のものを「デッキ1」として引き継ぐ
+      deckList.push({ slot:1, name:'デッキ1', cards: deckCardsOnly(main.deck), energy: Array.isArray(main.energy_types) ? main.energy_types : [] });
+      deckActiveSlot = 1;
+      await saveDeckSlot(deckList[0]); // 別のデッキに切り替えても消えないよう、すぐ「名前#1」の行に写す
+    }
+  }
+  if(deckList.length && !deckList.some(d => d.slot === deckActiveSlot)) deckActiveSlot = deckList[0].slot;
+}
+async function deckUpsert(playerName, deck, energy){
+  const { error } = await sb.from('megapoke_decks').upsert({ player_name: playerName, deck, energy_types: energy, updated_at: new Date().toISOString() }, { onConflict: 'player_name' });
+  if(error) throw error;
+}
+async function saveActiveDeck(){
+  const d = deckList.find(x => x.slot === deckActiveSlot);
+  await deckUpsert(getMyName(), d ? ['@slot:' + d.slot, ...d.cards] : [], d ? d.energy : []);
+}
+async function saveDeckSlot(d){
+  await deckUpsert(`${getMyName()}#${d.slot}`, ['@name:' + d.name, ...d.cards], d.energy);
+  if(d.slot === deckActiveSlot) await saveActiveDeck();
+}
+function deckKeyArt(d){
+  const ids = [...d.cards].sort((a,b) => (CARDS[b].isEx ? 1 : 0) - (CARDS[a].isEx ? 1 : 0) || (CARDS[b].kind === 'creature' ? 1 : 0) - (CARDS[a].kind === 'creature' ? 1 : 0));
+  for(const id of ids){ const art = printsForCard(id).map(printArt).find(Boolean); if(art) return art; }
+  return null;
+}
+async function refreshDeckList(){
+  const listView = document.getElementById('deckListView'), editView = document.getElementById('deckEditView');
+  listView.classList.remove('hidden'); editView.classList.add('hidden');
+  const grid = document.getElementById('deckListGrid');
+  grid.innerHTML = loadingHTML();
+  const ok = await ensureSb();
+  if(!ok){ grid.innerHTML = errorBannerHTML(); return; }
+  try{ await loadDeckList(); }catch(e){ grid.innerHTML = errorBannerHTML(); return; }
+  renderDeckList();
+}
+function renderDeckList(){
+  const grid = document.getElementById('deckListGrid');
+  document.getElementById('deckListCount').textContent = deckList.length;
+  grid.innerHTML = deckList.map(d => {
+    const art = deckKeyArt(d);
+    return `<button type="button" class="deck-slot${d.slot === deckActiveSlot ? ' active' : ''}" data-slot="${d.slot}">
+      <span class="ds-art">${art ? `<img src="${art}" alt="">` : ''}</span>
+      <span class="ds-body"><b></b><span>${d.energy.map(t => `<img src="${ENERGY_IMG[t]}" alt="${t}">`).join('')}${d.cards.length}枚</span></span>
+      ${d.slot === deckActiveSlot ? '<span class="ds-badge">使用中</span>' : ''}
+    </button>`;
+  }).join('') + (deckList.length < DECK_MAX ? '<button type="button" class="deck-slot new" id="newDeckBtn">＋ デッキをつくる</button>' : '');
+  grid.querySelectorAll('.deck-slot[data-slot]').forEach(btn => {
+    const d = deckList.find(x => x.slot === parseInt(btn.dataset.slot, 10));
+    btn.querySelector('.ds-body b').textContent = d.name;
+    btn.addEventListener('click', () => openDeckEditor(d));
+  });
+  const nb = document.getElementById('newDeckBtn');
+  if(nb) nb.addEventListener('click', () => {
+    let slot = 1; while(deckList.some(d => d.slot === slot)) slot++;
+    openDeckEditor({ slot, name: `デッキ${slot}`, cards: [], energy: [], isNew: true });
+  });
+}
+function openDeckEditor(d){
+  document.getElementById('deckListView').classList.add('hidden');
+  document.getElementById('deckEditView').classList.remove('hidden');
+  document.getElementById('deckNameInput').value = d.name;
+  document.getElementById('deckSaveStatus').textContent = '';
+  window.scrollTo(0, 0);
+  refreshDeckBuilder(d);
+}
+async function refreshDeckBuilder(d){
   const gridEl = document.getElementById('deckBuilderGrid');
   gridEl.innerHTML = loadingHTML();
   const ok = await ensureSb();
   if(!ok){ gridEl.innerHTML = errorBannerHTML(); return; }
   const name = getMyName();
   const owned = await getCollection(); // keyed by print id
-  let savedDeck = []; // stored as CARD ids (battle-ready)
-  let savedEnergyTypes = [];
-  if(sb && name){
-    try{
-      const { data } = await sb.from('megapoke_decks').select('deck, energy_types').eq('player_name', name).maybeSingle();
-      if(data && Array.isArray(data.deck)) savedDeck = data.deck;
-      if(data && Array.isArray(data.energy_types)) savedEnergyTypes = data.energy_types;
-    }catch(e){ /* ignore */ }
-  }
+  const savedDeck = d.cards;
+  const savedEnergyTypes = d.energy;
   // convert saved CARD-id deck into a per-PRINT allocation (best-effort: fill whichever owned prints match each card)
   const deckCounts = {}; // keyed by print id
   const cardIdCounts = {};
@@ -3636,25 +3778,45 @@ async function refreshDeckBuilder(){
   }
   renderGrid();
 
-  document.getElementById('saveDeckBtn').onclick = async () => {
-    // deckCounts is per-print; convert to CARD ids for the battle engine
+  const statusEl = document.getElementById('deckSaveStatus');
+  const useBtn = document.getElementById('useDeckBtn');
+  const say = msg => { statusEl.textContent = msg; setTimeout(() => { if(statusEl.textContent === msg) statusEl.textContent = ''; }, 3000); };
+  const paintUse = () => { const on = !d.isNew && d.slot === deckActiveSlot; useBtn.textContent = on ? '使用中' : '対戦で使う'; useBtn.disabled = on; };
+  paintUse();
+  document.getElementById('deleteDeckBtn').classList.toggle('hidden', !!d.isNew);
+  async function save(){
+    // deckCountsはPRINT単位。対戦用にカードIDの並びへ直す
     const deckArr = [];
-    Object.entries(deckCounts).forEach(([printId,n]) => {
-      const cardId = PRINTS[printId].cardId;
-      for(let i=0;i<n;i++) deckArr.push(cardId);
-    });
-    const statusEl = document.getElementById('deckSaveStatus');
-    if(!getMyName()){ statusEl.textContent = '名前を選んでから保存してね'; return; }
-    if(selectedEnergy.size === 0){ statusEl.textContent = 'エネルギータイプを1つ以上選んでね'; return; }
+    Object.entries(deckCounts).forEach(([printId,n]) => { for(let i=0;i<n;i++) deckArr.push(PRINTS[printId].cardId); });
+    if(deckArr.length === 0){ say('カードを1枚以上入れてください'); return false; }
+    if(selectedEnergy.size === 0){ say('エネルギーを1つ以上選んでください'); return false; }
+    d.cards = deckArr;
+    d.energy = Array.from(selectedEnergy);
+    d.name = document.getElementById('deckNameInput').value.trim() || `デッキ${d.slot}`;
+    if(!deckList.includes(d)){ deckList.push(d); deckList.sort((a,b) => a.slot - b.slot); }
+    if(deckList.length === 1) deckActiveSlot = d.slot;
+    try{ await saveDeckSlot(d); }catch(e){ say('保存できませんでした'); return false; }
+    d.isNew = false;
+    document.getElementById('deleteDeckBtn').classList.remove('hidden');
+    paintUse();
+    return true;
+  }
+  document.getElementById('saveDeckBtn').onclick = async () => { if(await save()) say(`保存しました(${d.cards.length}枚)`); };
+  useBtn.onclick = async () => {
+    if(!(await save())) return;
+    deckActiveSlot = d.slot;
+    try{ await saveActiveDeck(); say('このデッキで対戦します'); }catch(e){ say('切り替えできませんでした'); }
+    paintUse();
+  };
+  document.getElementById('deleteDeckBtn').onclick = async () => {
+    if(!confirm(`「${d.name}」を削除する?`)) return;
     try{
-      await sb.from('megapoke_decks').upsert({
-        player_name: getMyName(), deck: deckArr, energy_types: Array.from(selectedEnergy), updated_at: new Date().toISOString()
-      }, { onConflict: 'player_name' });
-      statusEl.textContent = `保存したよ(${deckArr.length}枚)`;
-    }catch(e){
-      statusEl.textContent = '保存に失敗した';
-    }
-    setTimeout(() => { statusEl.textContent = ''; }, 3000);
+      const { error } = await sb.from('megapoke_decks').delete().eq('player_name', `${getMyName()}#${d.slot}`);
+      if(error) throw error;
+      deckList = deckList.filter(x => x !== d);
+      if(deckActiveSlot === d.slot){ deckActiveSlot = deckList.length ? deckList[0].slot : 1; await saveActiveDeck(); }
+      refreshDeckList();
+    }catch(e){ say('削除できませんでした'); }
   };
 }
 
@@ -3744,6 +3906,7 @@ document.getElementById('botMatchBtn').addEventListener('click', startBotMatch);
 document.getElementById('cancelWaitBtn').addEventListener('click', () => document.getElementById('backToLandingBtn').click());
 document.getElementById('openWikiNavBtn').addEventListener('click', () => { location.href = 'wiki.html'; });
 document.getElementById('tabHomeBtn').addEventListener('click', showLanding);
+document.getElementById('backToDeckListBtn').addEventListener('click', refreshDeckList);
 document.getElementById('homeHeroBtn').addEventListener('click', showPackPage);
 document.getElementById('quitBtn').addEventListener('click', () => {
   if(!currentState) return;
