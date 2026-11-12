@@ -2327,7 +2327,12 @@ async function recordMatchIfFinished(){
 let BOT_MODE = false;
 let botBusy = false;
 // 相手が使ったカードを1枚ずつ見せる
-let actShown = null, actQueue = [], actBusy = false;
+let actShown = null, actQueue = [], actBusy = false, renderAfterActs = false;
+function hasNewOppActs(state){
+  const seq = state.actSeq || 0;
+  if(actShown === null || seq <= actShown) return false;
+  return (state.acts || []).some(a => a.seq > actShown && a.slot !== MY_SLOT && CARDS[a.cardId]);
+}
 function queueActs(state){
   const seq = state.actSeq || 0;
   if(actShown === null || seq < actShown){ actShown = seq; return; }
@@ -2335,7 +2340,8 @@ function queueActs(state){
   actShown = seq; playActs();
 }
 function playActs(){
-  if(actBusy || !actQueue.length) return;
+  if(actBusy) return;
+  if(!actQueue.length){ if(renderAfterActs){ renderAfterActs = false; render(); } return; }
   const w = ribbonUntil - Date.now();
   if(w > 0){ clearTimeout(playActs._t); playActs._t = setTimeout(playActs, w + 60); return; }
   actBusy = true;
@@ -2844,6 +2850,8 @@ function closeAttackSheet(){
 
 function render(){
   if(!currentState || !currentState.players) return;
+  // 相手が新しくカードを使った時は、先にそのカードを見せてから盤面(ダメージ・回復など)を反映する
+  if(hasNewOppActs(currentState)){ queueActs(currentState); renderAfterActs = true; return; }
   const state = currentState;
   const me = state.players[MY_SLOT];
   const opp = state.players[otherSlot(MY_SLOT)];
