@@ -1834,13 +1834,31 @@ function canRetreat(state, slot, benchIdx){
   if(p.active.energy.length < cost) return false;
   return true;
 }
+// にげる時に捨てるエネルギー: ワザに使わないタイプ → ワザに要る数より多い分 → 残り、の順で捨てる
+function discardForRetreat(fc, n){
+  const need = {};
+  getEffectiveAttacks(fc).forEach(a => {
+    const c = {};
+    (a.cost || []).forEach(t => { if(t !== '無色') c[t] = (c[t] || 0) + 1; });
+    Object.entries(c).forEach(([t, k]) => { need[t] = Math.max(need[t] || 0, k); });
+  });
+  const left = fc.energy.slice();
+  const have = t => left.filter(x => x === t).length;
+  for(let i = 0; i < n && left.length; i++){
+    let idx = left.findIndex(t => !need[t]);
+    if(idx < 0) idx = left.findIndex(t => have(t) > need[t]);
+    if(idx < 0) idx = left.length - 1;
+    left.splice(idx, 1);
+  }
+  fc.energy = left;
+}
 function doRetreat(state, slot, benchIdx, skipCost){
   const p = state.players[slot];
   const outgoing = p.active;
   if(p.bench[benchIdx]) act(state, slot, p.bench[benchIdx].cardId, 'にげて交代');
   if(!skipCost){
     const cost = effectiveRetreatCost(state, slot);
-    for(let i=0;i<cost;i++) outgoing.energy.pop();
+    discardForRetreat(outgoing, cost);
   }
   if(outgoing.status === 'confusion') outgoing.status = null;
   outgoing.statusBlocked = false;
