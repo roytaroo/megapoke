@@ -2327,11 +2327,28 @@ async function recordMatchIfFinished(){
 let BOT_MODE = false;
 let botBusy = false;
 // 相手が使ったカードを1枚ずつ見せる
-let actShown = null, actQueue = [], actBusy = false, renderAfterActs = false;
+let actShown = null, actQueue = [], actBusy = false, actDone = null;
+let snapQueue = [], snapBusy = false, renderingSnap = false;
 function hasNewOppActs(state){
   const seq = state.actSeq || 0;
-  if(actShown === null || seq <= actShown) return false;
-  return (state.acts || []).some(a => a.seq > actShown && a.slot !== MY_SLOT && CARDS[a.cardId]);
+  const base = snapQueue.length ? (snapQueue[snapQueue.length - 1].actSeq || 0) : actShown;
+  if(base === null || seq <= base) return false;
+  return (state.acts || []).some(a => a.seq > base && a.slot !== MY_SLOT && CARDS[a.cardId]);
+}
+function pumpSnaps(){
+  if(snapBusy) return;
+  const snap = snapQueue.shift();
+  if(!snap){ render(); return; } // 全部見せたら最新の状態を描く
+  snapBusy = true;
+  actDone = () => {
+    const real = currentState;
+    currentState = snap; renderingSnap = true;
+    try{ render(); }finally{ renderingSnap = false; currentState = real; }
+    // 効果の演出を少し見せてから次へ
+    setTimeout(() => { snapBusy = false; pumpSnaps(); }, snapQueue.length ? 700 : 0);
+  };
+  queueActs(snap);
+  if(!actBusy && !actQueue.length){ const f = actDone; actDone = null; f(); }
 }
 function queueActs(state){
   const seq = state.actSeq || 0;
@@ -2341,7 +2358,7 @@ function queueActs(state){
 }
 function playActs(){
   if(actBusy) return;
-  if(!actQueue.length){ if(renderAfterActs){ renderAfterActs = false; render(); } return; }
+  if(!actQueue.length){ if(actDone){ const f = actDone; actDone = null; f(); } return; }
   const w = ribbonUntil - Date.now();
   if(w > 0){ clearTimeout(playActs._t); playActs._t = setTimeout(playActs, w + 60); return; }
   actBusy = true;
@@ -2512,7 +2529,7 @@ async function botRun(){
       if(!BOT_MODE || !s || s.phase === 'finished') break;
       const acting = s.phase === 'playing' && (s.activePlayer === BOT_SLOT || !s.players[BOT_SLOT].active);
       if(acting) await wait(guard === 0 ? 700 : 450); // 考えている間
-      while(actBusy || actQueue.length) await wait(120); // 使ったカードを見せ終わるまで待つ
+      while(actBusy || actQueue.length || snapBusy || snapQueue.length) await wait(120); // 使ったカードを見せ終わるまで待つ
       if(currentState !== s) break; // 待っている間に再戦などで試合が入れ替わった
       if(!botStep()) break;
       render();
@@ -2851,7 +2868,11 @@ function closeAttackSheet(){
 function render(){
   if(!currentState || !currentState.players) return;
   // 相手が新しくカードを使った時は、先にそのカードを見せてから盤面(ダメージ・回復など)を反映する
-  if(hasNewOppActs(currentState)){ queueActs(currentState); renderAfterActs = true; return; }
+  // 届いた状態を1つずつ「カード表示→その効果」の順で再生する
+  if(!renderingSnap){
+    if(hasNewOppActs(currentState)) snapQueue.push(JSON.parse(JSON.stringify(currentState)));
+    if(snapQueue.length || snapBusy){ pumpSnaps(); return; }
+  }
   const state = currentState;
   const me = state.players[MY_SLOT];
   const opp = state.players[otherSlot(MY_SLOT)];
