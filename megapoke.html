@@ -823,9 +823,9 @@
   }
   #tabbar.hidden{ display:none; }
   #tabbar button{ all:unset; box-sizing:border-box; flex:1; display:flex; flex-direction:column; align-items:center; gap:1px; padding:4px 0 5px; font-size:.64rem; font-weight:900; color:#9aa1b8; cursor:pointer; -webkit-tap-highlight-color:transparent; }
-  #tabbar button::before{ content:""; width:20px; height:5px; border:2.5px solid transparent; border-radius:50%; }
+  #tabbar button::before{ content:none; }
   #tabbar button.on{ color:var(--violet-deep); }
-  #tabbar button.on::before{ border-color:var(--halo); box-shadow:0 0 6px rgba(245,184,46,.8); }
+
   #tabbar svg{ width:25px; height:25px; transition:transform .15s; }
   #tabbar button.on svg{ transform:scale(1.12); }
   body.has-tabbar .wrap{ padding-bottom:104px; }
@@ -2792,11 +2792,16 @@ const SND = (() => {
     home:{ bpm:96, chords:[[60,64,67],[55,59,62],[57,60,64],[53,57,60]], lead:'arp', drums:false },
     battle:{ bpm:132, chords:[[57,60,64],[53,57,60],[55,59,62],[52,56,59]], lead:'drive', drums:true },
   };
-  let song = null, songName = null, nextT = 0, step = 0, timer = null;
+  let songName = null, nextT = 0, step = 0, timer = null, songBus = null;
+  // 曲ごとに音量の通り道を分け、切り替える時は前の曲をすぐ消す(伸ばしている音が残って重ならないように)
+  function newSongBus(){
+    if(songBus){ const old = songBus; old.gain.setTargetAtTime(0, ctx.currentTime, 0.05); setTimeout(() => old.disconnect(), 600); }
+    songBus = ctx.createGain(); songBus.gain.value = 1; songBus.connect(bgmBus);
+  }
   function schedStep(t){
     const S = SONGS[songName], beat = 60 / S.bpm, s16 = beat / 4;
     const bar = Math.floor(step / 16) % S.chords.length, pos = step % 16;
-    const ch = S.chords[bar], B = { bus:bgmBus };
+    const ch = S.chords[bar], B = { bus:songBus };
     if(pos === 0) ch.forEach(m => tone(N(m), t, beat * 4, { ...B, type:'triangle', vol:0.12, attack:0.08 }));
     if(S.lead === 'arp'){
       if(pos % 2 === 0){ const m = ch[(pos / 2) % 3] + 12 + (pos >= 8 ? 12 : 0); tone(N(m), t, s16 * 3, { ...B, type:'sine', vol:0.22 }); }
@@ -2820,6 +2825,7 @@ const SND = (() => {
     if(name === songName) return;
     songName = name; step = 0;
     if(!ctx) return;
+    newSongBus();
     nextT = ctx.currentTime + 0.1;
     if(!timer) timer = setInterval(tick, 50);
   }
@@ -2833,7 +2839,7 @@ const SND = (() => {
   function unlock(){
     if(!init()) return;
     if(ctx.state !== 'running') ctx.resume();
-    if(songName && !timer){ nextT = ctx.currentTime + 0.1; timer = setInterval(tick, 50); }
+    if(songName && !timer){ newSongBus(); nextT = ctx.currentTime + 0.1; timer = setInterval(tick, 50); }
   }
   ['pointerdown','touchend','keydown'].forEach(ev => document.addEventListener(ev, unlock, { capture:true, passive:true }));
   document.addEventListener('pointerdown', e => { if(e.target.closest('button')) setTimeout(() => play('tap'), 0); }, { capture:true, passive:true });
