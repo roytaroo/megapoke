@@ -3267,16 +3267,20 @@ function render(){
     let touchStartY = null;
     let swiped = false;
     let previewShown = false;
+    let previewTimer = null; // 少し長押しした時だけ拡大する(触っただけ・スワイプでは出さない)
+    const stopPreviewTimer = () => { if(previewTimer){ clearTimeout(previewTimer); previewTimer = null; } };
     div.addEventListener('touchstart', (e) => {
       touchStartY = e.touches[0].clientY;
       swiped = false;
       div.classList.add('lifted');
-      previewShown = showTouchPreview(cardId);
+      stopPreviewTimer();
+      previewTimer = setTimeout(() => { previewTimer = null; if(touchStartY !== null && !swiped) previewShown = showTouchPreview(cardId); }, 400);
     }, { passive: true });
     div.addEventListener('touchmove', (e) => {
       if(touchStartY === null) return;
       e.preventDefault(); // カード操作中はページ側のスクロールを止める
       const dy = e.touches[0].clientY - touchStartY;
+      if(Math.abs(dy) > 10) stopPreviewTimer(); // 指を動かしたら長押し扱いにしない
       const canSwipe = setupPlayable || playable;
       if(canSwipe && dy < -40){
         if(!swiped){
@@ -3293,6 +3297,7 @@ function render(){
       div.classList.remove('lifted');
       div.classList.remove('swiping');
       touchStartY = null;
+      stopPreviewTimer();
       if(previewShown){ hideTouchPreview(); previewShown = false; }
       e.preventDefault(); // タッチではクリックの疑似発火を止め、スワイプでのみ出す
       if(swiped){
@@ -3305,6 +3310,7 @@ function render(){
       div.classList.remove('swiping');
       touchStartY = null;
       swiped = false;
+      stopPreviewTimer();
       if(previewShown){ hideTouchPreview(); previewShown = false; }
     });
     handRow.appendChild(div);
