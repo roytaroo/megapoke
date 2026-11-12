@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>カード登録フォーム | メガポケ</title>
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f5fb;--card:#fff;--line:#e3e0ee;--ink:#1d1b26;--sub:#6b6780;--acc:#6d4ad8;--acc2:#efeaff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Zen Kaku Gothic New',sans-serif;font-weight:500;-webkit-text-size-adjust:100%}
+main{max-width:560px;margin:0 auto;padding:16px 16px 120px}
+h1{font-size:22px;font-weight:900;margin:8px 0 16px}
+section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
+h2{font-size:15px;font-weight:900;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+label.f{display:block;font-size:13px;color:var(--sub);font-weight:700;margin:10px 0 6px}
+label.f:first-of-type{margin-top:0}
+input[type=text],input[type=number],textarea{width:100%;font:inherit;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink)}
+textarea{min-height:64px;resize:vertical}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{font:inherit;font-size:14px;font-weight:700;padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--ink);cursor:pointer}
+.seg button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.cost{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.cost div{border:1px solid var(--line);border-radius:12px;padding:6px;text-align:center}
+.cost span{display:block;font-size:12px;font-weight:700;color:var(--sub)}
+.cost .n{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:4px}
+.cost button{width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:#fff;font:inherit;font-weight:900;cursor:pointer}
+.cost b{min-width:14px;font-size:16px}
+.toggle{margin-left:auto;font-size:13px}
+.hide{display:none!important}
+.imgs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.imgs button{padding:0;border:2px solid var(--line);border-radius:10px;background:#fff;overflow:hidden;cursor:pointer;aspect-ratio:63/88}
+.imgs button.on{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc2)}
+.imgs img{width:100%;height:100%;object-fit:cover;display:block}
+.note{font-size:12px;color:var(--sub);margin:6px 0 0}
+.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+.bar div{max-width:560px;margin:0 auto;display:flex;gap:8px}
+.bar button{flex:1;font:inherit;font-size:16px;font-weight:900;padding:14px;border-radius:14px;border:0;cursor:pointer}
+#copyBtn{background:var(--acc);color:#fff}
+#resetBtn{flex:0 0 auto;background:var(--acc2);color:var(--acc)}
+pre{white-space:pre-wrap;font:inherit;font-size:13px;background:var(--bg);border-radius:12px;padding:10px;margin:0}
+</style>
+</head>
+<body>
+<main>
+<h1>カード登録フォーム</h1>
+
+<section>
+  <h2>種類</h2>
+  <div class="seg" data-k="kind" data-v="メガモン">
+    <button>メガモン</button><button>グッズ</button><button>サポート</button><button>どうぐ</button>
+  </div>
+</section>
+
+<section>
+  <h2>基本</h2>
+  <label class="f">名前</label><input type="text" id="name">
+  <div class="mon">
+    <label class="f">タイプ</label>
+    <div class="seg" data-k="type"><button>格闘</button><button>悪</button><button>超</button><button>無色</button></div>
+    <label class="f">HP</label><input type="number" id="hp" inputmode="numeric" step="10" min="10" placeholder="例: 70">
+    <label class="f">進化</label>
+    <div class="seg" data-k="evo" data-v="たね"><button>たね</button><button>怪化</button></div>
+    <div id="evoFromBox" class="hide">
+      <label class="f">怪化前のカード</label><input type="text" id="evoFrom" list="baseList" placeholder="選ぶか入力">
+      <datalist id="baseList"></datalist>
+    </div>
+    <label class="f">ex</label>
+    <div class="seg" data-k="ex" data-v="なし"><button>なし</button><button>あり</button></div>
+    <label class="f">にげる</label>
+    <div class="seg" data-k="retreat"><button>0</button><button>1</button><button>2</button><button>3</button><button>4</button></div>
+  </div>
+  <div class="trainer hide">
+    <label class="f">効果</label><textarea id="tEffect"></textarea>
+  </div>
+</section>
+
+<div class="mon">
+  <section id="atk1"></section>
+  <section id="atk2"></section>
+  <section>
+    <h2>特性 <label class="toggle"><input type="checkbox" id="abOn"> あり</label></h2>
+    <div id="abBox" class="hide">
+      <label class="f">名前</label><input type="text" id="abName">
+      <label class="f">効果</label><textarea id="abEffect"></textarea>
+    </div>
+  </section>
+</div>
+
+<section>
+  <h2>レア度・パック</h2>
+  <label class="f">レア度</label>
+  <div class="seg" data-k="rarity"><button>◇1</button><button>◇2</button><button>◇3</button><button>◇4</button><button>☆1</button><button>☆2</button><button>☆3</button><button>👑</button><button>♠</button><button>♣</button><button>DOPA</button><button>PROMO</button></div>
+  <label class="f">パック</label>
+  <div class="seg" data-k="pack"><button>ヒラメキ飯店</button><button>曲者スパイラル</button><button>熱血ワンダホー</button><button>全パック共通</button><button>パックに入れない</button></div>
+</section>
+
+<section>
+  <h2>画像</h2>
+  <div class="imgs" id="imgs"></div>
+  <p class="note" id="imgNote">読み込み中…</p>
+</section>
+
+<section>
+  <h2>メモ</h2>
+  <textarea id="memo" placeholder="自由に"></textarea>
+</section>
+
+<section>
+  <h2>送る内容</h2>
+  <pre id="out"></pre>
+</section>
+</main>
+
+<div class="bar"><div><button id="resetBtn">クリア</button><button id="copyBtn">コピー</button></div></div>
+
+<script>
+const SB_URL='https://kbsdvtjkczhnggamnggd.supabase.co';
+const st={kind:'メガモン',evo:'たね',ex:'なし',img:''};
+const $=id=>document.getElementById(id);
+
+function atkHTML(n){
+  return `<h2>ワザ${n}${n===2?' <label class="toggle"><input type="checkbox" id="a2On"> あり</label>':''}</h2>
+  <div id="a${n}Box" class="${n===2?'hide':''}">
+  <label class="f">名前</label><input type="text" id="a${n}Name">
+  <label class="f">エネルギー</label>
+  <div class="cost">${['格闘','悪','超','無色'].map(t=>`<div><span>${t}</span><div class="n"><button data-c="${n}" data-t="${t}" data-d="-1">−</button><b id="c${n}${t}">0</b><button data-c="${n}" data-t="${t}" data-d="1">＋</button></div></div>`).join('')}</div>
+  <label class="f">ダメージ</label><input type="text" id="a${n}Dmg" inputmode="numeric" placeholder="例: 30 / 20× / 10+ / なし">
+  <label class="f">効果</label><textarea id="a${n}Effect" placeholder="無ければ空欄"></textarea></div>`;
+}
+$('atk1').innerHTML=atkHTML(1); $('atk2').innerHTML=atkHTML(2);
+const cost={1:{},2:{}};
+
+document.querySelectorAll('.seg').forEach(g=>{
+  const k=g.dataset.k;
+  if(g.dataset.v) st[k]=g.dataset.v;
+  g.querySelectorAll('button').forEach(b=>{
+    if(b.textContent===st[k]) b.classList.add('on');
+    b.onclick=()=>{g.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');st[k]=b.textContent;update();};
+  });
+});
+document.addEventListener('click',e=>{
+  const b=e.target.closest('button[data-c]'); if(!b) return;
+  const c=cost[b.dataset.c], t=b.dataset.t;
+  c[t]=Math.max(0,Math.min(5,(c[t]||0)+ +b.dataset.d));
+  $('c'+b.dataset.c+t).textContent=c[t]; update();
+});
+document.addEventListener('input',update);
+document.addEventListener('change',update);
+
+function costText(n){ const s=Object.entries(cost[n]).filter(([,v])=>v>0).map(([t,v])=>t+'×'+v).join(' '); return s||'なし'; }
+const v=id=>($(id).value||'').trim();
+
+function update(){
+  const mon=st.kind==='メガモン';
+  document.querySelectorAll('.mon').forEach(x=>x.classList.toggle('hide',!mon));
+  document.querySelectorAll('.trainer').forEach(x=>x.classList.toggle('hide',mon));
+  $('evoFromBox').classList.toggle('hide',st.evo!=='怪化');
+  $('a2Box').classList.toggle('hide',!$('a2On').checked);
+  $('abBox').classList.toggle('hide',!$('abOn').checked);
+  const L=[];
+  L.push('種類: '+st.kind,'名前: '+v('name'));
+  if(mon){
+    L.push('タイプ: '+(st.type||''),'HP: '+v('hp'),'進化: '+(st.evo==='怪化'?(v('evoFrom')||'?')+'から怪化':'たね'),'ex: '+st.ex,'にげる: '+(st.retreat??''));
+    const atks=[1].concat($('a2On').checked?[2]:[]);
+    atks.forEach(n=>L.push(`ワザ${n}: ${v('a'+n+'Name')} / ${costText(n)} / ${v('a'+n+'Dmg')||'なし'} / ${v('a'+n+'Effect')||'効果なし'}`));
+    if($('abOn').checked) L.push(`特性: ${v('abName')} / ${v('abEffect')}`);
+  } else L.push('効果: '+v('tEffect'));
+  L.push('レア度: '+(st.rarity||''),'パック: '+(st.pack||''),'画像: '+(st.img||'未選択'));
+  if(v('memo')) L.push('メモ: '+v('memo'));
+  $('out').textContent=L.join('\n');
+}
+
+$('copyBtn').onclick=async()=>{
+  const t=$('out').textContent;
+  try{await navigator.clipboard.writeText(t);}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();}
+  $('copyBtn').textContent='コピーした'; setTimeout(()=>$('copyBtn').textContent='コピー',1500);
+};
+$('resetBtn').onclick=()=>{ if(confirm('入力を消しますか？')) location.reload(); };
+
+(async()=>{
+  try{
+    const html=await (await fetch('megapoke.html',{cache:'no-store'})).text();
+    const key=(html.match(/sb_publishable_[A-Za-z0-9_-]+/)||[])[0];
+    const names=[...html.matchAll(/name:'([^']+)',\s*type:'[^']+',\s*hp:\d+,\s*basic:true/g)].map(m=>m[1]);
+    $('baseList').innerHTML=[...new Set(names)].map(n=>`<option value="${n}">`).join('');
+    const r=await fetch(SB_URL+'/storage/v1/object/list/card-images',{method:'POST',headers:{apikey:key,'Content-Type':'application/json'},body:JSON.stringify({prefix:'',limit:1000,sortBy:{column:'created_at',order:'desc'}})});
+    const files=(await r.json()).map(f=>f.name).filter(n=>n&&!html.includes(n)&&!/^(pack|deck|name|Untitled design)/i.test(n));
+    $('imgNote').textContent=files.length?'まだゲームに入っていない画像。タップで選択':'新しい画像はありません。Supabaseのcard-imagesに上げてから開き直してください';
+    $('imgs').innerHTML=files.map(n=>`<button data-img="${n}"><img loading="lazy" src="${SB_URL}/storage/v1/object/public/card-images/${encodeURIComponent(n)}"></button>`).join('');
+    $('imgs').onclick=e=>{const b=e.target.closest('button');if(!b)return;const on=!b.classList.contains('on');$('imgs').querySelectorAll('button').forEach(x=>x.classList.remove('on'));if(on)b.classList.add('on');st.img=on?b.dataset.img:'';update();};
+  }catch(e){ $('imgNote').textContent='画像の一覧を読めませんでした'; }
+  update();
+})();
+update();
+</script>
+</body>
+</html>

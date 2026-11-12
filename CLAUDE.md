@@ -12,7 +12,8 @@
 - **使用量に厳しいユーザー。** 無駄に重い作業をしない。スクショを画像で確認するのは、見た目を大きく変えた時か頼まれた時だけ。原因がわからない時は、先に一言聞いてから動く
 - **`megapoke.html`を丸ごと出力・引用しない。** 約0.85MBあり、カード定義の行などにbase64画像が埋め込まれている。grepする時は`| cut -c1-200`で行を切るか、base64を潰したコピーで探す。編集は該当箇所だけ
 - 編集後は必ず: `<script>`の中身を取り出して`node --check`、ルールを触ったらNodeで簡易シミュレーション(成功/失敗の両パターン)
-- 新カードは、ユーザーがカード情報(テンプレか短文)+Supabaseの画像URLで送ってくる。画像を開いて読む必要はない。URLをそのまま`image`に書く
+- 新カードは、ユーザーが**カード登録フォーム**(https://megapoke.pages.dev/cardform.html 、`cardform.html`)でコピーした文を送ってくる。「画像:」はSupabase`card-images`のファイル名なので、`https://kbsdvtjkczhnggamnggd.supabase.co/storage/v1/object/public/card-images/ファイル名`を`image`に書く。画像は開いて見ない(会話が重くなる)
+- バケットの一覧は公開キー(`sb_publishable_…`)で`POST /storage/v1/object/list/card-images`で取れる(ユーザーがSELECTポリシーを追加済み。ダッシュボードの警告は「却下」でいい)。`pack.PNG`・`deck.PNG`・`name.PNG`・`Untitled design*.png`はカードではない
 - 新しい効果は、まず下の「実装済みメカニクス」で表現できないか確認してから新規実装する
 - ルールの決定事項(下記)を勝手に変えない
 
@@ -24,7 +25,7 @@
 - ルールを変えたら、wikiのルール文(手書き)も直す
 - **wikiに載せるのは絵のあるカードだけ**(絵の無い試作カードは出さない)。説明は短く。同じ情報を2か所に書かない
 - 一覧の画像は軽い`thumbs/*.webp`を使う(元画像は1枚1〜2MB)。**新しいカードやパックの画像を足したら`python3 tools/make_thumbs.py`を実行してcommit**(忘れてもwikiは元画像で表示される)。環境「megapoke」は画像サーバー(supabase)を許可済みなので、絵入りの見た目を確認できる
-- **カード画像はこっちで作れる**: 絵(イラスト)だけもらえば、`tools/cardmaker/`で枠・文字・絵入りのカード画像を作って`cards/*.webp`に置ける(手順はREADME)。`image:'cards/名前.webp'`と書けばSupabaseに上げなくていい。効果を任された時は「実装済みメカニクス」だけで組む
+- **画像は必ずSupabaseの`card-images`に置く**(リポジトリに置かない)。カードの絵はユーザーが自分で作る(Claudeの絵は不評でやめた)
 
 ## コードの構成(megapoke.html)
 - `CARDS`(性能データ)と`PRINTS`(刷り・レア度・絵・`packId`)を分離。1CARDに複数PRINTを持てる
