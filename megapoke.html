@@ -880,6 +880,17 @@
   .pack-stage{ width:50%; }
   .pack-card .pack-open-btn{ width:70%; }
   .pack-swipe-hint{ text-align:center; font-size:.72rem; font-weight:700; color:var(--ink-dim); margin:-4px 0 0; }
+  /* 相手が使ったカードを中央に出す */
+  #actPop{ position:absolute; left:50%; top:46%; z-index:44; width:clamp(110px, 24dvh, 200px); display:flex; flex-direction:column; align-items:center; gap:8px; transform:translate(-50%,-50%) scale(.7); opacity:0; pointer-events:none; transition:opacity .2s ease, transform .3s cubic-bezier(.2,1.4,.4,1); }
+  #actPop.show{ opacity:1; transform:translate(-50%,-50%) scale(1); }
+  #actPop .mcard{ width:100%; aspect-ratio:5/7; border-radius:10px; box-shadow:0 18px 40px rgba(39,48,74,.45); }
+  #actPop .act-cap{ background:#fff; color:var(--ink); font-weight:900; font-size:.92rem; padding:6px 14px; border-radius:999px; box-shadow:0 6px 16px rgba(39,48,74,.25); white-space:nowrap; }
+  #actPop .act-cap span{ color:var(--violet-deep); margin-right:6px; }
+  /* PC: 横に引き伸ばさず、スマホの幅で中央に置く */
+  @media (min-width:700px){
+    #game, #tabbar, .deck-save-bar, .attack-sheet{ max-width:480px; margin-left:auto; margin-right:auto; }
+    #game{ box-shadow:0 0 0 1px rgba(106,76,255,.12), 0 0 60px rgba(39,48,74,.18); }
+  }
 </style>
 </head>
 <body>
@@ -980,6 +991,7 @@
 
   <!-- ===== GAME ===== -->
   <div id="game" class="hidden">
+    <div id="actPop"></div>
     <div class="g-top">
       <div class="ptag" id="oppTag"></div>
       <div id="oppHandRow" class="opp-hand-row"></div>
@@ -1254,6 +1266,11 @@ function clearRoomSession(){
   sessionStorage.removeItem('megapoke_room_slot');
 }
 
+// 相手に見せる「使ったカード」の記録(画面中央に1枚ずつ出す)
+function act(state, slot, cardId, label){
+  state.actSeq = (state.actSeq || 0) + 1;
+  state.acts = (state.acts || []).concat({ seq: state.actSeq, slot, cardId, label }).slice(-12);
+}
 function log(state, msg){
   state.log = state.log || [];
   state.log.push(msg);
@@ -1398,6 +1415,7 @@ function useAbility(state, slot, target){
   const p = state.players[slot];
   const card = CARDS[p.active.cardId];
   const ab = card.ability;
+  act(state, slot, p.active.cardId, `特性「${ab.name}」`);
   if(ab.effect === 'heal10'){
     p.active.damage = Math.max(0, p.active.damage - 10);
     p.active.hp = Math.min(p.active.maxHp, p.active.hp + 10);
@@ -1577,6 +1595,7 @@ function playTrainer(state, slot, cardId){
   const card = CARDS[cardId];
   p.hand.splice(p.hand.indexOf(cardId),1);
   p.discard.push(cardId);
+  act(state, slot, cardId, card.kind === 'support' ? 'サポート' : 'グッズ');
   if(card.kind === 'support') p.supporterUsedThisTurn = true;
 
   if(card.effect === 'heal20'){
@@ -1673,6 +1692,7 @@ function playBasic(state, slot, cardId){
   const p = state.players[slot];
   const card = CARDS[cardId];
   p.hand.splice(p.hand.indexOf(cardId),1);
+  act(state, slot, cardId, 'たねを出した');
   const fieldCard = makeFieldCard(cardId);
   if(!p.active){
     p.active = fieldCard;
@@ -1774,6 +1794,7 @@ function attachTool(state, slot, cardId, target){
   const dest = (target && target.where === 'bench') ? p.bench[target.idx] : p.active;
   if(!dest || dest.tool) return;
   p.hand.splice(p.hand.indexOf(cardId),1);
+  act(state, slot, cardId, 'どうぐ');
   dest.tool = cardId;
   log(state, `${nameOf(slot)}が${CARDS[dest.cardId].name}に${card.name}をつけた`);
 }
@@ -1805,6 +1826,7 @@ function canRetreat(state, slot, benchIdx){
 function doRetreat(state, slot, benchIdx, skipCost){
   const p = state.players[slot];
   const outgoing = p.active;
+  if(p.bench[benchIdx]) act(state, slot, p.bench[benchIdx].cardId, 'にげて交代');
   if(!skipCost){
     const cost = effectiveRetreatCost(state, slot);
     for(let i=0;i<cost;i++) outgoing.energy.pop();
@@ -1843,6 +1865,7 @@ function doKaika(state, slot, cardId){
   const target = findKaikaTarget(p, card);
   if(!target) return;
   p.hand.splice(p.hand.indexOf(cardId),1);
+  act(state, slot, cardId, '怪化');
   const before = target.where === 'active' ? p.active : p.bench[target.idx];
   const dmgTaken = before.damage;
   const evolved = {
@@ -1903,6 +1926,7 @@ function doAttack(state, slot, attackIdx, targetBenchIdx){
   const defender = state.players[defSlot];
   const attackerCard = CARDS[attacker.active.cardId];
   const atk = getEffectiveAttacks(attacker.active)[attackIdx];
+  if(atk) act(state, slot, attacker.active.cardId, `ワザ「${atk.name}」`);
 
   attacker.lastCoinFlip = null;
   if(attacker.active.status === 'confusion'){
@@ -2302,6 +2326,24 @@ async function recordMatchIfFinished(){
 /* ================= BOTマッチ(1人用。通信なしで、この端末の中だけで進む) ================= */
 let BOT_MODE = false;
 let botBusy = false;
+// 相手が使ったカードを1枚ずつ見せる
+let actShown = null, actQueue = [], actBusy = false;
+function queueActs(state){
+  const seq = state.actSeq || 0;
+  if(actShown === null || seq < actShown){ actShown = seq; return; }
+  (state.acts || []).forEach(a => { if(a.seq > actShown && a.slot !== MY_SLOT && CARDS[a.cardId]) actQueue.push(a); });
+  actShown = seq; playActs();
+}
+function playActs(){
+  if(actBusy || !actQueue.length) return;
+  const w = ribbonUntil - Date.now();
+  if(w > 0){ clearTimeout(playActs._t); playActs._t = setTimeout(playActs, w + 60); return; }
+  actBusy = true;
+  const a = actQueue.shift(), el = document.getElementById('actPop');
+  el.innerHTML = `${cardFaceHTML(a.cardId)}<div class="act-cap"><span>${nameOf(a.slot)}</span>${a.label}</div>`;
+  el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+  setTimeout(() => { el.classList.remove('show'); setTimeout(() => { actBusy = false; playActs(); }, 250); }, 1400);
+}
 const BOT_SLOT = 'p2';
 const BOT_DECKS = [
   { energy:['悪'], cards:[['mitsu_base',2],['mitsu_ex',2],['pom_ex',2],['kagame_base',2],['bird_base',2],['family_rabbit',2],['item_watermelon',2],['item_akamaru',2],['item_ball',2]] },
@@ -2463,7 +2505,8 @@ async function botRun(){
       const s = currentState;
       if(!BOT_MODE || !s || s.phase === 'finished') break;
       const acting = s.phase === 'playing' && (s.activePlayer === BOT_SLOT || !s.players[BOT_SLOT].active);
-      if(acting) await wait(guard === 0 ? 900 : 750); // 考えている間
+      if(acting) await wait(guard === 0 ? 700 : 450); // 考えている間
+      while(actBusy || actQueue.length) await wait(120); // 使ったカードを見せ終わるまで待つ
       if(currentState !== s) break; // 待っている間に再戦などで試合が入れ替わった
       if(!botStep()) break;
       render();
@@ -2543,14 +2586,14 @@ function cardFaceGenHTML(cardId){
   const c = CARDS[cardId];
   if(!c) return '<div class="mcard back"></div>';
   if(c.kind !== 'creature'){
-    return `<div class="mcard cface tr-${c.kind}"><div class="cf-in"><span class="cf-kind">${c.trainerType || ''}</span><div class="cf-name">${c.name}</div><div class="cf-art">${TRAINER_ICON[c.kind] || '🃏'}</div><div class="cf-text">${c.desc || ''}</div></div></div>`;
+    return `<div class="mcard cface tr-${c.kind}" data-card="${cardId}"><div class="cf-in"><span class="cf-kind">${c.trainerType || ''}</span><div class="cf-name">${c.name}</div><div class="cf-art">${TRAINER_ICON[c.kind] || '🃏'}</div><div class="cf-text">${c.desc || ''}</div></div></div>`;
   }
   const atks = (c.attacks || []).map(a =>
     `<div class="cf-atk"><span class="cf-cost">${a.cost.map(t => `<img src="${ENERGY_IMG[t]}" alt="${t}">`).join('')}</span><span class="cf-an">${a.name}</span><span class="cf-dmg">${a.dmg || ''}</span></div>`
   ).join('');
   const ab = c.ability ? `<div class="cf-ab"><b>特性</b>${c.ability.name}</div>` : '';
   const nameSize = c.name.length <= 4 ? 10.5 : Math.max(6, 10.5 * 4.2 / c.name.length);
-  return `<div class="mcard cface ty-${c.type}"><div class="cf-in"><div class="cf-head"><span class="cf-stage">${c.basic ? 'たね' : '怪化'}</span><span class="cf-name" style="font-size:${nameSize.toFixed(1)}cqw">${c.name}</span><span class="cf-hp"><small>HP</small>${c.hp}</span></div><div class="cf-art">${TYPE_ICON[c.type] || ''}</div>${ab}${atks}</div></div>`;
+  return `<div class="mcard cface ty-${c.type}" data-card="${cardId}"><div class="cf-in"><div class="cf-head"><span class="cf-stage">${c.basic ? 'たね' : '怪化'}</span><span class="cf-name" style="font-size:${nameSize.toFixed(1)}cqw">${c.name}</span><span class="cf-hp"><small>HP</small>${c.hp}</span></div><div class="cf-art">${TYPE_ICON[c.type] || ''}</div>${ab}${atks}</div></div>`;
 }
 
 function slotInner(o, compact){
@@ -2658,7 +2701,9 @@ function fxAnim(el, cls, ms){
   el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls);
   setTimeout(() => el.classList.remove(cls), ms || 700);
 }
+let ribbonUntil = 0; // ターン交代の帯が出ている間は、使ったカードの表示を待たせる
 function fxRibbon(text, cls, delay){
+  ribbonUntil = Math.max(ribbonUntil, Date.now() + (delay || 0) + 1550);
   setTimeout(() => {
     const d = document.createElement('div');
     d.className = 'fx-ribbon ' + (cls || '');
@@ -3238,6 +3283,7 @@ function render(){
   }
 
   runFx(state);
+  queueActs(state);
 }
 
 /* ================= pack opening / collection / deck building ================= */
@@ -3897,6 +3943,14 @@ function openCardViewer(cardId, artOverride, nameOverride){
 function closeCardViewer(){
   document.getElementById('cardViewer').classList.add('hidden');
 }
+// PC(マウス): 場のカード(相手も含む)も右クリックで拡大。手札は手札側で処理済み
+document.getElementById('game').addEventListener('contextmenu', e => {
+  if(e.defaultPrevented) return;
+  const box = e.target.closest('.mcard, .slot');
+  const el = e.target.closest('[data-card]') || (box && box.querySelector('[data-card]'));
+  if(!el) return;
+  e.preventDefault(); openCardViewer(el.dataset.card);
+});
 document.getElementById('cardViewer').addEventListener('click', (e) => {
   if(e.target.id === 'cardViewer') closeCardViewer();
 });
