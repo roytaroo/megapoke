@@ -79,7 +79,7 @@
 ## 実装済みメカニクス
 - カード種別: `creature` / `item`(グッズ) / `support`(サポート、1ターン1枚) / `tool`(どうぐ、1体に1枚、`fieldCard.tool`)
 - 状態異常: どく・やけど・まひ・ねむり・こんらん
-- 特性 onPlay(バトル場に出た時だけ。ベンチでは発動しない): 1枚ドロー、コインで相手に状態異常(`coinInflictOpponent`)
+- 特性 onPlay(バトル場に出た時。ベンチに出しただけでは発動しないが、にげる・きぜつ後の入れ替えでバトル場に出た時は発動する): 1枚ドロー、コインで相手に状態異常(`coinInflictOpponent`)
 - 特性 passive: 被ダメ軽減(`dmgReduceN`)、特定カードの逃げるコスト0(`retreatCostReduceFor`)、相手2点ならワザコスト−1(`costReduceIfBehind`)、相手をきぜつさせたら自分回復(`healSelfOnKO`)、状態異常にならない(`statusImmune`)、指定名グッズ使用時に自分の場全員を追加回復(`healAllOnItemUse`+`itemName`)
 - 特性 activated(ターン1回): 自分10回復(`heal10`)、ベンチにエネルギー(`attachBenchEnergy`)、場の1体を10回復(`healOwnField10`)
 - ワザの追加効果: コイン(`coin`: perHeads / bonus、場の同名数で回数=boardCount)、状態異常(`inflicts`)、相手ベンチ全体(`benchSplash`)、相手エネルギー1個トラッシュ(`discardDefenderEnergy`)、ベンチにエネルギー(`attackEffect:'attachBenchEnergy'`)、シールド(`selfShield`)、コインで即きぜつ(`coinKO`)、自分の残りHPが閾値以下で追加ダメージ(`bonusIfSelfHpBelow`)、コイン表で相手ベンチ1体(選ぶ)に追加ダメージ(`coinBenchDamage`)、指定エネルギーがコスト+α付いてたら状態異常(`bonusEnergyInflict`)、直前の自分の番も同じワザなら追加ダメージ(累積しない、`repeatBonus`)

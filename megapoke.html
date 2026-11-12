@@ -1849,12 +1849,14 @@ function doRetreat(state, slot, benchIdx, skipCost){
   p.active = bench;
   p.retreatedThisTurn = true;
   log(state, `${nameOf(slot)}が${CARDS[p.active.cardId].name}と交代した${skipCost ? '(コスト無視)' : ''}`);
+  triggerOnPlayAbility(state, slot, p.active); // ベンチからバトル場に出た時も「バトル場に出た時」の特性が発動する
 }
 
 function doPromote(state, slot, benchIdx){
   const p = state.players[slot];
   p.active = p.bench.splice(benchIdx,1)[0];
   log(state, `${nameOf(slot)}が${CARDS[p.active.cardId].name}を場に出した`);
+  triggerOnPlayAbility(state, slot, p.active);
 }
 
 function findKaikaTarget(p, card){
