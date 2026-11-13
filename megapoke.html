@@ -80,12 +80,12 @@
   }
   @keyframes spin{ to{ transform:rotate(360deg); } }
   .loading-row{ display:flex; align-items:center; gap:10px; color:var(--ink-dim); font-size:0.88rem; padding:6px 0; }
-  input[type=text]{
+  input[type=text], input[type=email], input[type=password]{
     background:#fff; border:2px solid #dfe5f3; color:var(--ink);
     padding:12px 16px; border-radius:999px; font-family:inherit; font-size:1rem; font-weight:700;
     width:100%; outline:none;
   }
-  input[type=text]:focus{ border-color:var(--violet); }
+  input[type=email]:focus, input[type=password]:focus, input[type=text]:focus{ border-color:var(--violet); }
   .card{ background:var(--panel); border-radius:24px; padding:20px; box-shadow:0 10px 30px rgba(74,62,160,0.10); }
   .center{ text-align:center; }
   .row{ display:flex; gap:10px; }
@@ -721,6 +721,14 @@
   @media (prefers-reduced-motion:reduce){ body::before, .pack-stage img, .pack-stage::before, .wait-rings i{ animation:none !important; } }
   #roomActions > *{ animation:riseIn .45s cubic-bezier(.2,.8,.2,1) both; }
   #roomActions > :nth-child(2){ animation-delay:.06s; } #roomActions > :nth-child(3){ animation-delay:.12s; }
+  .auth-form{ display:flex; flex-direction:column; gap:10px; width:100%; }
+  .auth-form input{ width:100%; box-sizing:border-box; }
+  .auth-tabs{ display:grid; grid-template-columns:1fr 1fr; gap:6px; background:#eef0f8; padding:4px; border-radius:14px; }
+  .auth-tabs button{ background:transparent; color:var(--ink-dim); box-shadow:none; padding:9px; }
+  .auth-tabs button.on{ background:#fff; color:var(--violet-deep); box-shadow:0 2px 6px rgba(39,48,74,.12); }
+  .auth-msg{ min-height:1.2em; margin:0; font-size:.82rem; font-weight:700; color:#d2465c; text-align:center; }
+  .auth-msg.ok{ color:var(--violet-deep); }
+  .auth-link{ background:none; box-shadow:none; color:var(--ink-dim); font-size:.8rem; padding:4px; text-decoration:underline; }
   .sel-title{ font-weight:900; font-size:1.2rem; text-align:center; margin-bottom:14px; line-height:1.3; }
   .sel-title small{ display:block; font-size:.62rem; letter-spacing:.28em; color:var(--violet); }
   .home-menu{ grid-template-columns:repeat(4, 1fr); gap:8px; }
@@ -910,7 +918,7 @@
   <div id="landing">
     <img class="logo-img" src="https://kbsdvtjkczhnggamnggd.supabase.co/storage/v1/object/public/card-images/megapoke_logo.png" alt="メガポケ MEGA POKE">
     <div class="card" id="nameSelect">
-      <div class="sel-title">プレイヤーをえらぶ</div>
+      <div class="sel-title" id="authTitle">ログイン</div>
       <div class="row" style="flex-wrap:wrap; gap:8px;" id="nameButtons"></div>
       <button type="button" class="ghost hidden" id="nameCancelBtn" style="width:100%; margin-top:14px;">戻る</button>
     </div>
@@ -919,7 +927,7 @@
       <div class="home-top">
         <span id="homeAvatar"></span>
         <p id="whoAmI"></p>
-        <button type="button" class="ghost home-rename" id="changeNameBtn">プレイヤー変更</button>
+        <button type="button" class="ghost home-rename" id="changeNameBtn">ログアウト</button>
         <button type="button" class="icon-btn snd-btn" aria-label="音のオンオフ"></button>
       </div>
       <button type="button" class="home-hero" id="homeHeroBtn">
@@ -1217,43 +1225,115 @@ const PLAYER_ICONS = {
 function getMyName(){ return sessionStorage.getItem('megapoke_player_name'); }
 function setMyName(name){ sessionStorage.setItem('megapoke_player_name', name); }
 
-function initNameSelect(){
-  const existing = getMyName();
-  const nameSelectEl = document.getElementById('nameSelect');
-  const roomActionsEl = document.getElementById('roomActions');
-  if(existing){
-    nameSelectEl.classList.add('hidden');
-    roomActionsEl.classList.remove('hidden');
-    window._prevName = null;
-    setTimeout(() => { setTab(window._tab === undefined ? 'home' : window._tab || 'home'); renderHomeHero(); }, 0);
-    document.getElementById('whoAmI').innerHTML = `<small>ようこそ</small>${existing}`;
-    document.getElementById('homeAvatar').innerHTML = PLAYER_ICONS[existing]
-      ? `<img class="name-avatar-img" src="${PLAYER_ICONS[existing]}" alt="">`
-      : `<span class="name-avatar">${existing.charAt(0)}</span>`;
-    return;
-  }
-  nameSelectEl.classList.remove('hidden');
-  roomActionsEl.classList.add('hidden');
-  document.getElementById('nameCancelBtn').classList.toggle('hidden', !window._prevName);
+function showHomeFor(name){
+  document.getElementById('nameSelect').classList.add('hidden');
+  document.getElementById('roomActions').classList.remove('hidden');
+  setTimeout(() => { setTab(window._tab === undefined ? 'home' : window._tab || 'home'); renderHomeHero(); }, 0);
+  document.getElementById('whoAmI').innerHTML = `<small>ようこそ</small>${escHtml(name)}`;
+  document.getElementById('homeAvatar').innerHTML = PLAYER_ICONS[name]
+    ? `<img class="name-avatar-img" src="${PLAYER_ICONS[name]}" alt="">`
+    : `<span class="name-avatar">${escHtml(name.charAt(0))}</span>`;
+}
+function escHtml(t){ return String(t).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c])); }
+const AUTH_ERR = {
+  'Invalid login credentials':'メールアドレスかパスワードが違います',
+  'User already registered':'このメールアドレスは登録済みです',
+  'Email not confirmed':'確認メールのリンクを開いてからログインしてください',
+  'Password should be at least 6 characters.':'パスワードは6文字以上にしてください',
+};
+function authErrText(e){ const m = (e && e.message) || String(e); return AUTH_ERR[m] || m; }
+// ログイン画面。mode: login / signup / name(プレイヤー名だけ未設定) / recovery(パスワード再設定)
+function authView(mode){
+  document.getElementById('nameSelect').classList.remove('hidden');
+  document.getElementById('roomActions').classList.add('hidden');
+  document.getElementById('nameCancelBtn').classList.add('hidden');
   setTimeout(() => setTab(null), 0);
+  const title = { login:'ログイン', signup:'新規登録', name:'プレイヤー名を決める', recovery:'新しいパスワード' }[mode];
+  document.getElementById('authTitle').textContent = title;
   const box = document.getElementById('nameButtons');
-  box.innerHTML = '';
-  box.className = 'name-grid';
-  PLAYER_NAMES.forEach(name => {
-    const b = document.createElement('button');
-    b.className = 'name-card';
-    const avatar = PLAYER_ICONS[name]
-      ? `<img class="name-avatar-img" src="${PLAYER_ICONS[name]}" alt="${name}">`
-      : `<span class="name-avatar">${name.charAt(0)}</span>`;
-    b.innerHTML = `${avatar}<span>${name}</span>`;
-    b.addEventListener('click', () => {
-      setMyName(name);
-      initNameSelect();
-    });
-    box.appendChild(b);
+  box.className = 'auth-form';
+  const tabs = (mode === 'login' || mode === 'signup')
+    ? `<div class="auth-tabs"><button type="button" data-m="login" class="${mode === 'login' ? 'on' : ''}">ログイン</button><button type="button" data-m="signup" class="${mode === 'signup' ? 'on' : ''}">新規登録</button></div>` : '';
+  const email = (mode === 'login' || mode === 'signup') ? `<input type="email" id="authEmail" placeholder="メールアドレス" autocomplete="email">` : '';
+  const pass = mode !== 'name' ? `<input type="password" id="authPass" placeholder="パスワード(6文字以上)" autocomplete="${mode === 'login' ? 'current-password' : 'new-password'}">` : '';
+  const name = (mode === 'signup' || mode === 'name') ? `<input type="text" id="authName" maxlength="10" placeholder="プレイヤー名(10文字まで)">` : '';
+  const go = { login:'ログイン', signup:'登録する', name:'決定', recovery:'変更する' }[mode];
+  box.innerHTML = `${tabs}${email}${pass}${name}<button type="button" class="gold" id="authGo">${go}</button><p class="auth-msg" id="authMsg"></p>`
+    + (mode === 'login' ? `<button type="button" class="auth-link" id="authForgot">パスワードを忘れた</button>` : '')
+    + (mode === 'name' ? `<button type="button" class="auth-link" id="authOut">ログアウト</button>` : '');
+  const msg = (t, ok) => { const m = document.getElementById('authMsg'); m.textContent = t; m.classList.toggle('ok', !!ok); };
+  const val = id => { const e = document.getElementById(id); return e ? e.value.trim() : ''; };
+  box.querySelectorAll('.auth-tabs button').forEach(b => b.addEventListener('click', () => authView(b.dataset.m)));
+  const forgot = document.getElementById('authForgot');
+  if(forgot) forgot.addEventListener('click', async () => {
+    const em = val('authEmail');
+    if(!em){ msg('メールアドレスを入れてから押してください'); return; }
+    const { error } = await sb.auth.resetPasswordForEmail(em, { redirectTo: location.origin + location.pathname });
+    msg(error ? authErrText(error) : '再設定のメールを送りました', !error);
+  });
+  const out = document.getElementById('authOut');
+  if(out) out.addEventListener('click', async () => { await sb.auth.signOut(); authView('login'); });
+  const goBtn = document.getElementById('authGo');
+  const checkName = async n => {
+    if(!n) return 'プレイヤー名を入れてください';
+    if(n === 'BOT') return 'その名前は使えません';
+    const { data } = await sb.from('megapoke_profiles').select('name').eq('name', n).maybeSingle();
+    return data ? 'その名前はもう使われています' : null;
+  };
+  goBtn.addEventListener('click', async () => {
+    goBtn.disabled = true; msg('');
+    try{
+      if(mode === 'login'){
+        const { error } = await sb.auth.signInWithPassword({ email: val('authEmail'), password: val('authPass') });
+        if(error) throw error;
+        await initNameSelect();
+      }else if(mode === 'signup'){
+        const n = val('authName');
+        const bad = await checkName(n); if(bad){ msg(bad); return; }
+        const { data, error } = await sb.auth.signUp({ email: val('authEmail'), password: val('authPass'), options:{ data:{ player_name: n }, emailRedirectTo: location.origin + location.pathname } });
+        if(error) throw error;
+        if(!data.session){ msg('確認メールを送りました。メールのリンクを開いてからログインしてください', true); return; }
+        await saveProfile(n);
+      }else if(mode === 'name'){
+        const n = val('authName');
+        const bad = await checkName(n); if(bad){ msg(bad); return; }
+        await saveProfile(n);
+      }else if(mode === 'recovery'){
+        const { error } = await sb.auth.updateUser({ password: val('authPass') });
+        if(error) throw error;
+        await initNameSelect();
+      }
+    }catch(e){ msg(authErrText(e)); }
+    finally{ goBtn.disabled = false; }
   });
 }
-initNameSelect();
+async function saveProfile(n){
+  const { error } = await sb.from('megapoke_profiles').insert({ name: n });
+  if(error) throw (error.code === '23505' ? new Error('その名前はもう使われています') : error);
+  await initNameSelect();
+}
+let authWatching = false;
+async function initNameSelect(){
+  if(!(await ensureSb())){
+    authView('login'); document.getElementById('authMsg').textContent = 'サーバーにつながりません。時間をおいて開き直してください'; return;
+  }
+  if(!authWatching){
+    authWatching = true;
+    sb.auth.onAuthStateChange(ev => { if(ev === 'PASSWORD_RECOVERY') authView('recovery'); });
+  }
+  const { data:{ session } } = await sb.auth.getSession();
+  if(!session){ sessionStorage.removeItem('megapoke_player_name'); authView('login'); return; }
+  const { data: prof } = await sb.from('megapoke_profiles').select('name').eq('user_id', session.user.id).maybeSingle();
+  if(!prof){
+    // 確認メール経由で登録した人は、登録時に入れた名前で作る
+    const want = session.user.user_metadata && session.user.user_metadata.player_name;
+    if(want){ const { error } = await sb.from('megapoke_profiles').insert({ name: want }); if(!error) return initNameSelect(); }
+    authView('name'); return;
+  }
+  setMyName(prof.name);
+  showHomeFor(prof.name);
+}
+initNameSelect().catch(e => console.warn(e));
 
 let ROOM_CODE = null;
 let MY_SLOT = null; // 'p1' | 'p2'
@@ -4114,9 +4194,10 @@ document.getElementById('copyInviteBtn').addEventListener('click', async () => {
   setTimeout(() => { statusEl.textContent = ''; }, 4000);
 });
 document.getElementById('nameCancelBtn').addEventListener('click', () => { if(window._prevName){ setMyName(window._prevName); initNameSelect(); } });
-document.getElementById('changeNameBtn').addEventListener('click', () => {
-  window._prevName = getMyName();
+document.getElementById('changeNameBtn').addEventListener('click', async () => {
+  if(!confirm('ログアウトしますか？')) return;
   sessionStorage.removeItem('megapoke_player_name');
+  if(sb) await sb.auth.signOut();
   initNameSelect();
 });
 

@@ -35,6 +35,7 @@
 - ワザ一覧は必ず`getEffectiveAttacks(fieldCard)`経由(どうぐで怪化前のワザが増えるため)
 - 対象を選ばせるUIは`pendingTarget`(type: energy / ability / attack / tool)の共通の仕組み
 - 絵が無いカード・画像が読めなかったカードは`cardFaceGenHTML()`が仮のカード面を自動生成。画像読み込み失敗は`handleImgFail()`が拾って「？」を出さない
+- **ログイン(2026年11月〜)**: Supabase Authのメール+パスワード。新規登録でプレイヤー名(10文字まで、重複不可)を決め、`megapoke_profiles`(user_id↔name)に保存。起動時に`initNameSelect()`がセッション→プロフィールを読み、`setMyName()`してホームへ。画面は`authView(mode)`(login/signup/name/recovery)。ホーム右上は「ログアウト」。旧データは引き継がない方針で消した。RLSは`tools/auth_setup.sql`(本人の名前=`megapoke_my_name()`の行だけ書ける。デッキは`名前#番号`も本人扱い。部屋はログインしていれば読み書き可)
 - Supabaseテーブル: `megapoke_rooms` / `megapoke_collections`(所持=PRINT単位、`bonus_packs`列) / `megapoke_decks`(デッキ=CARD単位、`energy_types`列) / `megapoke_match_history` / `megapoke_redeemed_codes`
 
 ## 画面デザイン(2026年11月に全面リニューアル)
