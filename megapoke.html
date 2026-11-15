@@ -889,7 +889,12 @@
   .pack-card:first-child{ margin-left:0; } .pack-card:last-child{ margin-right:0; }
   .pack-stage{ width:50%; }
   .pack-card .pack-open-btn{ width:70%; }
-  .pack-swipe-hint{ text-align:center; font-size:.72rem; font-weight:700; color:var(--ink-dim); margin:-4px 0 0; }
+  .pack-nav{ display:flex; align-items:center; justify-content:center; gap:14px; margin:0; }
+  .pack-nav .icon-btn{ width:38px; height:38px; font-size:1.5rem; line-height:1; color:var(--violet-deep); }
+  .pack-nav .icon-btn:disabled{ opacity:.35; }
+  #packDots{ display:flex; gap:7px; }
+  #packDots i{ width:8px; height:8px; border-radius:50%; background:#d5d0ee; cursor:pointer; }
+  #packDots i.on{ background:var(--violet); width:20px; border-radius:4px; }
   /* 音のオンオフ(スピーカーの形。オフは斜線) */
   .snd-btn{ position:relative; }
   .snd-btn::before{ content:""; position:absolute; inset:0; margin:auto; width:18px; height:18px; background:currentColor;
@@ -956,7 +961,7 @@
     <div class="card stack">
       <div class="page-head"><button type="button" class="back-btn" id="backFromPackBtn" aria-label="戻る">‹</button><div class="page-title">パック</div><span class="page-chip" id="packLimitStatus"></span></div>
       <div id="packSelectGrid" class="pack-select-grid"></div>
-      <p class="pack-swipe-hint">‹ 左右にスワイプでパックを切り替え ›</p>
+      <div class="pack-nav"><button type="button" class="icon-btn" id="packPrev" aria-label="前のパック">‹</button><span id="packDots"></span><button type="button" class="icon-btn" id="packNext" aria-label="次のパック">›</button></div>
       <details class="redeem"><summary>コードを入力</summary>
       <div class="row" style="gap:8px;">
         <input type="text" id="redeemCodeInput" placeholder="特典コードを入力" style="flex:1;">
@@ -3786,6 +3791,22 @@ function renderPackSelectGrid(row){
   grid.querySelectorAll('.pack-open-btn').forEach(btn => {
     btn.addEventListener('click', () => openPack(btn.dataset.pack));
   });
+  // 矢印と点でも切り替えられるように(スワイプできないPCや、気づきにくい人向け)
+  const n = grid.children.length, dots = document.getElementById('packDots');
+  dots.innerHTML = Array.from({ length:n }, (_, i) => `<i data-i="${i}"></i>`).join('');
+  const cur = () => Math.round(grid.scrollLeft / Math.max(1, grid.clientWidth));
+  const go = i => grid.scrollTo({ left: Math.max(0, Math.min(n - 1, i)) * grid.clientWidth, behavior:'smooth' });
+  const sync = () => {
+    const c = cur();
+    dots.querySelectorAll('i').forEach((d, i) => d.classList.toggle('on', i === c));
+    document.getElementById('packPrev').disabled = c <= 0;
+    document.getElementById('packNext').disabled = c >= n - 1;
+  };
+  dots.onclick = e => { const d = e.target.closest('i'); if(d) go(+d.dataset.i); };
+  document.getElementById('packPrev').onclick = () => go(cur() - 1);
+  document.getElementById('packNext').onclick = () => go(cur() + 1);
+  grid.onscroll = () => { clearTimeout(grid._t); grid._t = setTimeout(sync, 60); };
+  sync();
 }
 
 /* 本家ポケポケのパック確率(公表値ベース)。1〜3枚目は確定でダイヤ1、
