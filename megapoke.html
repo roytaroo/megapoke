@@ -1373,9 +1373,16 @@ function clearRoomSession(){
 }
 
 // 相手に見せる「使ったカード」の記録(画面中央に1枚ずつ出す)
-function act(state, slot, cardId, label){
+function act(state, slot, cardId, label, quiet){
   state.actSeq = (state.actSeq || 0) + 1;
-  state.acts = (state.acts || []).concat({ seq: state.actSeq, slot, cardId, label }).slice(-12);
+  const a = { seq: state.actSeq, slot, cardId, label };
+  if(quiet) a.quiet = true; // カードは出さず、盤面の変化だけ1手として見せる(エネルギーなど)
+  state.acts = (state.acts || []).concat(a).slice(-12);
+}
+// 1手ごとの盤面(相手側で、まとめて届いても1手ずつ再生できるように)
+function boardSnap(state){
+  const pick = p => ({ active: p.active, bench: p.bench, points: p.points, pendingEnergy: p.pendingEnergy });
+  return JSON.parse(JSON.stringify({ phase: state.phase, turn: state.turn, activePlayer: state.activePlayer, p1: pick(state.players.p1), p2: pick(state.players.p2) }));
 }
 function log(state, msg){
   state.log = state.log || [];
@@ -1881,6 +1888,7 @@ function attachEnergy(state, slot, target){
   const p = state.players[slot];
   const dest = (target && target.where === 'bench') ? p.bench[target.idx] : p.active;
   if(!dest) return;
+  act(state, slot, dest.cardId, 'エネルギー', true);
   dest.energy.push(p.pendingEnergy);
   log(state, `${nameOf(slot)}が${CARDS[dest.cardId].name}に${dest.energy[dest.energy.length-1]}エネルギーを付けた`);
   p.pendingEnergy = null;
@@ -2414,7 +2422,9 @@ function startHeartbeat(){
 }
 
 async function pushState(){
-  if(BOT_MODE){ botRun(); return true; } // BOT戦は通信しない。自分が動いたらBOTの番を進める
+  if(BOT_MODE){ botRun(); return true; }
+  // 自分の手に、その時点の盤面を付けて送る
+  if(currentState && currentState.players) (currentState.acts || []).forEach(a => { if(a.slot === MY_SLOT && !a.snap) a.snap = boardSnap(currentState); }); // BOT戦は通信しない。自分が動いたらBOTの番を進める
   if(!sb || !ROOM_CODE) return;
   const newUpdatedAt = new Date().toISOString();
   let query = sb.from('megapoke_rooms').update({ state: currentState, updated_at: newUpdatedAt }).eq('room_code', ROOM_CODE);
@@ -2474,7 +2484,7 @@ function pumpSnaps(){
     setTimeout(() => { snapBusy = false; pumpSnaps(); }, snapQueue.length ? 700 : 0);
   };
   queueActs(snap);
-  if(!actBusy && !actQueue.length){ const f = actDone; actDone = null; f(); }
+  if(!actBusy && !actQueue.length && actDone){ const f = actDone; actDone = null; f(); }
 }
 function queueActs(state){
   const seq = state.actSeq || 0;
@@ -2489,6 +2499,7 @@ function playActs(){
   if(w > 0){ clearTimeout(playActs._t); playActs._t = setTimeout(playActs, w + 60); return; }
   actBusy = true;
   const a = actQueue.shift(), el = document.getElementById('actPop');
+  if(a.quiet){ actBusy = false; playActs(); return; }
   el.innerHTML = `${cardFaceHTML(a.cardId)}<div class="act-cap"><span>${nameOf(a.slot)}</span>${a.label}</div>`;
   el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
   sfx('card');
@@ -3135,7 +3146,19 @@ function render(){
   // 相手が新しくカードを使った時は、先にそのカードを見せてから盤面(ダメージ・回復など)を反映する
   // 届いた状態を1つずつ「カード表示→その効果」の順で再生する
   if(!renderingSnap){
-    if(hasNewOppActs(currentState)) snapQueue.push(JSON.parse(JSON.stringify(currentState)));
+    if(hasNewOppActs(currentState)){
+      // まとめて届いた時も、相手の1手ごとの盤面から途中の状態を作って順に再生する
+      const base = snapQueue.length ? (snapQueue[snapQueue.length - 1].actSeq || 0) : actShown;
+      const news = (currentState.acts || []).filter(a => a.seq > base && a.slot !== MY_SLOT && a.snap);
+      news.slice(0, -1).forEach(a => {
+        const st = JSON.parse(JSON.stringify(currentState));
+        st.phase = a.snap.phase; st.turn = a.snap.turn; st.activePlayer = a.snap.activePlayer;
+        ['p1','p2'].forEach(k => Object.assign(st.players[k], a.snap[k]));
+        st.actSeq = a.seq; st.acts = st.acts.filter(x => x.seq <= a.seq);
+        snapQueue.push(st);
+      });
+      snapQueue.push(JSON.parse(JSON.stringify(currentState)));
+    }
     if(snapQueue.length || snapBusy){ pumpSnaps(); return; }
   }
   const state = currentState;
