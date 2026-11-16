@@ -889,6 +889,16 @@
   .pack-card:first-child{ margin-left:0; } .pack-card:last-child{ margin-right:0; }
   .pack-stage{ width:50%; }
   .pack-card .pack-open-btn{ width:70%; }
+  .pack-rate-btn{ background:none; box-shadow:none; color:var(--ink-dim); font-size:.8rem; padding:2px 8px; text-decoration:underline; }
+  .rate-panel{ background:#fff; border-radius:16px; padding:16px; width:min(420px, 92vw); max-height:84vh; overflow-y:auto; display:flex; flex-direction:column; gap:10px; -webkit-user-select:text; user-select:text; }
+  .rate-title{ font-weight:900; font-size:1.05rem; text-align:center; }
+  .rate-title.sm{ font-size:.85rem; color:var(--ink-dim); text-align:left; margin-top:4px; }
+  .rate-table{ width:100%; border-collapse:collapse; font-size:.8rem; }
+  .rate-table th, .rate-table td{ padding:5px 4px; border-bottom:1px solid #eceaf6; text-align:right; font-variant-numeric:tabular-nums; }
+  .rate-table th{ text-align:left; font-weight:700; }
+  .rate-table tr:first-child td{ font-weight:900; color:var(--ink-dim); font-size:.72rem; }
+  .rate-table .rate-sub th{ background:#f5f3fd; color:var(--violet-deep); font-weight:900; }
+  .rate-panel .card-viewer-close{ align-self:center; }
   .pack-nav{ display:flex; align-items:center; justify-content:center; gap:14px; margin:0; }
   .pack-nav .icon-btn{ width:38px; height:38px; font-size:1.5rem; line-height:1; color:var(--violet-deep); }
   .pack-nav .icon-btn:disabled{ opacity:.35; }
@@ -1234,7 +1244,7 @@ function showHomeFor(name){
   document.getElementById('nameSelect').classList.add('hidden');
   document.getElementById('roomActions').classList.remove('hidden');
   setTimeout(() => { setTab(window._tab === undefined ? 'home' : window._tab || 'home'); renderHomeHero(); }, 0);
-  document.getElementById('whoAmI').innerHTML = `<small>ようこそ</small>${escHtml(name)}`;
+  document.getElementById('whoAmI').innerHTML = `${escHtml(name)}`;
   document.getElementById('homeAvatar').innerHTML = PLAYER_ICONS[name]
     ? `<img class="name-avatar-img" src="${PLAYER_ICONS[name]}" alt="">`
     : `<span class="name-avatar">${escHtml(name.charAt(0))}</span>`;
@@ -1419,7 +1429,7 @@ function newGameState(deck1, deck2, energyTypes1, energyTypes2){
   log(state, `${nameOf(state.activePlayer)}が先攻`);
   if(state.players.p1.mulligans > 0) log(state, `プレイヤー1は初手に基本カードが無く、${state.players.p1.mulligans}回引き直した`);
   if(state.players.p2.mulligans > 0) log(state, `プレイヤー2は初手に基本カードが無く、${state.players.p2.mulligans}回引き直した`);
-  log(state, `お互いにたねメガモンを裏側で配置してね(準備完了ボタンで確定)`);
+  log(state, `たねメガモンを裏側で配置(準備完了で確定)`);
   return state;
 }
 function hasBasicInHand(hand){
@@ -1608,7 +1618,7 @@ function handleKnockoutIfNeeded(state, ownerSlot, causeText){
     state.winner = otherSlot(ownerSlot);
     log(state, `${nameOf(ownerSlot)}の場にメガモンがいなくなった。${nameOf(otherSlot(ownerSlot))}の勝利！`);
   }else{
-    log(state, `${nameOf(ownerSlot)}は次に出すメガモンを選んでね`);
+    log(state, `${nameOf(ownerSlot)}が次のメガモンを選択`);
   }
 }
 
@@ -1854,7 +1864,7 @@ function revealSetup(state){
     p.bench.forEach(b => { if(b) b.hidden = false; });
   });
   state.phase = 'playing';
-  log(state, `せーの！お互いのたねメガモンが公開された`);
+  log(state, `たねメガモンを公開`);
   ['p1','p2'].forEach(slot => {
     const p = state.players[slot];
     if(p.active) triggerOnPlayAbility(state, slot, p.active);
@@ -2250,14 +2260,14 @@ function randomRoomCode(){
 async function createRoom(){
   try{
     const ok = await ensureSb();
-    if(!ok){ setLandingStatus('接続できませんでした。時間をおいて試してね。', 'error'); return; }
+    if(!ok){ setLandingStatus('接続できません。時間をおいて再度お試しください', 'error'); return; }
     setLandingStatus('部屋を作ってるよ…', 'info');
     const code = randomRoomCode();
     const { error, status, statusText } = await sb.from('megapoke_rooms').insert({
       room_code: code, player1_id: MY_ID, player2_id: null, player1_name: getMyName() || null, state: {}
     });
     if(error){
-      setLandingStatus('部屋を作れなかった(' + (status||'') + ' ' + (statusText||'') + '): ' + (error.message || error.details || error.hint || JSON.stringify(error)), 'error');
+      setLandingStatus('部屋を作成できませんでした(' + (status||'') + ' ' + (statusText||'') + '): ' + (error.message || error.details || error.hint || JSON.stringify(error)), 'error');
       return;
     }
     ROOM_CODE = code;
@@ -2275,13 +2285,13 @@ async function createRoom(){
 async function joinRoom(){
   try{
     const code = document.getElementById('joinCodeInput').value.trim().toUpperCase();
-    if(!code){ setLandingStatus('部屋コードを入力してね。'); return; }
+    if(!code){ setLandingStatus('部屋コードを入力してください'); return; }
     const ok = await ensureSb();
-    if(!ok){ setLandingStatus('接続できませんでした。時間をおいて試してね。', 'error'); return; }
+    if(!ok){ setLandingStatus('接続できません。時間をおいて再度お試しください', 'error'); return; }
     setLandingStatus('入室中…', 'info');
     const { data, error } = await sb.from('megapoke_rooms').select('*').eq('room_code', code).maybeSingle();
     if(error){ setLandingStatus('検索でエラー: ' + (error.message || JSON.stringify(error)), 'error'); return; }
-    if(!data){ setLandingStatus('その部屋が見つからなかった。', 'error'); return; }
+    if(!data){ setLandingStatus('部屋が見つかりません', 'error'); return; }
     if(data.player2_id && data.player2_id !== MY_ID){ setLandingStatus('この部屋はもう満員みたい。', 'error'); return; }
 
     ROOM_CODE = code;
@@ -2514,7 +2524,7 @@ async function startBotMatch(){
     render();
     botRun();
   }catch(e){
-    setLandingStatus('BOTマッチを始められなかった: ' + (e && e.message ? e.message : String(e)), 'error');
+    setLandingStatus('BOT戦を開始できませんでした: ' + (e && e.message ? e.message : String(e)), 'error');
   }
   if(btn){ btn.disabled = false; btn.textContent = 'ひとりで対戦'; }
 }
@@ -3145,7 +3155,7 @@ function render(){
   const dcBanner = document.getElementById('disconnectBanner');
   const isStale = oppLastSeen && (Date.now() - new Date(oppLastSeen).getTime()) > 15000;
   dcBanner.innerHTML = (isStale && state.phase === 'playing')
-    ? `<div class="disconnect-banner">相手の反応が15秒以上ないよ(通信が切れたかも)</div>`
+    ? `<div class="disconnect-banner">相手の応答が15秒以上ありません</div>`
     : '';
 
   // 盤面
@@ -3251,12 +3261,12 @@ function render(){
   if(state.phase === 'finished'){
     hint = '対戦終了';
   }else if(isSetupPhase){
-    if(me.setupReady){ hint = '相手の配置を待ってるよ'; }
-    else{ bcls = 'mine'; hint = me.active ? 'ベンチにも出せるよ。できたら「準備完了」' : 'たねメガモンを上にスワイプしてバトル場へ'; }
+    if(me.setupReady){ hint = '相手の配置待ち'; }
+    else{ bcls = 'mine'; hint = me.active ? 'ベンチにも出せます。完了したら「準備完了」' : 'たねメガモンを上にスワイプしてバトル場へ'; }
   }else if(needsMyPromote){
     bcls = 'alert'; hint = '次にバトル場に出すメガモンをタップ';
   }else if(!myTurn){
-    hint = (!opp.active && opp.bench.some(Boolean)) ? '相手が次のメガモンを選んでるよ' : 'あいてのターン';
+    hint = (!opp.active && opp.bench.some(Boolean)) ? '相手が次のメガモンを選択中' : 'あいてのターン';
   }else if(isAwaitingTarget){
     bcls = 'alert';
     hint = ({ energy:'エネルギーをつけるメガモンをタップ', tool:'どうぐをつけるメガモンをタップ', ability:'特性を使う相手をタップ' })[pendingTarget.type]
@@ -3670,7 +3680,7 @@ async function refreshStatsPage(){
       : '';
     rankEl.innerHTML = myRecord + (ranking.length
       ? ranking.map(([name,n], i) => `<div class="rank-row r${i+1}"><span class="rank-no">${i+1}</span>${avatar(name)}<span class="rank-name">${name}</span><b>${n}<small>勝</small></b></div>`).join('')
-      : '<div class="sub">まだ対戦記録がないよ</div>');
+      : '<div class="sub">まだ対戦記録がありません</div>');
     histEl.innerHTML = rows.length
       ? rows.map(r => {
           const d = new Date(r.finished_at);
@@ -3682,7 +3692,7 @@ async function refreshStatsPage(){
         }).join('')
       : '';
   }catch(e){
-    rankEl.innerHTML = '読み込みに失敗した';
+    rankEl.innerHTML = '読み込めませんでした';
   }
 }
 
@@ -3693,25 +3703,25 @@ const REDEEM_CODES = {
 };
 async function redeemCode(rawCode){
   const name = getMyName();
-  if(!name) return { ok:false, msg:'名前を選んでから使ってね' };
+  if(!name) return { ok:false, msg:'ログインしてください' };
   const code = (rawCode || '').trim().toUpperCase();
   const def = REDEEM_CODES[code];
-  if(!def) return { ok:false, msg:'そのコードは見つからなかった' };
+  if(!def) return { ok:false, msg:'コードが見つかりません' };
   const ok = await ensureSb();
-  if(!ok) return { ok:false, msg:'接続できなかった。もう一度試してね' };
+  if(!ok) return { ok:false, msg:'接続できません。再度お試しください' };
   try{
     const { data: existing } = await sb.from('megapoke_redeemed_codes')
       .select('*').eq('player_name', name).eq('code', code).maybeSingle();
-    if(existing) return { ok:false, msg:'このコードはもう使用済みだよ' };
+    if(existing) return { ok:false, msg:'使用済みのコードです' };
     const row = await getCollectionRow();
     const cards = row.cards || {};
     if(def.promoPrintId) cards[def.promoPrintId] = (cards[def.promoPrintId] || 0) + 1;
     const newBonus = (row.bonus_packs || 0) + (def.packs || 0);
     await saveCollection(cards, { bonus_packs: newBonus });
     await sb.from('megapoke_redeemed_codes').insert({ player_name: name, code });
-    return { ok:true, msg:`コード適用！ボーナスパック${def.packs}回分と、プロモカードをゲットしたよ` };
+    return { ok:true, msg:`ボーナスパック${def.packs}回分とプロモカードを受け取りました` };
   }catch(e){
-    return { ok:false, msg:'エラーが起きた。もう一度試してね' };
+    return { ok:false, msg:'エラーが発生しました。再度お試しください' };
   }
 }
 
@@ -3752,7 +3762,7 @@ function loadingHTML(text){
   return `<div class="loading-row"><span class="spinner"></span>${text || '読み込み中…'}</div>`;
 }
 function errorBannerHTML(text){
-  return `<div class="error-banner"><span class="err-icon">⚠️</span><div class="err-body">${text || '接続できませんでした。時間をおいて試してね。'}</div></div>`;
+  return `<div class="error-banner"><span class="err-icon">⚠️</span><div class="err-body">${text || '接続できません。時間をおいて再度お試しください'}</div></div>`;
 }
 
 async function refreshCollectionView(){
@@ -3763,12 +3773,9 @@ async function refreshCollectionView(){
 }
 
 function packLimitLabel(row){
-  const bonus = row.bonus_packs || 0;
-  if(bonus > 0) return `ボーナス あと${bonus}回`;
-  const opened = row.packs_opened_total || 0;
-  if(opened < FREE_PACKS) return `無料 あと${FREE_PACKS - opened}回`;
-  if(row.last_pack_date === todayStr()) return 'つぎは明日';
-  return 'きょうの1パック';
+  const bonus = row.bonus_packs || 0, opened = row.packs_opened_total || 0;
+  const n = bonus > 0 ? bonus : opened < FREE_PACKS ? FREE_PACKS - opened : (row.last_pack_date === todayStr() ? 0 : 1);
+  return `残り${n}回`;
 }
 function canOpenPack(row){
   if((row.bonus_packs || 0) > 0) return true;
@@ -3786,11 +3793,13 @@ function renderPackSelectGrid(row){
       <div class="pack-stage"><img src="${pack.image}" alt="${pack.name}"></div>
       <div class="pname">${pack.name}<span class="ptype t-${pack.type}">${pack.type}タイプ</span></div>
       <button type="button" class="pack-open-btn gold" data-pack="${pack.id}" ${openable ? '' : 'disabled'}>開ける</button>
+      <button type="button" class="pack-rate-btn" data-pack="${pack.id}">封入率</button>
     </div>
   `).join('');
   grid.querySelectorAll('.pack-open-btn').forEach(btn => {
     btn.addEventListener('click', () => openPack(btn.dataset.pack));
   });
+  grid.querySelectorAll('.pack-rate-btn').forEach(btn => btn.addEventListener('click', () => showPackRates(btn.dataset.pack)));
   // 矢印と点でも切り替えられるように(スワイプできないPCや、気づきにくい人向け)
   const n = grid.children.length, dots = document.getElementById('packDots');
   dots.innerHTML = Array.from({ length:n }, (_, i) => `<i data-i="${i}"></i>`).join('');
@@ -3848,6 +3857,42 @@ function drawPackCards(packType, packId){
     drawn.push(candidates[Math.floor(Math.random()*candidates.length)]);
   });
   return drawn;
+}
+
+// 封入率(drawPackCards と同じ計算: 1〜3枚目は◇確定、4・5枚目はこのパックにあるレア度だけで SLOT_RARITY_WEIGHTS を割り直す)
+function packRateData(pack){
+  const pool = exclusivePoolFor(pack.type, pack.id);
+  const by = {};
+  pool.forEach(pid => { const r = PRINTS[pid].rarity; (by[r] = by[r] || []).push(pid); });
+  if(!(by.diamond1 && by.diamond1.length)) by.diamond1 = ALL_PRINT_IDS.filter(id => PRINTS[id].rarity === 'diamond1');
+  const avail = new Set(Object.keys(by));
+  const slot = {};
+  [4,5].forEach(n => {
+    const e = Object.entries(SLOT_RARITY_WEIGHTS[n]).filter(([t,w]) => w > 0 && avail.has(t));
+    const tot = e.reduce((a,[,w]) => a + w, 0);
+    slot[n] = tot ? Object.fromEntries(e.map(([t,w]) => [t, w / tot])) : { diamond1:1 };
+  });
+  return { by, slot };
+}
+function pct(x){ if(!x) return '−'; const v = x * 100; return (v >= 10 ? v.toFixed(1) : v >= 1 ? v.toFixed(2) : v.toFixed(3)).replace(/\.?0+$/, '') + '%'; }
+function showPackRates(packId){
+  const pack = PACKS[packId], { by, slot } = packRateData(pack);
+  const tiers = Object.keys(RARITY_LABEL).filter(t => by[t] && (t === 'diamond1' || slot[4][t] || slot[5][t])); // パックから出ないレア度(プロモなど)は載せない
+  const rows = tiers.map(t => `<tr><th>${RARITY_LABEL[t]}</th><td>${t === 'diamond1' ? '100%' : '−'}</td><td>${pct(slot[4][t])}</td><td>${pct(slot[5][t])}</td></tr>`).join('');
+  const cards = tiers.map(t => {
+    const n = by[t].length;
+    const list = by[t].map(pid => `<tr><th>${escHtml(CARDS[PRINTS[pid].cardId].name)}</th><td>${t === 'diamond1' ? pct(1 / n) : '−'}</td><td>${pct((slot[4][t] || 0) / n)}</td><td>${pct((slot[5][t] || 0) / n)}</td></tr>`).join('');
+    return `<tr class="rate-sub"><th colspan="4">${RARITY_LABEL[t]}</th></tr>${list}`;
+  }).join('');
+  const head = '<tr><th></th><td>1〜3枚目</td><td>4枚目</td><td>5枚目</td></tr>';
+  document.getElementById('cardViewerInner').innerHTML = `<div class="rate-panel">
+    <div class="rate-title">${escHtml(pack.name)} 封入率</div>
+    <table class="rate-table">${head}${rows}</table>
+    <div class="rate-title sm">カードごと</div>
+    <table class="rate-table">${head}${cards}</table>
+    <button class="ghost card-viewer-close" id="cardViewerCloseBtn">閉じる</button></div>`;
+  document.getElementById('cardViewer').classList.remove('hidden');
+  document.getElementById('cardViewerCloseBtn').addEventListener('click', closeCardViewer);
 }
 
 async function openPack(packId){
@@ -4079,7 +4124,7 @@ async function refreshDeckBuilder(d){
   function renderGrid(){
     const visibleIds = ALL_PRINT_IDS.filter(id => (owned[id] || 0) > 0);
     if(visibleIds.length === 0){
-      gridEl.innerHTML = '<p class="sub">まだ所持カードが無いよ。パックを開けてね。</p>';
+      gridEl.innerHTML = '<p class="sub">まだカードがありません</p>';
       document.getElementById('deckCount').textContent = 0;
       return;
     }
@@ -4208,7 +4253,7 @@ document.getElementById('copyInviteBtn').addEventListener('click', async () => {
   const statusEl = document.getElementById('copyInviteStatus');
   try{
     await navigator.clipboard.writeText(text);
-    statusEl.textContent = 'コピーしたよ！';
+    statusEl.textContent = 'コピーしました';
   }catch(e){
     statusEl.textContent = text;
   }
