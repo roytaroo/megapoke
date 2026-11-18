@@ -942,6 +942,12 @@
   .dex-tile.none{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; background:#e9e6f5; box-shadow:inset 0 0 0 2px #dcd7ef; color:#a9a3c6; font-weight:900; }
   .dex-tile.none span{ font-size:.95rem; letter-spacing:.06em; }
   .dex-tile.none em{ font-style:normal; font-size:.7rem; }
+  .dbg-row{ display:flex; flex-wrap:wrap; gap:6px; }
+  .dbg-row button{ flex:1 1 auto; padding:9px 10px; font-size:.82rem; }
+  .dbg-row button:not(.gold):not(.danger){ background:#fff; color:var(--violet-deep); box-shadow:inset 0 0 0 1.5px #ddd6ff; }
+  .dbg-row button.danger{ background:#e0566b; color:#fff; box-shadow:none; }
+  .dbg-row select{ flex:1 1 40%; font:inherit; font-size:.85rem; padding:8px; border-radius:12px; border:1.5px solid #ddd6ff; background:#fff; }
+  .dbg-btn.hidden{ display:none; }
   .pack-rate-btn{ background:none; box-shadow:none; color:var(--ink-dim); font-size:.8rem; padding:2px 8px; text-decoration:underline; }
   .rate-panel{ background:#fff; border-radius:16px; padding:16px; width:min(420px, 92vw); max-height:84vh; overflow-y:auto; display:flex; flex-direction:column; gap:10px; -webkit-user-select:text; user-select:text; }
   .rate-title{ font-weight:900; font-size:1.05rem; text-align:center; }
@@ -997,6 +1003,7 @@
         <p id="whoAmI"></p>
         <button type="button" class="ghost home-rename" id="changeNameBtn">ログアウト</button>
         <button type="button" class="icon-btn snd-btn" aria-label="音のオンオフ"></button>
+        <button type="button" class="icon-btn dbg-btn hidden" aria-label="デバッグ">🛠</button>
       </div>
       <button type="button" class="home-hero" id="homeHeroBtn">
         <span class="hero-rays"></span>
@@ -1092,6 +1099,7 @@
       <div id="oppHandRow" class="opp-hand-row"></div>
       <div class="deck-chip" id="oppDeckChip"></div>
       <button type="button" class="icon-btn" id="logToggleBtn" aria-label="ログを見る">📜</button>
+      <button type="button" class="icon-btn dbg-btn hidden" aria-label="デバッグ">🛠</button>
       <button type="button" class="icon-btn snd-btn" aria-label="音のオンオフ"></button>
       <button type="button" class="icon-btn" id="quitBtn" aria-label="対戦をやめる">✕</button>
     </div>
@@ -1411,6 +1419,7 @@ async function initNameSelect(){
     if(want){ const { error } = await sb.from('megapoke_profiles').insert({ name: want }); if(!error) return initNameSelect(); }
     authView('name'); return;
   }
+  window._uid = session.user.id;
   setMyName(prof.name);
   showHomeFor(prof.name);
 }
@@ -3796,6 +3805,89 @@ function renderDex(){
   }).join('') : '<p class="sub">カードがありません</p>';
   grid.querySelectorAll('button.dex-tile').forEach(b => b.onclick = () => openCardViewer(PRINTS[b.dataset.id].cardId, printArt(b.dataset.id)));
 }
+/* ================= デバッグ(管理者だけ。ホームと対戦画面の🛠から開く) =================
+   できることは本人のコレクション書き換え(RLSで本人分しか書けない)と、BOT戦の盤面いじり、保存しない開封プレビューだけ */
+const ADMIN_IDS = ['773a6b5e-1f84-4aad-a3a7-3a13c9eb0739'];
+const isAdmin = () => ADMIN_IDS.includes(window._uid);
+function dbgSync(){ document.querySelectorAll('.dbg-btn').forEach(b => b.classList.toggle('hidden', !isAdmin())); }
+setInterval(dbgSync, 1000);
+function dbgPanel(html){
+  document.getElementById('cardViewerInner').innerHTML = `<div class="rate-panel dbg">${html}<button class="ghost card-viewer-close" id="cardViewerCloseBtn">閉じる</button></div>`;
+  document.getElementById('cardViewer').classList.remove('hidden');
+  document.getElementById('cardViewerCloseBtn').addEventListener('click', closeCardViewer);
+}
+const dbgMsg = t => { const m = document.getElementById('dbgMsg'); if(m) m.textContent = t; };
+async function dbgCollection(fn){
+  if(!(await ensureSb())) return dbgMsg('接続できません');
+  const row = await getCollectionRow();
+  const cards = row.cards || {};
+  const extra = fn(cards, row) || {};
+  await saveCollection(cards, extra);
+  dbgMsg('保存しました'); refreshCollectionView(); renderHomeHero();
+}
+function openDebug(){
+  if(!isAdmin()) return;
+  if(currentState && !document.getElementById('game').classList.contains('hidden')) return openBattleDebug();
+  const packOpts = Object.values(PACKS).map(pk => `<option value="${pk.id}">${pk.name}</option>`).join('');
+  const rarOpts = '<option value="">ランダム</option>' + Object.keys(RARITY_LABEL).filter(r => r !== 'promo').map(r => `<option value="${r}">${RARITY_LABEL[r]}</option>`).join('');
+  dbgPanel(`<div class="rate-title">デバッグ</div>
+    <div class="rate-title sm">パック開封(保存しない)</div>
+    <div class="dbg-row"><select id="dbgPack">${packOpts}</select><select id="dbgRar">${rarOpts}</select></div>
+    <div class="dbg-row"><button class="gold" id="dbgOpen">開封プレビュー</button></div>
+    <div class="rate-title sm">パック回数</div>
+    <div class="dbg-row"><button id="dbgB1">+1回</button><button id="dbgB10">+10回</button><button id="dbgToday">今日の分を戻す</button></div>
+    <div class="rate-title sm">コレクション</div>
+    <div class="dbg-row"><button id="dbgAll">全カード+1枚</button><button class="danger" id="dbgClear">全部消す</button></div>
+    <div class="rate-title sm">対戦</div>
+    <div class="dbg-row"><button id="dbgBot">BOT戦を始める</button></div>
+    <div class="rate-title sm">演出</div>
+    <div class="dbg-row">${Object.keys(TYPE_FX).map(t => `<button data-fx="${t}">衝撃 ${t}</button>`).join('')}</div>
+    <p class="auth-msg ok" id="dbgMsg"></p>`);
+  const $ = id => document.getElementById(id);
+  $('dbgOpen').onclick = async () => {
+    const pack = PACKS[$('dbgPack').value], rar = $('dbgRar').value;
+    const drawn = drawPackCards(pack.type, pack.id);
+    if(rar){
+      const pool = exclusivePoolFor(pack.type, pack.id).filter(id => PRINTS[id].rarity === rar);
+      const any = pool.length ? pool : ALL_PRINT_IDS.filter(id => PRINTS[id].rarity === rar);
+      if(any.length) drawn[4] = any[Math.floor(Math.random() * any.length)];
+    }
+    closeCardViewer();
+    await runPackBigReveal(drawn, pack, new Set([drawn[0]]));
+  };
+  $('dbgB1').onclick = () => dbgCollection((c, r) => ({ bonus_packs: (r.bonus_packs || 0) + 1 }));
+  $('dbgB10').onclick = () => dbgCollection((c, r) => ({ bonus_packs: (r.bonus_packs || 0) + 10 }));
+  $('dbgToday').onclick = () => dbgCollection(() => ({ last_pack_date: null }));
+  $('dbgAll').onclick = () => dbgCollection(c => { ALL_PRINT_IDS.filter(id => printArt(id)).forEach(id => { c[id] = (c[id] || 0) + 1; }); });
+  $('dbgClear').onclick = () => { if(confirm('自分のカードを全部消しますか？')) dbgCollection(c => { Object.keys(c).forEach(k => delete c[k]); }); };
+  $('dbgBot').onclick = () => { closeCardViewer(); startBotMatch(); };
+  document.querySelectorAll('[data-fx]').forEach(b => b.onclick = () => { fxImpact(b, b.dataset.fx, true); fxAnim(b, 'fx-shake', 420); sfx('hit'); });
+}
+// BOT戦の盤面いじり(通信対戦では使えない)
+function openBattleDebug(){
+  if(!BOT_MODE){ dbgPanel('<div class="rate-title">デバッグ</div><p class="sub">BOT戦の時だけ使えます</p>'); return; }
+  const cardOpts = ALL_CARD_IDS.map(id => `<option value="${id}">${escHtml(CARDS[id].name)}</option>`).join('');
+  dbgPanel(`<div class="rate-title">デバッグ(BOT戦)</div>
+    <div class="rate-title sm">手札に加える</div>
+    <div class="dbg-row"><select id="dbgCard">${cardOpts}</select><button id="dbgAdd">加える</button></div>
+    <div class="rate-title sm">盤面</div>
+    <div class="dbg-row"><button id="dbgDmg30">相手に30</button><button id="dbgDmg100">相手に100</button><button id="dbgEn">自分にエネルギー+1</button><button id="dbgHeal">自分を全回復</button></div>
+    <div class="dbg-row"><button id="dbgMyTurn">自分の番にする</button><button id="dbgWin">勝ちにする</button></div>
+    <p class="auth-msg ok" id="dbgMsg"></p>`);
+  const $ = id => document.getElementById(id);
+  const s = () => currentState, me = () => s().players[MY_SLOT], op = () => s().players[otherSlot(MY_SLOT)];
+  const done = t => { dbgMsg(t); render(); };
+  const hurt = n => { const a = op().active; if(!a) return dbgMsg('相手のバトル場が空です'); a.damage += n; a.hp = Math.max(0, a.maxHp - a.damage); handleKnockoutIfNeeded(s(), otherSlot(MY_SLOT), ''); closeCardViewer(); render(); };
+  $('dbgAdd').onclick = () => { me().hand.push($('dbgCard').value); done('加えました'); };
+  $('dbgDmg30').onclick = () => hurt(30);
+  $('dbgDmg100').onclick = () => hurt(100);
+  $('dbgEn').onclick = () => { const a = me().active; if(!a) return dbgMsg('バトル場が空です'); const t = CARDS[a.cardId].type; a.energy.push(t === '無色' ? (me().energyTypes || ['超'])[0] : t); done('付けました'); };
+  $('dbgHeal').onclick = () => { const a = me().active; if(!a) return; a.damage = 0; a.hp = a.maxHp; a.status = null; done('回復しました'); };
+  $('dbgMyTurn').onclick = () => { if(s().activePlayer !== MY_SLOT){ endTurn(s()); } closeCardViewer(); render(); };
+  $('dbgWin').onclick = () => { op().points = 0; me().points = 3; s().phase = 'finished'; s().winner = MY_SLOT; closeCardViewer(); render(); };
+}
+document.addEventListener('click', e => { if(e.target.closest('.dbg-btn')) openDebug(); });
+
 function showStatsPage(){
   setTab('stats');
   hidePages();
