@@ -3,7 +3,7 @@ const fs = require('fs'), vm = require('vm');
 const src = fs.readFileSync(process.argv[2] || '/home/user/megapoke/megapoke.html', 'utf8');
 const a = src.indexOf('const CARDS = {'), b = src.indexOf('/* ================= Supabase room plumbing');
 const stub = new Proxy(function(){}, { get: (t, k) => k === Symbol.toPrimitive ? () => '' : stub, apply: () => stub, construct: () => stub });
-const ctx = { document: stub, window: stub, localStorage: { getItem: () => null, setItem(){}, removeItem(){} }, sessionStorage: { getItem: () => 'x', setItem(){}, removeItem(){} }, navigator: stub, sb: null, ROOM_PLAYER_NAMES: {}, STATUS_LABEL: { poison:'どく', burn:'やけど', paralysis:'まひ', sleep:'ねむり', confusion:'こんらん' }, console, Math, setTimeout(){}, crypto: stub, location: stub };
+const ctx = { document: stub, window: stub, localStorage: { getItem: () => null, setItem(){}, removeItem(){} }, setInterval: () => 0, clearInterval: () => {}, sessionStorage: { getItem: () => 'x', setItem(){}, removeItem(){} }, navigator: stub, sb: null, ROOM_PLAYER_NAMES: {}, STATUS_LABEL: { poison:'どく', burn:'やけど', paralysis:'まひ', sleep:'ねむり', confusion:'こんらん' }, console, Math, setTimeout(){}, crypto: stub, location: stub };
 vm.createContext(ctx);
 vm.runInContext(src.slice(a, b) + '\n;Object.assign(globalThis,{CARDS,newGameState,shuffle,placeSetupBasic,canPlaceSetupBasic,markSetupReady,canPlayBasic,playBasic,canAttachEnergy,attachEnergy,canKaika,doKaika,canPlayTrainer,playTrainer,canPlayTool,attachTool,canUseAbility,useAbility,canRetreat,doRetreat,doPromote,canAttack,doAttack,endTurn,getEffectiveAttacks,canPayCost,effectiveRetreatCost});', ctx);
 const G = ctx, C = G.CARDS, R = n => Math.floor(Math.random() * n), pick = a => a[R(a.length)];

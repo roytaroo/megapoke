@@ -122,13 +122,13 @@
     display:flex; flex-direction:column; gap:12px;
   }
   .home-battle::before{
-    content:''; position:absolute; right:-34px; top:-40px; width:150px; height:150px; border-radius:50%;
+    content:''; position:absolute; right:-34px; top:-66px; width:150px; height:150px; border-radius:50%;
     border:14px solid rgba(255,210,86,0.9); box-shadow:0 0 24px rgba(255,210,86,0.7);
     transform:rotate(-20deg) scaleY(0.42); pointer-events:none;
   }
   .home-battle h2{ margin:0; font-size:1.6rem; line-height:1.2; position:relative; }
   .home-battle p{ margin:-6px 0 2px; font-size:0.82rem; opacity:0.85; position:relative; }
-  .home-battle #createRoomBtn{ width:100%; padding:15px; font-size:1.05rem; position:relative; }
+  .home-battle #createRoomBtn{ width:100%; padding:14px 4px; font-size:.84rem; position:relative; }
   .home-join{ display:flex; gap:8px; position:relative; }
   .home-join input{ flex:1; min-width:0; background:rgba(255,255,255,0.95); border-color:transparent; }
   .home-join button{ flex-shrink:0; padding:12px 18px; }
@@ -377,6 +377,10 @@
     width:100%; display:flex; align-items:center; justify-content:space-between; gap:8px;
     height:min(10cqh, 52px); padding:0 4px;
   }
+  #waiting.searching .room-code, #waiting.searching .sub, #waiting.searching #copyInviteBtn{ display:none; }
+  .turn-timer{ flex:0 0 auto; min-width:34px; text-align:center; font-weight:900; font-size:.85rem; font-variant-numeric:tabular-nums; padding:6px 8px; border-radius:999px; background:#fff; color:var(--violet-deep); box-shadow:0 4px 12px rgba(39,48,74,.08); }
+  .turn-timer:empty{ display:none; }
+  .turn-timer.low{ background:#e0566b; color:#fff; animation:auraPulse .8s ease-in-out infinite; }
   .turn-banner{
     flex:1; min-width:0; text-align:center; font-weight:900; font-size:0.86rem; line-height:1.25;
     padding:7px 12px; border-radius:999px; background:rgba(255,255,255,0.9); color:var(--ink-dim);
@@ -775,6 +779,7 @@
   .home-tile .tile-ic{ width:54px; height:54px; }
   .home-tile .tile-ic img, .home-tile .tile-ic svg{ width:38px; height:38px; }
   .home-tile.t-wiki .tile-ic{ background:#e4eeff; color:var(--violet-deep); }
+  #createRoomBtn{ width:100%; position:relative; background:rgba(255,255,255,.16); color:#fff; border:1.5px solid rgba(255,255,255,.5); box-shadow:none; }
   #botMatchBtn{ width:100%; position:relative; background:rgba(255,255,255,.16); color:#fff; border:1.5px solid rgba(255,255,255,.5); box-shadow:none; }
   /* 下の階層の画面の見出し */
   #packPage .card, #deckPage .card, #statsPage .card{ background:rgba(255,255,255,.84); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); border:1.5px solid #fff; }
@@ -860,8 +865,8 @@
   .hero-cta span{ background:rgba(255,255,255,.92); border-radius:999px; padding:5px 11px; font-size:.68rem; font-weight:900; color:#7a4d00; }
   .hero-cta span:empty{ visibility:hidden; }
   .hero-cta b{ margin-left:auto; background:linear-gradient(180deg,#ffe28a,var(--halo)); color:#5a3a00; border-radius:999px; padding:8px 18px; font-size:.9rem; box-shadow:0 3px 0 var(--halo-deep); }
-  .battle-row{ display:grid; grid-template-columns:1.25fr 1fr; gap:8px; position:relative; }
-  .battle-row button{ padding:14px 6px; font-size:.98rem; width:100%; }
+  .battle-row{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:6px; position:relative; }
+  .battle-row button{ padding:14px 4px; font-size:.84rem; width:100%; white-space:nowrap; }
   #tabbar{
     position:fixed; left:0; right:0; bottom:0; z-index:6; display:flex; justify-content:space-around;
     padding:4px 8px calc(4px + env(safe-area-inset-bottom, 0px)); background:rgba(255,255,255,.93);
@@ -1014,7 +1019,8 @@
       <div class="home-battle">
         <h2>バトル</h2>
         <div class="battle-row">
-          <button id="createRoomBtn" class="gold">ルームをつくる</button>
+          <button id="randomMatchBtn" class="gold">ランダム対戦</button>
+          <button id="createRoomBtn" class="ghost">ルーム作成</button>
           <button id="botMatchBtn" class="ghost">ひとりで対戦</button>
         </div>
         <div class="home-join">
@@ -1111,6 +1117,7 @@
       <div id="oppBoard" class="active-zone"></div>
       <div class="g-mid">
         <div id="turnBanner" class="turn-banner"></div>
+        <span id="turnTimer" class="turn-timer"></span>
         <div id="pendingEnergyBox" class="energy-zone"></div>
       </div>
       <div id="myBoard" class="active-zone"></div>
@@ -1421,9 +1428,32 @@ async function initNameSelect(){
   }
   window._uid = session.user.id;
   setMyName(prof.name);
+  setTimeout(() => syncPoolConfig(), 0);
   showHomeFor(prof.name);
 }
 initNameSelect().catch(e => console.warn(e));
+
+// 持ち時間: 自分の番は0秒で自動で終わる。相手が時間切れのまま動かない時は、5秒待ってからこちらで番を進める
+setInterval(() => {
+  const s = currentState, el = document.getElementById('turnTimer');
+  if(!el) return;
+  const inGame = !document.getElementById('game').classList.contains('hidden');
+  if(BOT_MODE || !ROOM_CODE || !inGame || !s || !s.players || s.phase !== 'playing' || !s.turnDeadline || snapBusy || snapQueue.length){ el.textContent = ''; return; }
+  const left = Math.max(0, Math.ceil((s.turnDeadline - Date.now()) / 1000));
+  el.textContent = left; el.classList.toggle('low', left <= 15);
+  const promoter = ['p1','p2'].find(k => !s.players[k].active && s.players[k].bench.some(Boolean));
+  const actor = promoter || s.activePlayer;
+  if(Date.now() < s.turnDeadline + (actor === MY_SLOT ? 0 : 5000)) return;
+  if(promoter){
+    doPromote(s, promoter, s.players[promoter].bench.findIndex(Boolean));
+    s.turnDeadline = Date.now() + TURN_LIMIT_MS;
+  }else{
+    log(s, `${nameOf(actor)}の時間切れ`);
+    pendingTarget = null;
+    endTurn(s);
+  }
+  pushState(); render();
+}, 1000);
 
 let ROOM_CODE = null;
 let MY_SLOT = null; // 'p1' | 'p2'
@@ -1743,9 +1773,12 @@ function applyStatusEffects(state, slot){
     }
   }
 }
+const TURN_LIMIT_MS = 90000; // 1ターンの持ち時間
 function startTurnSetup(state, slot, isFirstTurnOfGame){
   const p = state.players[slot];
   p.lastDrawn = null;
+  p.turnCount = (p.turnCount || 0) + 1;
+  state.turnDeadline = Date.now() + TURN_LIMIT_MS;
   if(p.active) p.active.statusBlocked = false;
   if(!(isFirstTurnOfGame)){
     if(p.deck.length > 0){
@@ -1757,8 +1790,14 @@ function startTurnSetup(state, slot, isFirstTurnOfGame){
   }
   applyStatusEffects(state, slot);
   if(state.phase === 'finished') return;
-  p.pendingEnergy = p.nextEnergy || p.energyTypes[Math.floor(Math.random()*p.energyTypes.length)];
-  p.nextEnergy = p.energyTypes[Math.floor(Math.random()*p.energyTypes.length)];
+  const rollEnergy = () => p.energyTypes[Math.floor(Math.random()*p.energyTypes.length)];
+  if(isFirstTurnOfGame){
+    p.pendingEnergy = null; // 先攻の最初の番はエネルギーなし(本家と同じ)
+    p.nextEnergy = p.nextEnergy || rollEnergy();
+  }else{
+    p.pendingEnergy = p.nextEnergy || rollEnergy();
+    p.nextEnergy = rollEnergy();
+  }
   p.retreatedThisTurn = false;
   p.supporterUsedThisTurn = false;
   if(p.active){ p.active.turnsInPlay += 1; p.active.abilityUsedThisTurn = false; p.active.shield = 0; }
@@ -2038,7 +2077,7 @@ function doRetreat(state, slot, benchIdx, skipCost){
     const cost = effectiveRetreatCost(state, slot);
     discardForRetreat(outgoing, cost);
   }
-  if(outgoing.status === 'confusion') outgoing.status = null;
+  outgoing.status = null; // ベンチに下がると状態異常はすべて回復(本家と同じ)
   outgoing.statusBlocked = false;
   const bench = p.bench[benchIdx];
   p.bench[benchIdx] = outgoing;
@@ -2066,6 +2105,7 @@ function canKaika(state, slot, cardId){
   const card = CARDS[cardId];
   if(!card || card.basic) return false;
   if(!p.hand.includes(cardId)) return false;
+  if((p.turnCount || 0) < 2) return false; // お互い最初の自分の番は怪化できない(本家と同じ)
   return !!findKaikaTarget(p, card);
 }
 function doKaika(state, slot, cardId){
@@ -2340,14 +2380,14 @@ function randomRoomCode(){
   return s;
 }
 
-async function createRoom(){
+async function createRoom(isPublic){
   try{
     const ok = await ensureSb();
     if(!ok){ setLandingStatus('接続できません。時間をおいて再度お試しください', 'error'); return; }
-    setLandingStatus('部屋を作ってるよ…', 'info');
+    setLandingStatus(isPublic ? '相手を探しています' : '部屋を作成中', 'info');
     const code = randomRoomCode();
     const { error, status, statusText } = await sb.from('megapoke_rooms').insert({
-      room_code: code, player1_id: MY_ID, player2_id: null, player1_name: getMyName() || null, state: {}
+      room_code: code, player1_id: MY_ID, player2_id: null, player1_name: getMyName() || null, state: {}, is_public: !!isPublic
     });
     if(error){
       setLandingStatus('部屋を作成できませんでした(' + (status||'') + ' ' + (statusText||'') + '): ' + (error.message || error.details || error.hint || JSON.stringify(error)), 'error');
@@ -2357,25 +2397,26 @@ async function createRoom(){
     MY_SLOT = 'p1';
     ROOM_PLAYER_NAMES.p1 = getMyName() || null;
     saveRoomSession(code, 'p1');
-    showWaiting(code);
+    showWaiting(code, isPublic);
     subscribeRoom();
     startPolling();
   }catch(e){
-    setLandingStatus('予期しないエラー: ' + (e && e.message ? e.message : String(e)), 'error');
+    setLandingStatus('エラーが発生しました: ' + (e && e.message ? e.message : String(e)), 'error');
   }
 }
 
-async function joinRoom(){
+async function joinRoom(codeArg){
+  const quiet = !!codeArg; // ランダム対戦から呼ばれた時は、失敗しても次の部屋を試すだけ
   try{
-    const code = document.getElementById('joinCodeInput').value.trim().toUpperCase();
+    const code = (codeArg || document.getElementById('joinCodeInput').value).trim().toUpperCase();
     if(!code){ setLandingStatus('部屋コードを入力してください'); return; }
     const ok = await ensureSb();
     if(!ok){ setLandingStatus('接続できません。時間をおいて再度お試しください', 'error'); return; }
     setLandingStatus('入室中…', 'info');
     const { data, error } = await sb.from('megapoke_rooms').select('*').eq('room_code', code).maybeSingle();
-    if(error){ setLandingStatus('検索でエラー: ' + (error.message || JSON.stringify(error)), 'error'); return; }
-    if(!data){ setLandingStatus('部屋が見つかりません', 'error'); return; }
-    if(data.player2_id && data.player2_id !== MY_ID){ setLandingStatus('この部屋はもう満員みたい。', 'error'); return; }
+    if(error){ setLandingStatus('エラーが発生しました: ' + (error.message || JSON.stringify(error)), 'error'); return; }
+    if(!data){ if(!quiet) setLandingStatus('部屋が見つかりません', 'error'); return false; }
+    if(data.player2_id && data.player2_id !== MY_ID){ if(!quiet) setLandingStatus('この部屋は満員です', 'error'); return false; }
 
     ROOM_CODE = code;
     if(!data.player2_id){
@@ -2388,10 +2429,10 @@ async function joinRoom(){
       ROOM_PLAYER_NAMES.p2 = getMyName() || null;
       const initial = newGameState(d1.deck, d2.deck, d1.energyTypes, d2.energyTypes);
       const joinTimestamp = new Date().toISOString();
-      const { error: updErr } = await sb.from('megapoke_rooms')
+      const { data: upd, error: updErr } = await sb.from('megapoke_rooms')
         .update({ player2_id: MY_ID, player2_name: getMyName() || null, state: initial, updated_at: joinTimestamp })
-        .eq('room_code', code);
-      if(updErr){ setLandingStatus('入室に失敗した: ' + (updErr.message || JSON.stringify(updErr)), 'error'); return; }
+        .eq('room_code', code).is('player2_id', null).select('room_code');
+      if(updErr || !upd || !upd.length){ ROOM_CODE = null; if(!quiet) setLandingStatus('入室できませんでした', 'error'); return false; }
       currentState = initial;
       localStateVersion = joinTimestamp;
     }else{
@@ -2406,8 +2447,10 @@ async function joinRoom(){
     startPolling();
     showGame();
     render();
+    return true;
   }catch(e){
-    setLandingStatus('予期しないエラー: ' + (e && e.message ? e.message : String(e)), 'error');
+    if(!quiet) setLandingStatus('エラーが発生しました: ' + (e && e.message ? e.message : String(e)), 'error');
+    return false;
   }
 }
 
@@ -2423,11 +2466,28 @@ function setLandingStatus(msg, type){
   }
 }
 
-function showWaiting(code){
+function showWaiting(code, isPublic){
   setTab(null);
   hidePages();
   document.getElementById('waiting').classList.remove('hidden');
-  document.getElementById('roomCodeDisplay').textContent = code;
+  document.getElementById('roomCodeDisplay').textContent = isPublic ? '' : code;
+  document.getElementById('waiting').classList.toggle('searching', !!isPublic);
+  document.querySelector('#waiting .zone-label').textContent = isPublic ? '相手を探しています' : '相手を待っています';
+}
+// ランダム対戦: 30秒以内に動いている公開部屋があれば入る。無ければ自分で公開部屋を作って待つ
+async function randomMatch(){
+  if(!(await ensureSb())){ setLandingStatus('接続できません。時間をおいて再度お試しください', 'error'); return; }
+  setLandingStatus('相手を探しています', 'info');
+  try{
+    const since = new Date(Date.now() - 30000).toISOString();
+    const { data } = await sb.from('megapoke_rooms').select('room_code, player1_name')
+      .eq('is_public', true).is('player2_id', null).gte('player1_last_seen', since).limit(5);
+    for(const r of (data || [])){
+      if(r.player1_name === getMyName()) continue;
+      if(await joinRoom(r.room_code)) return;
+    }
+  }catch(e){ /* 見つからなければ自分で作る */ }
+  createRoom(true);
 }
 function showGame(){
   setTab(null);
@@ -3817,13 +3877,10 @@ function dbgPanel(html){
   document.getElementById('cardViewerCloseBtn').addEventListener('click', closeCardViewer);
 }
 const dbgMsg = t => { const m = document.getElementById('dbgMsg'); if(m) m.textContent = t; };
-async function dbgCollection(fn){
+async function dbgAdmin(op, n){
   if(!(await ensureSb())) return dbgMsg('接続できません');
-  const row = await getCollectionRow();
-  const cards = row.cards || {};
-  const extra = fn(cards, row) || {};
-  await saveCollection(cards, extra);
-  dbgMsg('保存しました'); refreshCollectionView(); renderHomeHero();
+  const { error } = await sb.rpc('megapoke_admin', { p_op: op, p_n: n || 0 });
+  dbgMsg(error ? 'エラー: ' + error.message : '保存しました'); refreshCollectionView(); renderHomeHero();
 }
 function openDebug(){
   if(!isAdmin()) return;
@@ -3855,11 +3912,11 @@ function openDebug(){
     closeCardViewer();
     await runPackBigReveal(drawn, pack, new Set([drawn[0]]));
   };
-  $('dbgB1').onclick = () => dbgCollection((c, r) => ({ bonus_packs: (r.bonus_packs || 0) + 1 }));
-  $('dbgB10').onclick = () => dbgCollection((c, r) => ({ bonus_packs: (r.bonus_packs || 0) + 10 }));
-  $('dbgToday').onclick = () => dbgCollection(() => ({ last_pack_date: null }));
-  $('dbgAll').onclick = () => dbgCollection(c => { ALL_PRINT_IDS.filter(id => printArt(id)).forEach(id => { c[id] = (c[id] || 0) + 1; }); });
-  $('dbgClear').onclick = () => { if(confirm('自分のカードを全部消しますか？')) dbgCollection(c => { Object.keys(c).forEach(k => delete c[k]); }); };
+  $('dbgB1').onclick = () => dbgAdmin('bonus', 1);
+  $('dbgB10').onclick = () => dbgAdmin('bonus', 10);
+  $('dbgToday').onclick = () => dbgAdmin('today');
+  $('dbgAll').onclick = () => dbgAdmin('all');
+  $('dbgClear').onclick = () => { if(confirm('自分のカードを全部消しますか？')) dbgAdmin('clear'); };
   $('dbgBot').onclick = () => { closeCardViewer(); startBotMatch(); };
   document.querySelectorAll('[data-fx]').forEach(b => b.onclick = () => { fxImpact(b, b.dataset.fx, true); fxAnim(b, 'fx-shake', 420); sfx('hit'); });
 }
@@ -3887,6 +3944,28 @@ function openBattleDebug(){
   $('dbgWin').onclick = () => { op().points = 0; me().points = 3; s().phase = 'finished'; s().winner = MY_SLOT; closeCardViewer(); render(); };
 }
 document.addEventListener('click', e => { if(e.target.closest('.dbg-btn')) openDebug(); });
+// サーバーの抽選(megapoke_open_pack)が使う封入データ。カードやパックを足したら、管理者がゲームを開いた時に自動で更新される
+function poolConfig(){
+  const packs = {};
+  Object.values(PACKS).forEach(pk => {
+    const by = {};
+    exclusivePoolFor(pk.type, pk.id).forEach(id => { const r = PRINTS[id].rarity; (by[r] = by[r] || []).push(id); });
+    packs[pk.id] = { byRarity: by };
+  });
+  const codes = {};
+  Object.entries(REDEEM_CODES).forEach(([c, d]) => { codes[c] = { packs: d.packs || 0, promo: d.promoPrintId || null }; });
+  return { packs, diamond1All: ALL_PRINT_IDS.filter(id => PRINTS[id].rarity === 'diamond1'), weights: SLOT_RARITY_WEIGHTS,
+    freePacks: FREE_PACKS, codes, allArt: ALL_PRINT_IDS.filter(id => printArt(id)) };
+}
+async function syncPoolConfig(){
+  if(!isAdmin() || !sb) return;
+  try{
+    const want = poolConfig();
+    const { data } = await sb.from('megapoke_config').select('value').eq('key', 'pool').maybeSingle();
+    if(data && JSON.stringify(data.value) === JSON.stringify(want)) return;
+    await sb.from('megapoke_config').upsert({ key: 'pool', value: want, updated_at: new Date().toISOString() });
+  }catch(e){ /* 次に開いた時にまた試す */ }
+}
 
 function showStatsPage(){
   setTab('stats');
@@ -3951,15 +4030,8 @@ async function redeemCode(rawCode){
   const ok = await ensureSb();
   if(!ok) return { ok:false, msg:'接続できません。再度お試しください' };
   try{
-    const { data: existing } = await sb.from('megapoke_redeemed_codes')
-      .select('*').eq('player_name', name).eq('code', code).maybeSingle();
-    if(existing) return { ok:false, msg:'使用済みのコードです' };
-    const row = await getCollectionRow();
-    const cards = row.cards || {};
-    if(def.promoPrintId) cards[def.promoPrintId] = (cards[def.promoPrintId] || 0) + 1;
-    const newBonus = (row.bonus_packs || 0) + (def.packs || 0);
-    await saveCollection(cards, { bonus_packs: newBonus });
-    await sb.from('megapoke_redeemed_codes').insert({ player_name: name, code });
+    const { error } = await sb.rpc('megapoke_redeem', { p_code: code });
+    if(error) return { ok:false, msg: (error.message || '').includes('USED') ? '使用済みのコードです' : (error.message || '').includes('NO_CODE') ? 'コードが見つかりません' : 'エラーが発生しました。再度お試しください' };
     return { ok:true, msg:`ボーナスパック${def.packs}回分とプロモカードを受け取りました` };
   }catch(e){
     return { ok:false, msg:'エラーが発生しました。再度お試しください' };
@@ -4146,16 +4218,15 @@ async function openPack(packId){
     document.getElementById('packLimitStatus').textContent = '残り0回';
     return;
   }
-  const opened = row.packs_opened_total || 0;
   const cards = row.cards || {};
-  const drawn = drawPackCards(pack.type, pack.id);
+  // 抽選と保存はサーバー(megapoke_open_pack)でやる。画面側では所持カードを書き換えない
+  const { data: drawn, error } = await sb.rpc('megapoke_open_pack', { p_pack: pack.id });
+  if(error || !Array.isArray(drawn)){
+    const m = (error && error.message) || '';
+    document.getElementById('packLimitStatus').textContent = m.includes('NO_PACKS') ? '残り0回' : m.includes('NO_POOL') ? '準備中です' : '開封できませんでした';
+    return;
+  }
   const newSet = new Set(drawn.filter(id => !cards[id]));
-  drawn.forEach(id => { cards[id] = (cards[id] || 0) + 1; });
-  const useBonus = (row.bonus_packs || 0) > 0;
-  const extraFields = useBonus
-    ? { bonus_packs: row.bonus_packs - 1 }
-    : { packs_opened_total: opened + 1, last_pack_date: todayStr() };
-  await saveCollection(cards, extraFields);
   await refreshCollectionView();
   await runPackBigReveal(drawn, pack, newSet);
   const revealEl = document.getElementById('packReveal');
@@ -4595,8 +4666,9 @@ document.getElementById('logToggleBtn').addEventListener('click', () => {
   box.classList.toggle('hidden');
   btn.setAttribute('aria-expanded', String(!box.classList.contains('hidden')));
 });
-document.getElementById('createRoomBtn').addEventListener('click', createRoom);
-document.getElementById('joinRoomBtn').addEventListener('click', joinRoom);
+document.getElementById('createRoomBtn').addEventListener('click', () => createRoom(false));
+document.getElementById('joinRoomBtn').addEventListener('click', () => joinRoom());
+document.getElementById('randomMatchBtn').addEventListener('click', randomMatch);
 document.getElementById('botMatchBtn').addEventListener('click', startBotMatch);
 document.getElementById('cancelWaitBtn').addEventListener('click', () => document.getElementById('backToLandingBtn').click());
 document.getElementById('openWikiNavBtn').addEventListener('click', () => { location.href = 'wiki.html'; });
